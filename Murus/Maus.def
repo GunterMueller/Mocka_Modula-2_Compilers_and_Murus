@@ -1,0 +1,55 @@
+DEFINITION MODULE Maus;
+
+(* (c) Christian Maurer   v. 3. April 2006
+
+   >>> Nur zur Implementierung von Tastatur und Bildschirm,
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+(* Vor.: [ -z $DISPLAY ], d.h. X-Windows ist nicht aktiv.
+   Eff.: Wenn eine Maus installiert und die Welt auf /dev/input/mice Leserecht
+         hat (ggf. root: chmod 644 ...), ist die Maus initialisiert. *)
+
+TYPE Kommandos = (gehe,                   (* Mausbewegung ohne gedrückte Knüpfe *)
+                  hier, ziehe, hierhin,   (* linker Mausknopf    *)
+                  dort, schiebe, dorthin, (* rechter Mausknopf   *)
+                  da, bewege, dahin);     (* mittlerer Mausknopf *)
+
+PROCEDURE initialisieren (x, y: CARDINAL);
+(* Vor.: s.o.
+   Eff.: Wenn eine Maus installiert ist, ist sie initialisiert.
+         In diesem Fall ist ihr Bereich durch die linke obere Ecke (0, 0)
+         und die rechte untere Ecke (x, y) gegeben. *)
+
+PROCEDURE initialisiert (VAR mfd: CARDINAL): BOOLEAN;
+(* Vor.: s.o.
+   Eff.: Liefert genau dann TRUE, wenn die Maus initialisiert ist. *)
+
+PROCEDURE terminieren;
+(* Vor.: s.o.
+   Eff.: Die Maus ist nicht initialisiert. *)
+
+PROCEDURE positionieren (x, y: CARDINAL);
+(* Vor.: Die Maus ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE KursorSchalten (e: BOOLEAN);
+(* Vor.: Die Maus ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE gegeben (VAR K: Kommandos): BOOLEAN;
+(* Vor.: Die Maus ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn ein Mauskommando im Mauspuffer ist.
+         In diesem Fall ist K dieses Kommando, und dieses Kommando ist
+         jetzt aus dem Mauspuffer entfernt. *)
+
+PROCEDURE PositionLesen (VAR x, y: CARDINAL);
+(* Vor.: Die Maus ist initialisiert.
+   Eff.: (x, y) = (Spalte, Zeile) ist die Position des letzten 
+         Mauskommandos, sofern eins gegeben war, sonst (0, 0). *)
+
+PROCEDURE definieren (x, y, dx, dy: CARDINAL);
+(* Vor.: Die Maus ist initialisiert.
+   Eff.: Die Mausposition ist auf das Innere des Rechtecks mit
+         linker oberer Ecke (x, y), Breite dx und Höhe dy beschränkt. *)
+
+END Maus.

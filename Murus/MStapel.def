@@ -1,0 +1,34 @@
+DEFINITION MODULE MStapel;
+
+(* (c) Christian Maurer   v. 5. Dezember 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Objekte;
+(* Mehrprozeßfähige Stapel (= Kellerspeicher) von Strömen
+   beliebiger aber fester Länge.
+
+   Die Prozeduren einfuegen und entfernen sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. n > 0.
+   Eff.: X ist initialisiert und leer und hat die Stromlänge n. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Stromlänge von X
+         ist als oberster Strom auf X abgelegt. *)
+
+PROCEDURE entfernen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Ab A steht der erste Strom von X der Stromlänge von X
+         und dieser Strom ist jetzt aus X entfernt.
+         Der aufrufende Prozeß war ggf. solange blockiert,
+         bis X einen Strom enthielt. *)
+
+END MStapel.

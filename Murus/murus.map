@@ -1,0 +1,290 @@
+# murus.map
+#
+# (c) Christian Maurer   v. 8. Oktober 2007
+#     Nutzungsbedingungen siehe Murus.mod
+#
+# in /etc/sysconfig/keyboard einbinden: KEYTABLE="murus.map.gz"
+# und dort diese Zeile auskommentieren: COMPOSETABLE=...
+
+keymaps       0,         1,         2,         4,         8,         12
+#             Normal     Umschalt   AltGr      Strg       Alt        Strg+Alt
+#
+#                        noch nicht genutzt:        6,   
+#                                                   Strg+AltGr
+# Vorwahltasten
+#
+keycode  42 = Shift     # Umschalt links
+keycode  54 = Shift     # Umschalt rechts
+# keycode  58 = Caps_Lock # nervt ...
+keycode  58 = Shift     # stattdessen nur Umschalt
+keycode  29 = Control   # Strg links
+keycode  97 = Control   # Strg rechts
+keycode  56 = Alt       # Alt links
+keycode 100 = AltGr     # Alt rechts
+
+# Steuertasten
+# Tiefe       0          1          2          1          2          3
+#
+keycode  28 = Return     F31        F32        F31        F32        F33        # Eingabetaste
+keycode   1 = Escape     F36        F37        F36        F37        F38        # Fluchttaste
+keycode  14 = Delete     F41        F42        F41        F42        F43        # Entfernungstaste
+keycode  15 = Tab        F46        F47        F46        F47        F48        # Tabulatortaste
+
+# Buchstaben-, Ziffern- und Sonderzeichentasten
+#
+keycode  41 = asciicircum  degree                                               # ^  °
+#             0,         1,         2,         4,         8,         12,        # 6,
+#             Normal     Shift      AltGr      Strg       Alt        Strg+Alt   # Strg+AltGr
+# Tiefe       0          1          2          1          2          3          # 4
+#
+keycode   2 = one        exclam                                                 # 1  !
+keycode   3 = two        quotedbl   twosuperior                                 # 2  "  ²
+keycode   4 = three      section    threesuperior                               # 3  §  ³
+keycode   5 = four       dollar                                                 # 4  $
+keycode   6 = five       percent                                                # 5  %
+keycode   7 = six        ampersand                                              # 6  &
+keycode   8 = seven      slash      braceleft                                   # 7  /  {
+keycode   9 = eight      parenleft  bracketleft                                 # 8  (  [
+keycode  10 = nine       parenright bracketright                                # 9  )  ]
+keycode  11 = zero       equal      braceright                                  # 0  =  }
+keycode  12 = ssharp     question   backslash                                   # ß  ?  \
+keycode  13 = apostrophe grave      dead_grave                                  # '  `  è (per Kombination mit e)
+#
+keycode  16 = +q         +Q         at
+keycode  17 = w
+keycode  18 = +e         +E         currency                                    # e  E  Euro
+keycode  19 = r
+keycode  20 = t
+keycode  21 = z
+keycode  22 = u
+keycode  23 = i
+keycode  24 = o
+keycode  25 = p
+keycode  26 = +udiaeresis +Udiaeresis
+keycode  27 = plus       asterisk   asciitilde asterisk   asterisk   dead_tilde
+#
+keycode  30 = a
+keycode  31 = s
+keycode  32 = d
+keycode  33 = f
+keycode  34 = g
+keycode  35 = h
+keycode  36 = j
+keycode  37 = k
+keycode  38 = l
+keycode  39 = +odiaeresis +Odiaeresis
+keycode  40 = +adiaeresis +Adiaeresis
+keycode  43 = numbersign apostrophe dead_acute                                  # Gartenzaun  Apostroph  é (Kombination mit e)
+#
+keycode  86 = less       greater    bar
+keycode  44 = y
+keycode  45 = x
+keycode  46 = c
+keycode  47 = v
+keycode  48 = b
+keycode  49 = n
+keycode  50 = +m         +M         mu
+keycode  51 = comma      semicolon       
+keycode  52 = period     colon                                                  # Punkt, Doppelpunkt
+keycode  53 = minus      underscore
+#
+keycode  57 = space      # Leerzeichen
+
+# Pfeil- und Editiertasten
+#             Normal     Umschalt   AltGr      Strg       Alt        Strg+Alt
+# Tiefe       0          1           2         1           2         3  
+#
+keycode 103 = Up         F51        F52        F51        F52        F53  # Scroll_Backward
+keycode 104 = PageUp     F53        F54        F53        F54        F55  # Scroll_Backward
+keycode 108 = Down       F61        F62        F61        F62        F63  # Scroll_Forward
+keycode 109 = PageDown   F63        F64        F63        F64        F65  # Scroll_Forward
+# keycode 105 = Left       F71        F72        F71        F115       Decr_Console
+keycode 105 = Left       F71        F72        F71        F72        Decr_Console
+# keycode 106 = Right      F76        F77        F76        F116       Incr_Console
+keycode 106 = Right      F76        F77        F76        F77        Incr_Console
+keycode 102 = Home       F81        F82        F81        F82        F83
+keycode 107 = End        F86        F87        F86        F87        F88
+keycode 110 = Insert     F91        F92        F91        F92        F93
+keycode 111 = Remove     F96        F97        F96        F97        F98  # Boot
+
+# # Spezialtasten IBM Thinkpad
+# #
+# keycode 113 = Lautsprecher an_aus
+# keycode 114 = Lautsprecher leiser
+# keycode 115 = Lautsprecher lauter
+# keycode 226 = Werkzeug (blaue Thinkvantage-Taste)
+
+# Numerische Tasten
+#
+keycode  69 = Num_Lock
+keycode  55 = KP_Multiply
+keycode  74 = KP_Subtract
+keycode  71 = KP_7       seven
+keycode  72 = KP_8       eight
+keycode  73 = KP_9       nine
+keycode  75 = KP_4       four
+keycode  76 = KP_5       five
+keycode  77 = KP_6       six
+keycode  78 = KP_Add
+keycode  79 = KP_1       one
+keycode  80 = KP_2       two
+keycode  81 = KP_3       three
+keycode  82 = KP_0       zero
+keycode  83 = KP_Comma   KP_Comma   KP_Comma   KP_Comma   KP_Comma   Boot
+keycode  96 = KP_Enter
+keycode  98 = KP_Divide
+
+# Funktionstasten
+#             Normal     Umschalt   AltGr      Strg       Alt        Strg+Alt
+#
+keycode  59 = F1         F13        Console_13 F13        F25        Console_1
+keycode  60 = F2         F14        Console_14 F14        F26        Console_2
+keycode  61 = F3         F15        Console_15 F15        F27        Console_3
+keycode  62 = F4         F16        Console_16 F16        F28        Console_4
+keycode  63 = F5         F17        Console_17 F17        F29        Console_5
+keycode  64 = F6         F18        Console_18 F18        F30        Console_6
+keycode  65 = F7         F19        Console_19 F19        F40        Console_7
+keycode  66 = F8         F20        Console_20 F20        F50        Console_8
+keycode  67 = F9         F21        Console_21 F21        F60        Console_9
+keycode  68 = F10        F22        Console_22 F22        F70        Console_10
+keycode  87 = F11        F23        Console_23 F23        F80        Console_11
+keycode  88 = F12        F24        Console_24 F24        F90        Console_12
+# control altgr keycode 59 = Console_25 # boot.klog
+# control altgr keycode 60 = Console_26
+# control altgr keycode 61 = Console_27
+# control altgr keycode 62 = Console_28
+# control altgr keycode 63 = Console_29
+# control altgr keycode 64 = Console_30
+# control altgr keycode 65 = Console_31
+# control altgr keycode 66 = Console_32
+# control altgr keycode 67 = Console_33
+# control altgr keycode 68 = Console_34
+# control altgr keycode 87 = Console_35
+# control altgr keycode 88 = Console_36
+
+# Spezialtasten
+#
+keycode  99 = F100       F101       F102       F101       F102       F103       # SysRq/PrintScrn = S-Abfr/Druck
+keycode  70 = F110       F111       F112       F111       F112       F113       # Scroll_Lock = Rollen
+keycode 119 = F120       F121       F122       F121       F122       F123       # Pause/Break = Pause/Untbr
+
+# Windooftasten bei 105er-Tastatur
+#
+keycode 125 = Alt     # Decr_Console
+keycode 126 = AltGr   # Incr_Console
+keycode 127 = Control # Last_Console
+
+# Pfeil- und Editiertasten
+#
+# Up     = "\033[A"
+# Down   = "\033[B"
+# Left   = "\033[D"
+# Right  = "\033[C"
+#
+string Insert   = "\033[2~"  # heißen auch:
+string Remove   = "\033[3~"
+string Home     = "\033[1~"  # Find
+string End      = "\033[4~"  # Select
+string PageUp   = "\033[5~"  # Prior
+string PageDown = "\033[6~"  # Next
+
+# Funktionstasten F1 .. F12
+#
+string F1 = "\033[[A"
+string F2 = "\033[[B"
+string F3 = "\033[[C"
+string F4 = "\033[[D"
+string F5 = "\033[[E"
+string F6 = "\033[17~"
+string F7 = "\033[18~"
+string F8 = "\033[19~"
+string F9 = "\033[20~"
+string F10 = "\033[21~"
+string F11 = "\033[23~"
+string F12 = "\033[24~"
+
+# Umschalt F1 .. F12
+#
+string F13 = "\033[25~"
+string F14 = "\033[26~"
+string F15 = "\033[28~"
+string F16 = "\033[29~"
+string F17 = "\033[31~"
+string F18 = "\033[32~"
+string F19 = "\033[33~"
+string F20 = "\033[34~"
+string F21 = "\033[22~"
+string F22 = "\033[27~"
+string F23 = "\033[30~"
+string F24 = "\033[35~"
+
+# Alt F1 .. F12
+#
+string F25 = "\033[F1~"
+string F26 = "\033[F2~"
+string F27 = "\033[F3~"
+string F28 = "\033[F4~"
+string F29 = "\033[F5~"
+string F30 = "\033[F6~"
+string F40 = "\033[F7~"
+string F50 = "\033[F8~"
+string F60 = "\033[F9~"
+string F70 = "\033[FA~"
+string F80 = "\033[FB~"
+string F90 = "\033[FC~"
+
+# Kombinationen von Umschalt, AltGr,
+# Strg, Alt und Strg+Alt mit Editiertasten
+#
+string F31 = "\033[3B~" # Enter
+string F32 = "\033[3C~"
+string F33 = "\033[3D~"
+string F36 = "\033[36~" # Escape
+string F37 = "\033[37~"
+string F38 = "\033[38~"
+string F41 = "\033[41~" # Delete
+string F42 = "\033[42~"
+string F43 = "\033[43~"
+string F46 = "\033[46~" # Tab
+string F47 = "\033[47~"
+string F48 = "\033[48~"
+string F51 = "\033[51~" # Up
+string F52 = "\033[52~"
+string F53 = "\033[53~" # PageUp
+string F54 = "\033[54~"
+string F55 = "\033[55~"
+string F61 = "\033[61~" # Down
+string F62 = "\033[62~"
+string F63 = "\033[63~" # PageDown
+string F64 = "\033[64~"
+string F65 = "\033[65~"
+string F71 = "\033[71~" # Left
+string F72 = "\033[72~"
+string F76 = "\033[76~" # Right
+string F77 = "\033[77~"
+string F81 = "\033[81~" # Home
+string F82 = "\033[82~"
+string F83 = "\033[83~"
+string F86 = "\033[86~" # End
+string F87 = "\033[87~"
+string F88 = "\033[88~"
+string F91 = "\033[91~" # Insert
+string F92 = "\033[92~"
+string F93 = "\033[93~"
+string F96 = "\033[96~" # Remove
+string F97 = "\033[97~"
+string F99 = "\033[99~"
+string F100 = "\033[X0~" # SysRq/PrintScrn # S-Abfr/Druck
+string F101 = "\033[X1~" #
+string F102 = "\033[X2~" #
+string F103 = "\033[X3~" #
+string F110 = "\033[Y0~" # Scroll_Lock # Rollen
+string F111 = "\033[Y1~" #
+string F112 = "\033[Y2~" # 
+string F113 = "\033[Y3~" #
+# string F115 = "\033[Y5~" # Alt Left
+# string F116 = "\033[Y6~" # Alt Right
+string F120 = "\033[Z0~" # Pause/Break = Pause/Untbr
+string F121 = "\033[Z1~"
+string F122 = "\033[Z2~"
+string F123 = "\033[Z3~"

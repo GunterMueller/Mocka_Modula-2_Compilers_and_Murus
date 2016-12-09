@@ -1,0 +1,93 @@
+DEFINITION MODULE Zeichen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Einzelne sichtbare Zeichen des verwendeten
+                 Zeichensatzes und das Leerzeichen mit Farben *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer.
+         X hat die Farben des Bildschirms. *)
+   
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; C: CHAR);
+(* Vor.: X ist initialisiert. C ist ein sichtbares Zeichen
+         des verwendeten Zeichensatzes oder das Leerzeichen.
+   Eff.: X hat das Zeichen C. *)
+
+PROCEDURE Wert (X: Objekte): CHAR;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert das Zeichen von X. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE,
+         wenn das Zeichen von X das Leerzeichen ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Das Zeichen von X ist das Leerzeichen. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X ist unverändert; X1 stimmt mit X überein. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE,
+         wenn X und X1 das gleiche Zeichen haben. *)
+PROCEDURE aequivalent (X: Objekte; C: CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X einen Buchstaben hat,
+         der bis auf Groß-/Kleinschreibung mit C übereinstimmt,
+         oder wenn C als Zeichen hat. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist oder
+         wenn beide nicht leer sind und das Zeichen von X im verwendeten
+         Zeichensatz die kleinere Ordnungszahl als das von X1 hat. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Das Zeichen von X ist an der Bildschirmposition (Z, S)
+         in seinen Farben ausgegeben.
+         Ist X leer, ist ein Leerzeichen ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das an der Bildschirmposition (Z, S) editierte Zeichen
+         (als Echo in seinen Farben).
+         Ist ein Leerzeichen eingegeben, hat X das Leerzeichen. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines Zeichens als Strom notwendig ist.
+         Diese Zahl ist für alle Zeichen gleich. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Zeichen als Strom codiert.
+   Eff.: X ist das Objekt, das ab A als Zeichenfolge codiert ist. *)
+
+END Zeichen.

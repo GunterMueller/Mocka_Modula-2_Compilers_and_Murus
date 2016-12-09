@@ -1,0 +1,80 @@
+DEFINITION MODULE KBNatZahlen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Natürliche Zahlen <= 2^16 - 2 = 65534,
+                 angereichert um eine undefinierte Zahl ohne Wert. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X keinen Wert hat. *)
+
+PROCEDURE leeren (Z: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Wenn X leer ist, ist X1 auch leer; andernfalls hat X1 den Wert von X.
+         X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und X1 leer sind 
+         oder wenn die Werte von X und X1 gleich sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist 
+         oder wenn beide nicht leer sind und 
+         der Wert von X kleiner als der von X1 ist. *)
+
+PROCEDURE definieren (X: Objekte; N: SHORTCARD);
+(* Vor.: X ist initialisiert. 
+   Eff.: Für N <= 65534 hat Z den Wert N, für N = 65535 ist X leer. *)
+
+PROCEDURE Wert (X: Objekte): SHORTCARD;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert den Wert von X, wenn X nicht leer ist,
+         andernfalls 65535. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Z < Bildschirm.Zeilenzahl, S + 5 < Bildschirm.Spaltenzahl.
+   Eff.: X ist ab Position (Z, S) in der Farbe von X auf dem Bildschirm 
+         ausgegeben. Ist X leer, sind nur Leerzeichen ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Z < Bildschirm.Zeilenzahl, S + 5 < Bildschirm.Spaltenzahl.
+   Eff.: X hat den über die Tastatur auf dem Bildschirm ab Position (Z, S)
+         eingegebenen Wert. Sind nur Leerzeichen eingegeben, ist X leer. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor: X ist initialisiert. F ist ein definierter Font.
+   Eff: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END KBNatZahlen.

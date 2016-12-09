@@ -1,0 +1,55 @@
+DEFINITION MODULE Prozesse;
+
+(* (c) Christian Maurer   v. 5. Dezember 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Bearbeitungen;
+
+TYPE Objekte;
+(* Prozesse auf der Basis des dynamischen Prozeßbegriffs:
+   Zu jedem Zeitpunkt ist mindestens ein Prozeß bereit und mindestens
+   einer der bereiten Prozesse aktiv, d.h. im Besitz eines Prozessors.
+   Jeder bereite Prozeß ist immer wieder einmal aktiv und führt dann
+   genau seine Bearbeitungsprozedur aus.
+   Zu Beginn ist der laufende Prozeß der einzige bereite und daher aktive
+   Prozeß (s. Grundzüge der Nichtsequentiellen Programmierung, S. 44-45).
+
+   ("Aufrufender Prozeß" ist jeweils der beim Prozeduraufruf aktive Prozeß.) *)
+
+PROCEDURE initialisieren (VAR X: Objekte; B: Bearbeitungen;
+                                          A: ADDRESS);
+(* Vor.: X ist nicht initialisiert. B terminiert nicht oder enthält "beenden"
+         als letzte Anweisung. A ist NIL oder die Adresse einer Variablen
+         eines beliebigen Typs. 
+   Eff.: X ist initialisiert und bereit. X hat die Bearbeitung B mit dem
+         Argument A, d.h. immer wenn X aktiv ist, führt X die Prozedur B
+         mit dem Wert von A als Parameter aus. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: Wenn X nicht beendet ist, ist nichts verändert.
+         Andernfalls ist X nicht mehr initialisiert. *)
+
+PROCEDURE beenden;
+(* Vor.: Keine. 
+   Eff.: Wenn es nur einen bereiten Prozeß gibt, ist nichts verändert. 
+         Andernfalls ist der aufrufende Prozeß beendet und mindestens
+         ein anderer Prozeß aktiv. Wenn es einen Prozeß gibt, der vorher
+         nicht bereit war, weil er auf die Beendigung des aufrufenden
+         Prozesses gewartet hat, ist der jetzt bereit. *) 
+
+PROCEDURE abwarten (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn kein anderer Prozeß neben dem aufrufenden bereit ist oder
+         wenn X der aktive Prozeß oder beendet ist oder auf die Beendigung
+         eines anderen Prozesses wartet oder wenn ein anderer Prozeß auf
+         die Beendigung von X wartet, ist nichts verändert.
+         Andernfalls ist der aufrufende Prozeß nicht mehr bereit, sondern
+         wartet auf die Beendigung von X; aber mindestens ein anderer bereiter
+         Prozeß ist aktiv. *)
+
+PROCEDURE aufrufender (): Objekte;
+(* Vor.: Keine.
+   Eff.: Liefert den aufrufenden Prozeß. *)
+
+END Prozesse.

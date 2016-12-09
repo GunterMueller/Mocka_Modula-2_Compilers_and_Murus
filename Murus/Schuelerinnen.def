@@ -1,0 +1,169 @@
+DEFINITION MODULE Schuelerinnen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+  FROM Schulfaecher IMPORT Fremdsprachen;
+
+TYPE Nummern = SHORTCARD; (* TSIZE (Nummern) = 2 ! *)
+     Objekte; (* Stammdaten von Schüler/inne/n gemäß SchuldatenVO.
+                 Jede/r Schüler/in hat eine eindeutige Nummer.
+                 Zu den Stammdaten gehören drei strikte Ordnungen:
+                 nach Person (alphabetisch nach Name/Vorname, im Falle von
+                 Namensgleichheit nach Alter), nach Nummer oder nach Alter,
+                 von denen immer eine die aktuelle Ordnung ist
+                 (anfangs ist die Ordnung nach Person die aktuelle). *)
+     Formate = (minimal,  (*  1 Zeile,  52 Spalten *)
+                ganzKurz, (*  1 Zeile,  80 Spalten *)
+                kurz,     (*  2 Zeilen, 80 Spalten *)
+                lang);    (* 21 Zeilen, 80 Spalten *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer, hat kein Attribut, 
+         die Nummer 0 und das Format kurz. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Nachname von X leer ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist bis auf die Standardsprachenfolge leer 
+         und hat die Nummer 0. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: X ist unverändert, X1 stimmt in allen Attributen mit X überein. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 
+         in allen Attributen übereinstimmen. *)
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 in Name, Vorname 
+         und Geburtsdatum übereinstimmen. *)
+
+PROCEDURE nummerngleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 die gleiche Nummer haben. *)
+
+PROCEDURE gleichalt (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 das gleiche Geburtsdatum
+         haben. *) 
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE im Falle aktuelleOrdnung =
+         nachPerson:
+           wenn der Nachname von X lexikographisch vor dem von X1 liegt;
+           bei gleichem Nachnamen, wenn der Vorname von X vor dem von X1 liegt,
+           bei gleichem Nach- und Vornamen, wenn X jünger als X1 ist,
+           d.h. das Geburtsdatum von X vor dem von X1 liegt;
+         nachNummer:
+           wenn X eine kleinere Nummer als X1 hat;
+         nachAlter:
+           bei gleichem Geburtsdatum von X und X1,
+             wenn der Nachname von X lexikographisch vor dem von X1 liegt,
+             bei gleichen Nachnamen,
+             wenn der Vorname von X lexikographisch vor dem von X1 liegt,
+             bei gleichem Nach- und Vornamen, wenn X jünger als X1 ist;
+           andernfalls, wenn X jünger als X1 ist. *)
+
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A bzw. A1 sind Objekte als Zeichenfolgen codiert.
+   Eff.: Liefert genau dann TRUE, wenn das ab A codierte Objekt im Sinne
+         der obigen Funktionsprozedur kleiner als das ab A1 codierte ist. *)
+
+PROCEDURE umordnen (* X: Objekte *);
+(* Vor.: (* X ist initialisiert. *)
+   Eff.: Die aktuelle Ordnung ist verändert. *)
+
+PROCEDURE numerieren (X: Objekte; N: Nummern);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Nummer N. *)
+
+PROCEDURE Nummer (X: Objekte): Nummern;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Nummer von X. *)
+
+PROCEDURE IdVertexten (X: Objekte; VAR I: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: . *)
+
+PROCEDURE Anzahl (X: Objekte;
+                  VAR FS: ARRAY OF Fremdsprachen;
+                  VAR von, bis: ARRAY OF CARDINAL): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Fremdsprachen von X. 
+         FS sind diese Fremdsprachen, von bzw. bis 
+         sind die entsprechenden Klassenstufen. *)
+
+PROCEDURE volljaehrig (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X zum Zeitpunkt des Aufrufs
+         mindestens 18 Jahre alt ist. *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Format F. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farbe S für die Schrift und H für den Hintergrund. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind klein genug.
+   Eff.: X ist ab Zeile Z, Spalte S in seinen Farben und seinem Format
+         auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE PersonEditieren (X: Objekte; Z: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die ab Zeile Z, Spalte S auf dem Bildschirm editierten
+         Angaben zur Person (Namen, Geschlecht, Geburtsdatum). *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das Objekt, das ab Zeile Z, Spalte S auf dem Bildschirm
+         editiert wurde. Die Nummer von X ist unverändert. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht ab Zeile Z, Spalte S im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines Objektes als Zeichenfolge notwendig ist.
+         Diese Länge ist für alle Objekte gleich. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A umkehrbar eindeutig als Zeichenfolge codiert,
+         d.h. ein aus dem Strom ab A der Codelaenge decodiertes Objekt
+         stimmt mit X überein. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Objekt als Zeichenfolge codiert.
+   Eff.: X ist dieses Objekt. *)
+
+PROCEDURE Indexlaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Länge des Indexstroms eines Objektes.
+         Diese Länge ist für alle Objekte gleich. *)
+
+PROCEDURE IndexCodieren (A, I: ADDRESS);
+(* Vor.: Ab A ist ein Objekt als Strom codiert.
+   Eff.: Ab I steht der Strom, der aus den Teilströmen dieses Stroms besteht,
+         auf denen die strikten Ordnungen auf den Objekten definiert sind. *)
+
+END Schuelerinnen.

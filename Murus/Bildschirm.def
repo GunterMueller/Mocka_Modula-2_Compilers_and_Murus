@@ -1,0 +1,533 @@
+DEFINITION MODULE Bildschirm;
+
+(* (c) Christian Maurer   v. 5. August 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+(* Vor.: Der Framebuffer ist ansteuerbar, d.h. in /boot/grub/menu.lst ist
+         in der Zeile "kernel ..." eine der u.a. Optionen "vga=..." enthalten.
+         Die Welt hat Leserecht auf /dev/fb0 und /dev/input/mice.
+   
+         Prozeduren mit graphischen Ausgaben oder Mausbenutzung werden
+         von Programmen, die auf fernen Rechnern ausgeführt werden,
+         nur unter X-Windows aufgerufen.
+
+   Eff.: Globale und aktuelle Schriftfarbe bzw. Hintergrundfarbe
+         sind auf einer Konsole weiss bzw. schwarz, unter X-Windows
+         schwarz bzw. hellweiss. Die aktuelle Schriftart ist normal.
+         Der Bildschirm ist gelöscht und der Kursor ist aus.
+         Signal1..2 aus dem Muruskern sind benutzt und nicht mehr verfügbar.
+         Kein Prozeß ist in exklusivem Besitz des Bildschirmzugriffs. *)
+
+(******  Modi und Bildschirmgröße  *******************************************)
+
+TYPE Modi = (QVGA,   (*                  15 x  40 /  320 x  240 *)
+             Txt,    (* vga=768, normal: 25 x  80 / nicht graphikfähig *)
+             VGA,    (* vga=769, 785..6: 30 x  80 /  640 x  480 *)
+             PAL,    (*                  36 x  96 /  768 x  576 *)
+             SVGA,   (* vga=771, 788..9: 37 x 100 /  800 x  600 *)
+             XGA,    (* vga=773, 791..2: 48 x 128 / 1024 x  768 *)
+             SXGA,   (* vga=775, 794..5: 64 x 160 / 1280 x 1024 *)
+             UXGA,   (* vga=     796..8: 75 x 200 / 1600 x 1200 *)
+             SUXGA,  (*                  90 x 240 / 1920 x 1440 *)
+             QXGA);  (*                  96 x 256 / 2048 x 1536 *)
+
+PROCEDURE unterX (): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der aufrufende Prozeß unter
+         X-Windows (d.h. auf einer graphischen Oberfläche) läuft. *)
+
+PROCEDURE maximalerModus (): Modi;
+(* Eff.: Liefert den größtmöglichen Modus des Bildschirms
+         (bzgl. der linearen Ordnung auf dem Aufzähltyp Modi). *)
+
+PROCEDURE submaximalerModus (): Modi;
+(* Eff.: Liefert MIN (Modi), falls das der größtmögliche Modus des Bildschirms
+         ist, andernfalls den größten Modus M mit M < größtmöglicher Modus. *)
+
+PROCEDURE schaltbar (M: Modi): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn M verfügbar ist. *) 
+
+PROCEDURE schalten (M: Modi);
+(* Vor.: Der aufrufende Prozeß läuft nicht unter X-Windows.
+   Eff.: Wenn M nicht schaltbar ist, ist nichts verändert. Andernfalls gilt:
+         Der aktuelle Modus ist M. Die globalen Farben sind unverändert.
+         Die aktuelle Schriftart ist normal. Aktuelle Schrift- bzw.
+         Hintergrundfarbe ist die globale Schrift- bzw. Hintergrundfarbe.
+         Der Bildschirm ist gelöscht. *)
+
+PROCEDURE Modus (): Modi;
+(* Eff.: Liefert den aktuellen Modus. *)
+
+PROCEDURE Moduskennzeichen (): CHAR;
+(* Eff.: Liefert ein Zeichen, das den Modus eindeutig charakterisiert. *)
+
+PROCEDURE AnzahlFarben (): CARDINAL;
+(* Eff.: Liefert die Anzahl der darstellbaren Farben im aktuellen Modus. *)
+
+PROCEDURE graphikfaehig (): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Bildschirm grahikfähig ist,
+         d.h. wenn einzelne Pixel gesetzt werden können. *)
+
+PROCEDURE Zeilenzahl (): CARDINAL;
+PROCEDURE Spaltenzahl (): CARDINAL;
+(* Eff.: Liefert - in Abhängigkeit von der aktuellen Schriftart -
+         die Anzahl der Textzeilen bzw. -spalten. *)
+
+PROCEDURE Graphikspaltenzahl (): CARDINAL;
+PROCEDURE Graphikzeilenzahl (): CARDINAL;
+(* Eff.: Liefert die Pixelbreite/-höhe des Bildschirms. *)
+
+PROCEDURE Zeilenhoehe (): CARDINAL;
+PROCEDURE Spaltenbreite (): CARDINAL;
+(* Eff.: Liefert den Abstand zwischen zwei Textzeilen/-spalten in Pixeln
+         = Zeichenhoehe bzw. Zeichenbreite der aktuellen Schriftart (s. u.). *)
+
+(******  Farben  *************************************************************)
+
+VAR Schriftfarbe, Hintergrundfarbe: (* globale *) Farben.Objekte;
+
+(* Vor.: Keine. *)
+
+PROCEDURE FarbeSetzen (S: Farben.Objekte);
+PROCEDURE FarbenSetzen (S, H: Farben.Objekte);
+(* Eff.: Die aktuelle Schriftfarbe ist S,
+         die aktuelle Hintergrundfarbe ist die des Bildschirms bzw. H. 
+         Die Farben des Bildschirms sind unverändert. *)
+
+PROCEDURE FarbeLiefern (VAR H: Farben.Objekte);
+PROCEDURE FarbenLiefern (VAR S, H: Farben.Objekte);
+(* Eff.: S ist die aktuelle Schrift- und H die aktuelle Hintergrundfarbe. *)
+
+(******  Bereiche  ***********************************************************)
+
+(* Vor.: S + B <= Spaltenzahl, Z + H <= Zeilenzahl bzw.
+         x <= x1 < Graphikspaltenzahl, y <= y1 < Graphikzeilenzahl. *)
+
+PROCEDURE faerben (S, H: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: Schriftfarbe = S, Hintergrundfarbe = H; der Bildschirm ist gelöscht. *)
+
+PROCEDURE loeschen;
+(* Vor.: Keine.
+   Eff.: Der Bildschirm ist in seiner Hintergrundfarbe gelöscht. 
+         Der Kursor hat die Position (0, 0) und ist aus. 
+         (* Wenn eine Maus vorhanden ist, hat der Mauskursor 
+         die Position (?, ?) und ist aus. *) *)
+
+PROCEDURE TeilLoeschen (Z, S, B, H: CARDINAL);
+(* Eff.: Der Bildschirm ist zwischen Zeile Z und Z + H und Spalte S und S + B
+         (jeweils einschließlich) in seiner Hintergrundfarbe gelöscht. *)
+
+PROCEDURE invertieren (Z, S, B, H: CARDINAL);
+PROCEDURE GraphikInvertieren (x, y, x1, y1: CARDINAL);
+(* Eff.: Dokumentation in Arbeit. *)
+
+PROCEDURE GraphikLoeschen (x, y, x1, y1: CARDINAL);
+(* Eff.: Die Pixel im Rechteck zwischen (x, y) und (x1, y1) (einschl. Rand)
+         haben die Hintergrundfarbe des Bildschirms. *)
+
+PROCEDURE archivieren (Z, S, B, H: CARDINAL);
+PROCEDURE GraphikArchivieren (x, y, x1, y1: CARDINAL);
+(* Eff.: Der Bildschirminhalt zwischen Zeile Z und Z + H und Spalte S und S + B
+         ist in ein Archiv kopiert (dessen vorheriger Inhalt verloren ist). *)
+
+PROCEDURE restaurieren (Z, S, B, H: CARDINAL);
+PROCEDURE GraphikRestaurieren (x, y, x1, y1: CARDINAL);
+(* Eff.: Der Bildschirminhalt zwischen Zeile Z und Z + H und Spalte S und S + B
+         ist aus dem Archiv zurückkopiert. *)
+
+(******  Kursor  *************************************************************)
+
+TYPE Kursorformen = (aus, klein, gross);
+
+PROCEDURE positionieren (Z, S: CARDINAL; F: Kursorformen);
+(* Vor.: Z < Zeilenzahl, S < Spaltenzahl.
+   Eff.: Der Kursor hat die Position (Zeile, Spalte) = (Z, S)
+         und die Form F. (0, 0) ist die linke obere Ecke. *)
+
+PROCEDURE GraphikPositionieren (x, y: CARDINAL; F: Kursorformen);
+(* Vor.: x <= Graphikspaltenzahl - Spaltenbreite,
+         y <= Graphikzeilenzahl - Zeilenhoehe.
+   Eff.: Der Kursor hat die Graphikposition (Spalte, Zeile) = (x, y)
+         und die Form F. (0, 0) ist die linke obere Ecke. *)
+
+(******  Textausgaben  *******************************************************)
+
+(* Eff.: Die Position (0, 0) ist die linke obere Ecke des Bildschirms.
+         Die Pixel der Textzeichen haben die aktuelle Schriftfarbe, 
+         in den Rechtecken darum die aktuelle Hintergrundfarbe.
+         Wenn Transparenz eingeschaltet ist, sind diese Pixel unverändert.
+         Beim GraphikSchreiben ist nichts verändert, wenn der Bildschirm
+         nicht graphikfähig ist. *)
+
+PROCEDURE schreiben1 (C: CHAR; Z, S: CARDINAL);
+(* Vor.: 32 <= ORD (C) < 127.
+         Z < Zeilenzahl, S + 1 < Spaltenzahl. 
+   Eff.: C ist an der Position (Zeile, Spalte) = (Z, S) ausgegeben. *)
+
+PROCEDURE schreiben (T: ARRAY OF CHAR; Z, S: CARDINAL);
+(* Vor.: Z < Zeilenzahl, S + Länge (T) < Spaltenzahl. 
+   Eff.: T ist ab der Position (Zeile, Spalte) = (Z, S) ausgegeben. *)
+
+PROCEDURE ZahlSchreiben (n, Z, S: CARDINAL);
+(* Vor.: S + Ziffernzahl von n < Spaltenzahl, Z < Zeilenzahl.
+   Eff.: n ist ab der Position (Z, S) ausgegeben. *)
+
+PROCEDURE GraphikSchreiben1 (C: CHAR; x, y: CARDINAL);
+PROCEDURE GraphikSchreiben (T: ARRAY OF CHAR; x, y: CARDINAL);
+(* Vor.: x + Spaltenbreite < Graphikspaltenzahl bzw.
+         x + Spaltenbreite * Länge (T) < Graphikspaltenzahl,
+         y + Zeilenhoehe < Graphikzeilenzahl.
+   Eff.: C bzw. T ist im Rechteck mit der linken oberen Ecke (x, y)
+         ausgegeben. *)
+
+PROCEDURE GraphikSchriftInvertieren1 (C: CHAR; x, y: CARDINAL);
+PROCEDURE GraphikSchriftInvertieren (T: ARRAY OF CHAR; x, y: CARDINAL);
+
+PROCEDURE TransparenzEingeschaltet (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn Transparenz eingeschaltet ist. *)
+
+PROCEDURE TransparenzSchalten (t: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Transparenz ist genau dann eingeschaltet, wenn t gilt. *)
+
+(******  Schriftart  *********************************************************)
+
+TYPE Schriftarten = (zierlich,      (*  6 x 10 *)
+                     normal,        (*  8 x 16 *)
+                     groesser,      (* 12 x 24 *)
+                     nochgroesser); (* 16 x 32 *)
+
+PROCEDURE SchriftartSchalten (A: Schriftarten);
+(* Vor.: Keine.
+   Eff.: Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert,
+         sonst ist A die aktuelle Schriftart. *)
+
+PROCEDURE Zeichenbreite (A: Schriftarten): CARDINAL;
+PROCEDURE Zeichenhoehe (A: Schriftarten): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Pixelbreite/-höhe des Rechtecks für die
+         Darstellung eines Zeichens in der aktuellen Schriftart. *)
+
+(******  Graphikausgaben  ****************************************************)
+
+(* Vor.: Der Bildschirm ist graphikfähig.
+         X, X1, X1 < Graphikspaltenzahl; Y, Y1, Y2 < Graphikzeilenzahl.
+   Eff.: Die Position (0, 0) ist die linke obere Ecke des Bildschirms.
+         Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert.
+         Beim XZeichnen ist X in der aktuellen Schriftfarbe gezeichnet; beim
+         XFuellen sind auch alle inneren Punkte von X auf diese Farbe gesetzt.
+         Beim XInvertieren ist die Farbe jedes Punktes auf dem Rand von X
+         auf die Komplementärfarbe seiner zuletzt gesetzten Farbe gesetzt.
+         (* Alle Ausgaben erfolgen genau dann auf dem Phantombildschirm,
+         wenn Puffern eingeschaltet ist, andernfalls auf dem Bildschirm.
+         Puffern ist anfangs ausgeschaltet. *) *)
+
+PROCEDURE P;
+(* Vor.: Keine.
+   Eff.: Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert.
+         Andernfalls ist der Phantombildschirm ist gelöscht und
+         alle weiteren Ausgaben erfolgen nur auf dem Phantombildschirm. *)
+
+PROCEDURE V;
+(* Vor.: Keine.
+   Eff.: Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert.
+         Andernfalls enthält der Bildschirm den Inhalt des Phantombildschirms
+         und alle weiteren Ausgaben erfolgen auf dem Bildschirm. *)
+
+PROCEDURE PunktSetzen (X, Y: CARDINAL);
+PROCEDURE PunktInvertieren (X, Y: CARDINAL);
+(* Eff.: An der Position (Spalte, Zeile) = (X, Y) ist ein Punkt in der
+         aktuellen Schriftfarbe gesetzt bzw. der dort zuletzt gesetzte Punkt
+         in seiner Farbe invertiert. *)
+
+PROCEDURE PunktmengeZeichnen (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE PunktmengeInvertieren (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+(* Vor.: HIGH (X), HIGH (Y) >= N;
+         X[i] < Graphikspaltenzahl, Y[i] < Graphikzeilenzahl für alle i <= N.
+   Eff.: An den Positionen (X[i], Y[i]) (i < n) ist ein Punkt in der aktuellen
+         Schriftfarbe gesetzt bzw. der jeweils dort zuletzt gesetzte Punkt
+         in seiner Farbe invertiert. *)
+
+PROCEDURE StreckeZeichnen (X, Y, X1, Y1: CARDINAL);
+PROCEDURE StreckeInvertieren (X, Y, X1, Y1: CARDINAL);
+(* Eff.: Zwischen (X, Y) und (X1, Y1) ist eine Strecke in der aktuellen
+         Schriftfarbe gezeichnet bzw. sind alle Punkte darauf invertiert. *)
+
+PROCEDURE aufStrecke (X, Y, X1, Y1, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         von der Strecke von (X, Y) nach (X1, Y1) entfernt ist. *)
+ 
+PROCEDURE StrichZeichnen (X, Y, X1, Y1, D: CARDINAL);
+(* >>>>> experimentelle Version *)
+(* Vor.: 0 < D <= 16.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE GeradeZeichnen (X, Y, X1, Y1: CARDINAL);
+PROCEDURE GeradeInvertieren (X, Y, X1, Y1: CARDINAL);
+(* Eff.: Es ist eine Gerade durch (X, Y) und (X1, Y1) gezeichnet
+         bzw. es sind alle Punkte darauf invertiert. *)
+
+PROCEDURE aufGerade (X, Y, X1, Y1, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         von der Gerade durch (X, Y) und (X1, Y1) entfernt ist. *)
+
+PROCEDURE RechteckZeichnen (X, Y, X1, Y1: CARDINAL);
+PROCEDURE RechteckInvertieren (X, Y, X1, Y1: CARDINAL);
+PROCEDURE RechteckFuellen (X, Y, X1, Y1: CARDINAL);
+PROCEDURE RechteckVollInvertieren (X, Y, X1, Y1: CARDINAL);
+(* Eff.: Zwischen (X, Y) und (X1, Y1) ist ein Rechteck (mit horizontalen und
+         vertikalen Kanten) in der aktuellen Schriftfarbe gezeichnet bzw.
+         sind alle Punkte darauf invertiert bzw. sind alle Punkte innerhalb
+         des Rechtecks (einschließlich Rand) gesetzt bzw. invertiert. *)
+
+PROCEDURE aufRechteck (X, Y, X1, Y1, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         vom Rand des Rechtecks zwischen (X, Y) und (X1, Y1) entfernt ist. *)
+
+PROCEDURE imRechteck (X, Y, X1, Y1, x, y: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) nicht
+         außerhalb Rechtecks zwischen (X, Y) und (X1, Y1) liegt. *)
+ 
+PROCEDURE StreckenzugZeichnen (VAR X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE StreckenzugInvertieren (VAR X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+(* Vor.: HIGH (X), HIGH (Y) >= N;
+         X[i] < Graphikspaltenzahl, Y[i] < Graphikzeilenzahl für alle i <= N.
+   Eff.: Von (X[0], Y[0]) ist über (X[1], Y[1]), ... ein Streckenzug bis
+         (X[N], Y[N]) gezeichnet bzw. sind alle Punkte darauf invertiert. *)
+
+PROCEDURE aufStreckenzug (VAR X, Y: ARRAY OF CARDINAL; N, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         von einer der Strecken des durch X, Y und N definierten Streckenzugs
+         entfernt ist. *)
+
+PROCEDURE StreckenZeichnen (VAR X, Y, X1, Y1: ARRAY OF CARDINAL; N: CARDINAL);
+(* >>>>> experimentelle Version *)
+(* Vor.: .
+   Eff.: . *)
+
+PROCEDURE PolygonZeichnen (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE PolygonInvertieren (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE PolygonFuellen (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE PolygonFuellen1 (X, Y: ARRAY OF CARDINAL; x, y, N: CARDINAL);
+(* Vor.: HIGH (X) = HIGH (Y) >= N > 0,
+         X[i] < Graphikspaltenzahl, Y[i] < Graphikzeilenzahl für alle i <= N.
+   Vor. für PolygonFuellen:
+         N > 1; das durch X, Y definierte Polygon ist konvex
+         und in der gleichen Farbe gezeichnet.
+   Vor. für PolygonFuellen1:
+         N > 1; (x, y) liegt im Inneren des durch X, Y definierten Polygons.
+         Das Polygon ist in der gleichen Farbe gezeichnet.
+   Eff.: Zwischen (X[0], Y[0]), (X[1], Y[1]), ... (X[N], Y[N]), (X[0], Y[0])
+         ist ein Polygon gezeichnet bzw. sind alle Pixel darauf invertiert
+         bzw. ist das Polygon gefüllt. *)
+
+PROCEDURE aufPolygon (X, Y: ARRAY OF CARDINAL; N, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         vom Rand des durch X, Y und N definierten Polygons entfernt ist. *)
+
+PROCEDURE KreisZeichnen (X, Y, R: CARDINAL);
+PROCEDURE KreisInvertieren (X, Y, R: CARDINAL);
+PROCEDURE KreisFuellen (X, Y, R: CARDINAL);
+PROCEDURE KreisVollInvertieren (X, Y, R: CARDINAL);
+(* Vor.: R <= X, X + R < Graphikspaltenzahl, R <= Y, Y + R < Graphikzeilenzahl. 
+   Eff.: Um (X, Y) ist ein Kreis mit dem Radius R gezeichnet / invertiert
+         bzw. alle Punkte innerhalb des Kreises gesetzt / invertiert. *)
+
+PROCEDURE aufKreis (X, Y, R, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         vom Rand des Kreises um (X, Y) mit dem Radius R entfernt ist. *)
+
+PROCEDURE EllipseZeichnen (X, Y, A, B: CARDINAL);
+PROCEDURE EllipseInvertieren (X, Y, A, B: CARDINAL);
+PROCEDURE EllipseFuellen (X, Y, A, B: CARDINAL);
+PROCEDURE EllipseVollInvertieren (X, Y, A, B: CARDINAL);
+(* Vor.: A <= X, X + A < Graphikspaltenzahl, B <= Y, Y + B < Graphikzeilenzahl. 
+   Eff.: Um (X, Y) ist eine Ellipse mit der horizontalen Halbachse A und der
+         vertikalen Halbachse B gezeichnet / invertiert bzw. sind alle Punkte
+         innerhalb der Ellipse gesetzt / invertiert. *)
+
+PROCEDURE aufEllipse (X, Y, A, B, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel vom
+         Rand der Ellips um (X, Y) mit den Halbachsen A und B entfernt ist. *)
+
+CONST maxBeziergrad = 34;
+PROCEDURE BezierkurveZeichnen (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+PROCEDURE BezierkurveInvertieren (X, Y: ARRAY OF CARDINAL; N: CARDINAL);
+(* Vor.: N <= maxBeziergrad; HIGH (X), HIGH (Y) >= N.
+   Eff.: Von (X[0], Y[0]) nach (X[N], Y[N]) ist eine Bezierkurve n-ter Ordnung
+         mit (X[1], Y[1]) .. (X[N-1], Y[N-1]) als Stützstellen gezeichnet bzw.
+         sind alle Punkte auf dieser Kurve invertiert (für N = 0 ist die Kurve
+         der Punkt (X[0], Y[0]) und für n = 1 die Strecke zwischen (X[0], Y[0])
+         und (X[1], Y[1]). *)
+
+PROCEDURE aufBezierkurve (X, Y: ARRAY OF CARDINAL; N, x, y, t: CARDINAL): BOOLEAN;
+(* Eff.: Liefert genau dann TRUE, wenn der Punkt (x, y) höchstens t Pixel
+         von der durch X, Y und N definierten Bezierkurve entfernt ist. *)
+
+PROCEDURE fuellen (X, Y: CARDINAL);
+PROCEDURE fuellen1 (X, Y: CARDINAL);
+(* >>>>> experimentelle Versionen *)
+(* Vor.: Der aufrufende Prozeß läuft nicht unter X-Windows.
+         X < Graphikspaltenzahl, Y < Graphikzeilenzahl.
+   Eff.: Alle zu (X, Y) benachbarten Pixel des Bildschirms ...
+         ... Rest der Dokumentation in Arbeit. *)
+
+(******  Maus  ***************************************************************)
+
+(* Vor.: Maus vorhanden. *)
+
+PROCEDURE MausVorhanden (): BOOLEAN;
+(* Vor.: Falls auf einer Konsole aufgerufen:
+         /dev/input/mice ist für die Welt lesbar.
+   Eff.: Liefert genau dann TRUE, wenn eine Maus installiert ist. *)
+
+PROCEDURE MausDefinieren (Z, S, B, H: CARDINAL);
+PROCEDURE GraphikMausDefinieren (x, y, x1, y1: CARDINAL);
+(* Vor.: S + B <= Spaltenzahl, Z + H <= Zeilenzahl bzw.
+         x <= x1 < Graphikspaltenzahl, y <= y1 < Graphikzeilenzahl.
+   Eff.: Die Position der Maus ist auf den durch das entsprechende Rechteck
+         gegebenen Bereich beschränkt. *)
+
+PROCEDURE MausPositionLesen (VAR Z, S: CARDINAL);
+PROCEDURE GraphikMausPositionLesen (VAR x, y: CARDINAL);
+(* Eff.: (Zeile, Spalte) = (Z, S) (in Textauflösung, d.h. Z < Zeilenzahl,
+         S < Spaltenzahl) bzw. Spalte, Zeile) = (X, Y) (in Graphikauflösung,
+         d.h. x < Graphikspaltenzahl, y < Graphikzeilenzahl)
+         ist die Position der Maus. *)
+
+PROCEDURE MausZeigen (b: BOOLEAN);
+(* >>>>> Nur zur Implementierung von Tastatur;
+         soll auf keinen Fall weiter oben verwendet werden.
+   Eff.: Der Mauszeiger ist neu ausgegeben. *)
+
+PROCEDURE MauskursorSchalten (b: BOOLEAN);
+(* Vor.: Der aufrufende Prozeß läuft nicht unter X-Windows.
+   Eff.: Wenn keine Maus vorhanden, ist nichts verändert. Andernfalls
+         ist der Mauskursor genau dann eingeschaltet, wenn b = TRUE. *)
+
+PROCEDURE MauskursorEingeschaltet (): BOOLEAN;
+(* Vor.: Der aufrufende Prozeß läuft nicht unter X-Windows.
+   Eff.: Liefert genau dann TRUE, wenn der Mauskursor eingeschaltet ist. *)
+
+PROCEDURE unterMaus (Z, S, B, H: CARDINAL): BOOLEAN;
+PROCEDURE GraphikUnterMaus (x, y, x1, y1, T: CARDINAL): BOOLEAN;
+(* Vor.: S + B <= Spaltenzahl, Z + H <= Zeilenzahl bzw.
+         x <= x1 < Graphikspaltenzahl, y <= y1 < Graphikzeilenzahl.
+   Eff.: Liefert FALSE, wenn keine Maus vorhanden.
+         Liefert ansonsten genau dann TRUE, wenn die Mausposition innerhalb
+         des durch Z, S, B, H definierten Rechtecks bzw. um nicht mehr als
+         T Pixel außerhalb des Rechtecks zwischen (x, y) und (x1, y1) liegt. *)
+
+PROCEDURE MausPositionieren (Z, S: CARDINAL);
+(* Vor.: Z < Zeilenzahl, S < Spaltenzahl.
+   Eff.: Der Mauskursor hat die Position (Zeile, Spalte) = (Z, S). *)
+
+PROCEDURE GraphikMausPositionieren (X, Y: CARDINAL);
+(* Vor.: x < Graphikspaltenzahl, y < Graphikzeilenzahl.
+   Eff.: Der Mauskursor hat die Position (Spalte, Zeile) = (S, Z). *)
+
+(******  Synchronisation  ****************************************************)
+
+PROCEDURE sperren;
+(* Vor.: Keine.
+   Eff.: Der aufrufende Prozeß ist - unter allen denjenigen Prozessen,
+         die ebenfalls "sperren" aufgerufen haben - in exklusivem Besitz
+         des Zugriffs zum Schreiben oder Zeichnen auf den Bildschirm, d.h.
+         er kann von anderen derartigen Prozessen nicht unterbrochen werden.
+         (Durch die Kapselung mittels "sperren" und "entsperren" kann in nicht-
+         sequentiellen Programmen vermieden werden, daß ein Prozeß nach dem
+         Setzen seiner Farben bei einem folgenden Schreib-/Zeichnenzugriff
+         von anderen Prozessen durch das Setzen ihrer Farben unterbrochen wird
+         und danach seinen Zugriff in veränderten Farben weiterführt.)
+         Der aufrufende Prozeß war ggf. solange blockiert,
+         bis diese Exklusivität sichergestellt war. *)
+
+PROCEDURE entsperren;
+(* Vor.: Der aufrufende Prozeß ist in exklusivem Besitz des Zugriffs
+         zum Schreiben oder Zeichnen auf den Bildschirm.
+   Eff.: Er ist es nicht mehr. *)
+
+(******  Serialisierung  *****************************************************)
+
+(* Vor.: Der aufrufende Prozeß läuft nicht unter X-Windows.
+         Der Bildschirm ist grahikfähig. *)
+
+PROCEDURE Codelaenge (B, H: CARDINAL): CARDINAL;
+(* Vor.: 0 < B <= Graphikspaltenzahl, 0 < H <= Graphikzeilenzahl.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         der Pixel eines Rechtecks der Größe B x H als Strom notwendig ist. *)
+ 
+PROCEDURE codieren (X, Y, B, H: CARDINAL; A: ADDRESS);
+(* Vor.: 0 < B, X + B < Graphikspaltenzahl, 0 < H, Y + H < Graphikzeilenzahl.
+   Eff.: Die Pixel im Rechteck zwischen (X, Y) und (X + B, Y + H) sind
+         als Strom ab A der Länge Codelaenge (B, H) codiert. *)
+
+PROCEDURE decodieren (A: ADDRESS);
+(* Vor.: Ab A sind die Pixel eines Rechtecks mit rechter unterer Ecke (x, y)
+         mit x < Graphikspaltenzahl, y < Graphikzeilenzahl als Strom codiert.
+   Eff.: Die Pixel dieses Rechtecks sind auf dem Bildschirm ausgegeben;
+         der Rest des Bildschirms ist unverändert. *)
+
+(* >>>>> experimentelle Versionen: *)
+
+PROCEDURE P6Codelaenge (B, H: CARDINAL): CARDINAL;
+(* Vor.: B <= Graphikspaltenzahl, H <= Graphikzeilenzahl.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines rechteckigen Pixelbildes der Breite B und Höhe H im PPM-Format
+         P6 notwendig ist. *)
+
+PROCEDURE P6codieren (A, P: ADDRESS);
+(* Vor.: Ab A sind die Pixel eines Rechtecks als Strom codiert.
+   Eff.: Der ab A codierte rechteckige Bildschirmausschnitt ist
+         ab P als Bild im PPM-Format P6 codiert. *)
+
+PROCEDURE P6GroesseLesen (P: ADDRESS; VAR B, H: CARDINAL);
+(* Vor.: X < Graphikspaltenzahl, Y < Graphikzeilenzahl.
+         Ab P ist ein Bild im PPM-Format P6 codiert.
+   Eff.: B und H sind Breite und Höhe dieses Bildes in Pixeln. *)
+
+PROCEDURE P6decodieren (X, Y: CARDINAL; P, A: ADDRESS);
+(* Vor.: X < Graphikspaltenzahl, Y < Graphikzeilenzahl.
+         Ab P ist ein Bild im PPM-Format P6 codiert.
+   Eff.: Dieses Bild ist als Pixel des Rechtecks zwischen (X, Y) ...
+         ... Rest der Dokumentation folgt. *)
+
+PROCEDURE P6invertieren (P: ADDRESS);
+(* Vor.: Ab P ist ein Bild im PPM-Format P6 codiert.
+   Eff.: Alle Pixel auf diesem Bild sind jetzt invertiert,
+         d.h. haben jetzt die inverse Farbe der Farbe vorher. *)
+
+PROCEDURE P6SWinvertieren (P: ADDRESS);
+(* Vor.: Ab P ist ein Bild im PPM-Format P6 codiert.
+   Eff.: Alle schwarzen und hellweissen Pixel auf diesem Bild
+         sind jetzt invertiert, alle anderen sind nicht verändert. *)
+
+(******  2D-Funktionsgraphen  ************************************************)
+
+(* >>>>> experimentelle Versionen *)
+(* Vor.: X, X1, X1 < Graphikspaltenzahl; Y, Y1, Y2 < Graphikzeilenzahl. *)
+
+PROCEDURE FunktionsgraphZeichnen (VAR F: ARRAY OF CARDINAL;
+                                  X, Y, X1, Y1: CARDINAL);
+(* Vor.: Für alle x mit X <= x <= X1 ist F[x] definiert.
+   Eff.: Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert.
+         Sonst sind für alle diejenigen x mit X <= x <= X1 diejenigen Punkte
+         (x, F[x]) gesetzt, für die Y <= F[x] <= Y1 gilt. F ist unverändert. *)
+
+PROCEDURE AchsenZeichnen (X, Y, X1, Y1: CARDINAL;
+                          VAR SX, SY: ARRAY OF CARDINAL;
+                          sx, sy, nx, ny: CARDINAL);
+(* Vor.: nx <= sx <= HIGH (X), ny <= sy <= HIGH (Y),
+         für alle i mit i < sx gilt X <= SX [i] <= X1,
+         für alle k mit k < sy gilt Y <= SY [k] <= Y1.
+   Eff.: Wenn der Bildschirm nicht graphikfähig ist, ist nichts verändert.
+         Falls SY [ny] < Y1 ist, ist bei SY [ny] eine Waagerechte gezeichnet,
+         falls SX [nx] < X1 ist, ist bei SX [nx] eine Senkrechte gezeichnet.
+         (* Noch nicht implementiert: In diesen Fällen sind die Geraden
+            an den Stellen SX [i] für i < sx bzw. SY [k] für k < sy mit
+            kleinen vertikalen bzw. horizontalen Markierungen versehen. *) *)
+
+END Bildschirm.

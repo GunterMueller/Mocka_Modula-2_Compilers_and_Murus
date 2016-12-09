@@ -1,0 +1,18 @@
+DEFINITION MODULE Farbauswahl;
+
+(* (c) Christian Maurer   v. 30. August 2006 *)
+
+FROM Farben IMPORT Objekte;
+
+PROCEDURE auswaehlen (VAR F: Objekte);
+(* Vor.: Keine.
+   Eff.: F ist die aktuelle Schriftfarbe für die Schreib- und Zeichen-
+         prozeduren aus Bildschirm. F ist eine der Farben, die
+         im Modul Farben explizit mit einem Namen angegeben ist. *)
+
+PROCEDURE auswaehlen16 (VAR F: Objekte);
+(* Vor.: Keine.
+   Eff.: F ist die aktuelle Schriftfarbe für die Schreib- und Zeichen-
+         prozeduren aus Bildschirm. F ist eine der 16 Basisfarben. *)
+
+END Farbauswahl.

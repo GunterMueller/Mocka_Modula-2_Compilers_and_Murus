@@ -1,0 +1,56 @@
+DEFINITION MODULE Anschriften;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Adresse aus Straße/Hausnummer oder Postfach,
+                 Postleitzahl und Ort,
+                 2 Telefonnumern *)
+     Formate = (zweizeilig, einzeilig);
+
+PROCEDURE initialisieren (VAR X: Objekte);
+
+PROCEDURE terminieren (VAR X: Objekte);
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+
+PROCEDURE leeren (X: Objekte);
+
+PROCEDURE kopieren (X, X1: Objekte);
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die Postleitzahl von X
+         mit der von X1 übereinstimmt. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert bei gleichen Postleitzahlen der Anschriften von X und X1
+         genau dann TRUE, wenn der Ort von X lexikographisch vor dem von X1
+         liegt, bei gleicher Ortsangabe, wenn die Adresse von X lexikographisch
+         vor der von X1 liegt; liefert andernfalls genau dann TRUE,
+         wenn die Postleitzahl von X kleiner als die von X1 ist. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Anschriften.

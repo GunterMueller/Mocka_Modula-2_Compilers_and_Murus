@@ -1,0 +1,55 @@
+DEFINITION MODULE Kurshalbjahrmengen;
+
+(* (c) Christian Maurer   v. 14. September 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST
+  Max = 4;
+TYPE
+  Kurshalbjahre = [0..Max]; (* 0 für das "leere" Kurshalbjahr *)
+  Objekte = ARRAY [1..Max] OF BOOLEAN;
+
+PROCEDURE leeren (VAR X: Objekte);
+(* Vor.: Keine.
+   Eff.: X enthält kein Kurshalbjahr. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn X keine Kurshalbjahre enthält. *)
+
+PROCEDURE kleinergleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn alle Kurshalbjahre 
+         aus X auch in X1 enthalten sind. *)
+
+PROCEDURE kopieren (X: Objekte; VAR X1: Objekte);
+(* Vor.: Keine.
+   Eff.: X ist unverändert, X1 stimmt mit X überein. *)
+
+PROCEDURE definieren2 (VAR X: Objekte; H, H1: Kurshalbjahre);
+(* Vor.: H # 0, H1 # 0.
+   Eff.: X enthält genau die Kurshalbjahre H und H1. *)
+
+PROCEDURE fuellen (VAR X: Objekte);
+(* Vor.: Keine.
+   Eff.: X enthält alle Kurshalbjahre. *)
+
+PROCEDURE Anzahl (X: Objekte): Kurshalbjahre;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Kurshalbjahre von X. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         einer Menge von Kurshalbjahren als Zeichenfolge notwendig ist. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: Ab A sind Codelaenge Bytes alloziert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (VAR X: Objekte; A: ADDRESS);
+(* Vor.: Ab A ist eine Menge von Kurshalbjahren als Zeichenfolge codiert. 
+   Eff.: X ist die Menge von Kurshalbjahren, die ab A als Zeichenfolge codiert ist. *)
+
+END Kurshalbjahrmengen.

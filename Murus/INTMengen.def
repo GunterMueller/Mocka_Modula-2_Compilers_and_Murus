@@ -1,0 +1,52 @@
+DEFINITION MODULE INTMengen;
+
+(* (c) Christian Maurer   v. 28. Januar 2008 *)
+
+TYPE Objekte; (* Mengen von maximal 1024 INTEGER-Zahlen >= 0 *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine INTEGER-Zahlen enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist unverändert, X1 enthält genau die gleichen Zahlen wie X. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der INTEGER-Zahlen in X. *)
+
+PROCEDURE Maximum (X: Objekte): INTEGER;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann -1, wenn X leer ist,
+         andernfalls die größte INTEGER-Zahl aus X. *)
+
+PROCEDURE einfuegen (X: Objekte; i: INTEGER);
+(* Vor.: X ist initialisiert.
+         0 <= i < 1024.
+   Eff.: i ist in X eingefügt, falls i noch nicht in X enthalten war,
+         ansonsten ist X unverändert. *)
+
+PROCEDURE entfernen (X: Objekte; i: INTEGER);
+(* Vor.: X ist initialisiert.
+         0 <= i < 1024.
+   Eff.: i ist aus X entfernt, falls i in X enthalten war,
+         ansonsten ist X unverändert. *)
+
+PROCEDURE enthalten (X: Objekte; i: INTEGER): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn i in X enthalten ist. *)
+
+END INTMengen.

@@ -1,0 +1,54 @@
+DEFINITION MODULE Drucker;
+
+(* (c) Christian Maurer   v. 24. August 2008
+
+   >>> Nur zur Implementierung von Druckfelder;
+       soll weiter oben nicht verwendet werden ! *)
+
+CONST Kommando = "lp -o sides=one-sided"; (* oder nur "lp" *)
+
+TYPE Modi = (groesser, (* 14 Punkt,  40 Zeilen,  64 Spalten *)
+             gross,    (* 12 Punkt,  48 Zeilen,  80 Spalten *)
+             mittel,   (* 10 Punkt,  64 Zeilen,  96 Spalten *)
+             klein,    (*  8 Punkt,  80 Zeilen, 128 Spalten *)
+             winzig);  (*  5 Punkt, 120 Zeilen, 160 Spalten *)
+
+PROCEDURE schalten (M: Modi);
+(* Vor.: M ist schaltbar.
+   Eff.: Der aktuelle Modus ist M. Der Druckerpuffer ist gelöscht. *)
+
+PROCEDURE Modus (): Modi;
+(* Vor.: Keine.
+   Eff.: Liefert den aktuellen Modus. *)
+
+PROCEDURE Zeilenzahl (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeilen pro Seite. *)
+
+PROCEDURE Spaltenzahl (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Spalten pro Zeile. *)
+
+PROCEDURE voffset (mm: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Geheim. *)
+
+PROCEDURE footline (T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Geheim. *)
+
+PROCEDURE drucken1 (C: CHAR; Z, S, F: CARDINAL);
+(* Vor.: Z < maxZ; S + 1 < maxS. F ist ein Font.
+   Eff.: C steht in Zeile Z in Spalte S im Font F im Druckerpuffer. *)
+
+PROCEDURE drucken (T: ARRAY OF CHAR; Z, S, L, F: CARDINAL);
+(* Vor.: Z < maxZ, L > 0, S + L < maxS. F ist ein Font.
+   Eff.: T steht in Zeile Z von Spalte S bis Spalte S + L - 1
+         im Font F im Druckerpuffer. *)
+
+PROCEDURE ausdrucken;
+(* Vor.: TeX ist installiert.
+   Eff.: Alle Zeilen aus dem Druckerpuffer sind ausgedruckt;
+         der Druckerpuffer ist geleert. *)
+
+END Drucker.

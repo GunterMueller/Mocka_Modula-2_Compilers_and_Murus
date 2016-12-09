@@ -1,0 +1,62 @@
+DEFINITION MODULE FLRAbschnitte;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM IP IMPORT Namen;
+
+TYPE Objekte;
+(* Ferne Links-Rechts-Abschnitte, d.h. Zugangsprotokolle zu kritischen
+   Abschnitten, in denen mehrere Unix-Prozesse oder Prozesse auf
+   verschiedenen Rechnern "von links" oder "von rechts" die gleiche
+   Ressource benutzen; zu jedem Zeitpunkt im gleichen kritischen Abschnitt
+   entweder nur Prozesse "von links" oder Prozesse "von rechts".
+
+   Anbieter und Kunde verwenden bei FLSAbschnitten den gleichen Quelltext.
+   Ob ein gestarteter Prozeß der Anbieter oder ein Kunde ist, hängt vom Aufruf
+   der Prozedur initialisieren ab.
+
+   Die Prozeduren links/rechts-Ein/Aus sind unteilbar, d.h. ihr
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; A: Namen; N: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         A ist der Name des lokalen oder eines fernen im Netz erreichbaren
+         Rechners; im zweiten Fall hat ein Prozeß auf dem Rechner mit dem
+         Namen A einen fernen LSAbschnitt mit gleicher Nummer initialisiert.
+         N + 4 <= Kanaele.maxNr; die Ports Muruskern.MinPort + N + i (i < 4)
+         sind nicht von Netzwerkdiensten belegt.
+   Eff.: X ist initialisiert.
+         Kein Prozeß ist "von links" oder "von rechts" in X.
+         Weiteres s. Spezifikation der FSemaphore. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß ist "von links" oder "von rechts" in X.
+   Eff.: X ist nicht initialisiert. Die o.g. Ports von X sind auf dem
+         lokalen Rechner nicht mehr von Netzwerkdiensten belegt. *) 
+
+PROCEDURE linksEin (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X,
+         der weder "von links" noch "von rechts" in X ist.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß "von rechts" in X war.
+         Jetzt ist er "von links" in X. *)
+
+PROCEDURE linksAus (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X und "von links" in X.
+   Eff.: Er ist nicht "von links" in X. *)
+
+PROCEDURE rechtsEin (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X,
+         der weder "von links" noch "von rechts" in X ist.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß "von links" in X war.
+         Jetzt ist er "von rechts" in X. *)
+
+PROCEDURE rechtsAus (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X und "von rechts" in X.
+   Eff.: Er ist nicht "von rechts" in X. *)
+
+END FLRAbschnitte.

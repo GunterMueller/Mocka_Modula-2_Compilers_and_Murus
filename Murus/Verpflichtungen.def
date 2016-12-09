@@ -1,0 +1,42 @@
+DEFINITION MODULE Verpflichtungen;
+
+(* (c) Christian Maurer   v. 12. Dezember 2005 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte = (keinPf, Lf1, Lf2, Pf3, Pf4, Pk5);
+     Pruefungsverpflichtungen = [Lf1..Pk5];
+VAR VerpflichtungS, VerpflichtungH: Farben.Objekte;
+
+PROCEDURE ausgeben (V: Objekte; Z, S: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Das Kürzel von ist auf dem Bildschirm
+         an der Position (Z, S) ausgegeben. *)
+
+PROCEDURE editieren (VAR V: Objekte; Z, S: CARDINAL);
+(* Vor.: Keine.
+   Eff.: V ist die Verpflichtung, deren Kürzel an der 
+         Bildschirmposition (Z, S) eingegeben wurde. *)
+
+PROCEDURE drucken (V: Objekte; Z, S: CARDINAL);
+(* Vor.: Keine.
+   Eff.: . *)
+
+PROCEDURE HinweisAusgeben (V: Objekte);
+(* Vor.: Keine.
+   Eff.: Für V = keinPf ist nichts passiert, 
+         sonst ist ein Hinweis zu V ausgegeben. *)
+
+PROCEDURE FehlerMelden (V: Objekte);
+(* Vor.: Keine.
+   Eff.: Für V = keinPf ist nichts passiert, sonst 
+         ist eine Fehlermeldung zu V ausgegeben. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (V: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (VAR V: Objekte; A: ADDRESS);
+
+END Verpflichtungen.

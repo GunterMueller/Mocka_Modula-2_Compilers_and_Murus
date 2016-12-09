@@ -1,0 +1,26 @@
+DEFINITION MODULE Murusversion;
+
+(* (c) Christian Maurer   v. 14. Januar 2006 *)
+
+IMPORT Farben, Kalenderdaten;
+
+PROCEDURE FarbenLiefern (VAR U, V, H: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: U, V, H sind die Farben der Meldung
+         nach erfolgreicher Installation aller Komponenten von Murus. *)
+
+PROCEDURE TextLiefern (VAR T: ARRAY OF CHAR);
+(* Vor.: HIGH (T) >= 18.
+   Eff.: T bezeichnet das Datum der vorhandenen Version von Murus. *)
+
+PROCEDURE DatumLiefern (D: Kalenderdaten.Objekte);
+(* Vor.: D ist initialisiert.
+   Eff.: D ist das Datum der vorhandenen Version von Murus. *)
+
+PROCEDURE pruefen (T, M, J: CARDINAL);
+(* Vor.: T, M und 2000 + J definieren Tag, Monat und Jahr eines Kalenderdatums.
+   Eff.: Wenn das Datum der vorhandenen Version von Murus älter als das
+         durch T, M, J definierte ist, ist der aufrufende Prozeß mit einer
+         Fehlermeldung abgebrochen; andernfalls ist nichts verändert. *)
+
+END Murusversion.

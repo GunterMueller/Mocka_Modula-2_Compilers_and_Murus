@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# (c) Christian Maurer   v. 21. Mai 2007
+
+cd $MURUS/..
+if [ -f Murus.tgz ]; then
+  mv Murus.tgz Murus.old.tgz
+fi
+wget lwb.mi.fu-berlin.de/murus/Murus.tgz
+tar xfzv Murus.tgz
+cd Murus
+./machen

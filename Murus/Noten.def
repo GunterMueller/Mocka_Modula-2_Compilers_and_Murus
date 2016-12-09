@@ -1,0 +1,71 @@
+DEFINITION MODULE Noten;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Notenstufen 1 bis 6 mit Tendenz +/- oder 
+                 0 bis 15 Punkte, leer oder "ohne Beurteilung". *)
+     Formate = (Notenformat,   (* z.B. "1+", "4 ", "4-", "5 " *)
+                Punkteformat,  (* z.B. "15", "05", "04", "02" *)
+                Mischformat);  (* Eingabe beliebig, Echo im Punkteformat *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert, leer, nicht markiert und 
+         hat das Punkteformat. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(*
+PROCEDURE definiert (X: Objekte; n: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn n <= 15.
+         In diesem Fall ist X die entsprechende Notenstufe. *)
+*)
+PROCEDURE leer (X: Objekte): BOOLEAN;
+
+PROCEDURE leeren (X: Objekte);
+
+PROCEDURE kopieren (X, X1: Objekte);
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: 0 < .. 15 < leere Note < "ohneBeurteilung". *)
+
+PROCEDURE ohneBeurteilung (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X ohne Beurteilung ist. *)
+
+PROCEDURE Punktwert (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 0, wenn X leer oder ohne Beurteilung ist, 
+         sonst den Punktwert von X. *)
+
+PROCEDURE optimieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat den Wert "1+" bzw. "15". *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE Durchschnitt (X: ARRAY OF Objekte): REAL;
+(* Vor.: Alle X [i] (i <= HIGH (X)) sind initialisiert.
+   Eff.: Liefert den Durchschnitt dieser Noten. *)
+
+END Noten.

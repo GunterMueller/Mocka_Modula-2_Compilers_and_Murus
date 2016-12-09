@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Skript zum Übersetzen aller Moduln von Murus
+#
+# (c) Christian Maurer   v. 14. September 2008
+
+if [ $PWD != $MURUS ]; then clear
+  echo Dieses Skript setzt voraus, das das aktuelle Verzeichnis $PWD
+  echo mit dem Wert der Umgebungsvariablen MURUS=$MURUS übereinstimmt.
+  echo Da das nicht der Fall ist, kann das Skript nicht ausgeführt werden.
+  echo; exit
+fi
+
+rm -f BB* FMonitork* Mausk* Navi* *nFolg* Rechn* Robi* FKan* [VZ]Folg* # obsolete Moduln werden entfernt
+B=./m2bin
+rm -f $B/* # alte Kompilate werden entfernt
+
+m2 -s Prozedurtypen # wird bereits vom Muruskern importiert
+
+# alle in C geschriebenen Moduln werden mit dem gcc übersetzt:
+for d in `ls *.c`; do m=${d%.c}; m2 -s $m; gcc -c -o $B/$m.o $m.c; done
+
+# alle in Assembler geschriebenen Moduln werden mit dem as übersetzt:
+for d in `ls *.s`; do m=${d%.s}; m2 -s $m; as     -o $B/$m.o $m.s; done
+
+# Mocka wird angeworfen
+echo p Murus | m2
+
+if [ ! -f m2bin/Prozedurtypen.o ]; then clear
+  echo m2 konnte nicht gefunden werden.
+  echo
+  echo Ist das Verzeichnis /usr/local/bin im Pfad enthalten ?
+  echo \(Kontrolle mit \"echo '$PATH'\"\)
+  echo; exit
+fi
+
+if [ -x Murus ]; then
+  echo p Murus | m2
+  ./Murus
+else
+  echo; echo Bei der Installation ist irgendetwas schief gegangen.; echo
+fi

@@ -1,0 +1,100 @@
+DEFINITION MODULE Sprachenfolgen;
+
+(* (c) Christian Maurer   v. 2. Januar 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+  FROM Schulfaecher IMPORT Fremdsprachen;
+
+TYPE
+  Objekte; (* Folgen von bis zu 4 Fremdsprachen mit Unterrichts-
+              beginn und -Ende sowie eine Standardsprachenfolge, 
+              vorbesetzt mit 1. Englisch 5-11, 2. Französisch 7-11 *)
+  Formate = (kurz,  (* 1 Zeile *)
+             lang); (* 4 Zeilen *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert. 
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn S leer ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist leer. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und X1 
+         gleich lang sind und die gleichen Sprachen 
+         in der gleichen Reihenfolge enthalten. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: >>>  Spezifikation fehlt.  <<<
+         Liefert immer FALSE. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: X1 stimmt mit X überein; X ist nicht verändert. *)
+
+PROCEDURE aktualisieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X stimmt mit der Standardsprachenfolge überein;
+         die Standardsprachenfolge ist unverändert. *)
+
+PROCEDURE Anzahl (X: Objekte;
+                  VAR FS: ARRAY OF Fremdsprachen;
+                  VAR von, bis: ARRAY OF CARDINAL): CARDINAL;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert die Anzahl der Fremdsprachen von X. 
+         FS sind diese Sprachen; von/bis sind die erste 
+         bzw. letzte Klassenstufe zu jeder Fremdsprache. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE formatieren (X: Objekte; T: Formate);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Format T. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist ab der Position (Z, S) auf dem Bildschirm 
+         ausgegeben. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: X steht an der Seitenposition (Z, S) im Druckerpuffer. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist die an der Bildschirmposition (Z, S) editierte 
+         Sprachenfolge. In X sind die 1. und 2. Fremdsprache 
+         nicht leer. X ist in VOGO als aktuelle Sprachenfolge 
+         eingefügt. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE StandardEditieren (Z, S: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Die Standardsprachenfolge ist die an der 
+         Bildschirmposition (Z, S) editierte Sprachenfolge. *)
+
+PROCEDURE konfigurieren;
+(* Vor.: Keine.
+   Eff.: Die Standardsprachenfolge ist die in Zeile 2 editierte 
+         Sprachenfolge. *)
+
+END Sprachenfolgen.

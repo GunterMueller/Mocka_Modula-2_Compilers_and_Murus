@@ -1,0 +1,60 @@
+DEFINITION MODULE FSemaphore;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM IP IMPORT Namen;
+
+TYPE Objekte;
+(* Ferne Semaphore, d.h. ganzzahlige Werte als Zugangsprotokolle zu kritischen
+   Abschnitten, in denen mehrere Unix-Prozesse oder Prozesse auf verschiedenen
+   Rechnern auf gemeinsame Ressourcen zugreifen (s. Grundzüge
+   der Nichtsequentiellen Programmierung, S. 52 ff., 87, und 111 ff.).
+
+   Ob ein gestarteter Prozeß der Anbieter oder ein Kunde ist, hängt vom Aufruf
+   der Prozedur I ab.
+
+   Die Prozeduren P und V sind unteilbar, d.h. sie können von anderen Prozessen
+   nicht unterbrochen werden. *)
+
+PROCEDURE I (VAR X: Objekte; n: CARDINAL; A: Namen; N: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         A ist der Name des lokalen oder eines fernen im Netz erreichbaren
+         Rechners; im zweiten Fall hat ein Prozeß auf dem Rechner mit dem
+         Namen A ein fernes Semaphor mit der gleichen Nummer initialisiert.
+         N < Kanaele.maxNr; die Ports Muruskern.MinPort + N + i (i < 2)
+         sind nicht von Netzwerkdiensten belegt.
+   Eff.: X ist initialisiert und hat den Wert n.
+         Kein Prozeß ist auf X blockiert.
+         X hat die Nummer N, d.h. die Kommunikation zwischen dem Anbieter
+         und den Kunden läuft unter TCP/IP über die o.g. Ports.
+
+         Der aufrufende Prozeß ist genau dann Anbieter von X, wenn der lokale
+         Rechner den Namen A hat und der aufrufende Prozeß die Prozedur
+         als erster aufgerufen hat; andernfalls ist er Kunde von X.
+
+         Wenn er Anbieter von X ist, hat er Kunden von X
+         bei ihren Aufrufen von P und V bedient, bis er abgebrochen wurde.
+         Anweisungen nach dem Aufruf von I sind nicht mehr ausgeführt.
+         Danach ist er nicht mehr initialisiert; insbesondere sind die
+         o.g. Ports nicht mehr von Netzwerkdiensten belegt.
+
+         Andernfalls, d.h. wenn er Kunde von X ist, steht ihm der
+         Anbieter von X bei seinen Aufrufen von P und V zur Verfügung. *)
+
+PROCEDURE T (VAR X: Objekte);
+(* Vor.: X ist initialisiert und hat einen Wert >= 0.
+   Eff.: X ist nicht initialisiert. Die o.g. Ports von X sind auf dem
+         lokalen Rechner nicht mehr von Netzwerkdiensten belegt. *) 
+
+PROCEDURE P (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X.
+   Eff.: Der aufrufende Prozeß war ggf. solange auf X blockiert, bis der
+         Wert von X > 0 war. Jetzt ist der Wert von X dekrementiert. *)
+
+PROCEDURE V (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X.
+   Eff.: Der Wert von X ist inkrementiert. *)
+
+END FSemaphore.

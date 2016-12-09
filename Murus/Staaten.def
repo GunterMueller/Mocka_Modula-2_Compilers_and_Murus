@@ -1,0 +1,51 @@
+DEFINITION MODULE Staaten;
+
+(* (c) Christian Maurer   v. 18. August 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Formate = (kurz,   (* Top-Level-Domain, z.B. "de",          "it"      *)
+                lang,   (* Bezeichnung,      z.B. "Deutschland", "Italien" *)
+                tel,    (* Telefon-Vorwahl,  z.B. 49,            39        *)
+                kfz,    (* Kfz-Kennzeichen,  z.B. "D",           "I"       *)
+                sport); (* IOC-Code,         z.B. "GER",         "ITA"     *)
+     Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+
+PROCEDURE terminieren (VAR X: Objekte);
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+
+PROCEDURE leeren (X: Objekte);
+
+PROCEDURE kopieren (X, X1: Objekte);
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(*
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+*)
+PROCEDURE inEuropa (X: Objekte): BOOLEAN;
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+
+PROCEDURE faerben (X: Objekte; V, H: Farben.Objekte);
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+
+PROCEDURE ausgeben (X: Objekte; z, s: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; z, s: CARDINAL);
+
+PROCEDURE editieren (X: Objekte; z, s: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Staaten.

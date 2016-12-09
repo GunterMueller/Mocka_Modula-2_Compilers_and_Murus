@@ -1,0 +1,14 @@
+FOREIGN MODULE Murustest;
+
+(* (c) Christian Maurer   v. 7. Juni 2008 *)
+
+(* >>> Nur für Ausgaben auf die Startkonsole unter X zu Testzwecken. *)
+
+PROCEDURE print0 (T: ARRAY OF CHAR);
+PROCEDURE println (T: ARRAY OF CHAR);
+PROCEDURE print (T: ARRAY OF CHAR; n: CARDINAL);
+PROCEDURE print2 (T: ARRAY OF CHAR; n: CARDINAL; S: ARRAY OF CHAR; k: CARDINAL);
+PROCEDURE printi (T: ARRAY OF CHAR; i: INTEGER);
+PROCEDURE printint (i: INTEGER);
+
+END Murustest.

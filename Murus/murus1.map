@@ -1,0 +1,55 @@
+# murus1.map
+#
+# (c) Christian Maurer   v. 8. Oktober 2007
+#     Nutzungsbedingungen siehe Murus.mod
+
+keycode 58 = Shift # Caps_Lock nervt
+
+# keycode 113 = Lautsprecher an_aus
+# keycode 114 = Lautsprecher leiser
+# keycode 115 = Lautsprecher lauter
+# keycode 226 = Werkzeug
+
+control alt keycode 105 = Decr_Console    # Left
+control alt keycode 106 = Incr_Console    # Right
+control alt keycode 104 = Scroll_Backward # PageUp
+control alt keycode 109 = Scroll_Forward  # PageDown
+
+control alt keycode 59 = Console_1
+control alt keycode 60 = Console_2
+control alt keycode 61 = Console_3
+control alt keycode 62 = Console_4
+control alt keycode 63 = Console_5
+control alt keycode 64 = Console_6
+control alt keycode 65 = Console_7
+control alt keycode 66 = Console_8
+control alt keycode 67 = Console_9
+control alt keycode 68 = Console_10 # durch System belegt
+control alt keycode 87 = Console_11
+control alt keycode 88 = Console_12
+
+altgr keycode 59 = Console_13
+altgr keycode 60 = Console_14
+altgr keycode 61 = Console_15
+altgr keycode 62 = Console_16
+altgr keycode 63 = Console_17
+altgr keycode 64 = Console_18
+altgr keycode 65 = Console_19
+altgr keycode 66 = Console_20
+altgr keycode 67 = Console_21
+altgr keycode 68 = Console_22
+altgr keycode 87 = Console_23
+altgr keycode 88 = Console_24
+
+# control altgr keycode 59 = Console_25 # boot.klog
+# control altgr keycode 60 = Console_26
+# control altgr keycode 61 = Console_27
+# control altgr keycode 62 = Console_28
+# control altgr keycode 63 = Console_29
+# control altgr keycode 64 = Console_30
+# control altgr keycode 65 = Console_31
+# control altgr keycode 66 = Console_32
+# control altgr keycode 67 = Console_33
+# control altgr keycode 68 = Console_34
+# control altgr keycode 87 = Console_35
+# control altgr keycode 88 = Console_36

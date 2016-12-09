@@ -1,0 +1,62 @@
+DEFINITION MODULE Semesterdaten;
+
+(* (c) Christian Maurer   v. 11. Januar 2006 *)
+
+IMPORT Farben;
+  FROM Kalenderdaten IMPORT Objekte;
+
+VAR Semesterbeginn, Semesterende,
+    Vorlesungsbeginn, Vorlesungsende: Objekte;
+(* Eff.: Diese Variablen sind initialisiert. *)
+
+PROCEDURE definieren (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn T vorher leer war, ist T jetzt ein Text aus vier Zeichen der Form
+         wie z.B. "WS04" oder "SS05", der dasjenige Semester definiert, in dem
+         das Datum der Systemuhr des Rechners liegt.
+         War T vorher ein Text, der eine solche Form hatte, ist T unverändert.
+         In diesen Fällen haben die o.a. Variablen die zu T passenden Werte.
+         War T vorher nicht leer oder ein Text einer solchen Form,
+         sind T und die Variablen jetzt leer. *)
+
+PROCEDURE AnzahlTage (): CARDINAL;
+(* Vor.: Ein Semester ist definiert.
+   Eff.: Liefert die Anzahl der Tages des definierten Semesters. *)
+
+PROCEDURE DatumAusgeben (D: Objekte; Z, S: CARDINAL);
+(* Vor.: Ein Semester ist definiert.
+         D ist initialisiert und liegt innerhalb des definierten Semesters.
+   Eff.: D ist, je nachdem, ob es in der Vorlesungszeit liegt oder nicht, in
+         bestimmten Farben ab Position (Z, S) auf dem Bildschirm ausgeben. *)
+
+PROCEDURE imSemester (D: Objekte): BOOLEAN;
+(* Vor.: Ein Semester ist definiert.
+         D ist initialisiert und liegt innerhalb des definierten Semesters.
+   Eff.: Liefert genau dann TRUE, wenn D innerhalb
+         des definierten Semesters liegt. *)
+
+PROCEDURE inErsterVorlesungswoche (D: Objekte): BOOLEAN;
+(* Vor.: Ein Semester ist definiert.
+         D ist initialisiert und liegt innerhalb des definierten Semesters.
+   Eff.: Liefert genau dann TRUE, wenn D innerhalb der ersten Vorlesungswoche
+         des definierten Semesters liegt. *)
+
+PROCEDURE inVorlesungszeit (D: Objekte): BOOLEAN;
+(* Vor.: Ein Semester ist definiert.
+         D ist initialisiert und liegt innerhalb des definierten Semesters.
+   Eff.: Liefert genau dann TRUE, wenn D innerhalb der Vorlesungszeit des
+         definierten Semesters liegt und kein Sonn- oder Feiertag ist. *)
+
+PROCEDURE verschieben (D: Objekte; v: BOOLEAN; E: CARDINAL);
+(* Vor.: Ein Semester ist definiert.
+         D ist initialisiert und liegt innerhalb des definierten Semesters.
+   Eff.: Wenn das innerhalb des definierten Semesters möglich ist, ist D
+         E = 0 um einen Tag und für E = 1 um eine Woche w weitergesetzt
+         (für w = TRUE) bzw. zurückgesetzt (für w = FALSE).
+         Für E > 1 liegt D jetzt innerhalb der ersten (für w = FALSE) bzw.
+         letzten (für w = TRUE) Vorlesungswoche des definierten Semesters
+         und hat den gleichen Wochentag wie D vorher. *)
+
+(* VAR SemS, SemH, VorlS, VorlH: Farben.Objekte; *)
+
+END Semesterdaten.

@@ -1,0 +1,70 @@
+DEFINITION MODULE FBSchlangen;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM IP IMPORT Namen;
+
+CONST M = 1024;
+TYPE Objekte;
+(* Ferne beschränkte Warteschlangen der Maximalkapazität M von Strömen
+   beliebiger aber fester Länge, auf die mehrere Unix-Prozesse
+   oder Prozesse auf verschiedenen Rechnern zugreifen.
+
+   Anbieter und Kunde verwenden bei FBSchlangen den gleichen Quelltext.
+   Ob ein gestarteter Prozeß der Anbieter oder ein Kunde ist, hängt vom Aufruf
+   der Prozedur initialisieren ab.
+
+   Die Prozeduren einfuegen und entfernen sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; k, n: CARDINAL; A: Namen; N: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 0 < k <= M und n > 0.
+         A ist der Name des lokalen oder eines fernen im Netz erreichbaren
+         Rechners; im zweiten Fall hat ein Prozeß auf dem Rechner mit dem
+         Namen A eine ferne beschränkte Schlange mit der gleichen Nummer
+         initialisiert.
+         N < Kanaele.maxNr; die Ports Muruskern.MinPort + N + i (i < 2)
+         sind nicht von Netzwerkdiensten belegt.
+   Eff.: X ist initialisiert, hat die Kapazität k und die Stromlänge n.
+         X enthält keinen Strom.
+
+         X hat die Nummer N, d.h. die Kommunikation zwischen dem Anbieter
+         und den Kunden läuft unter TCP/IP über die o.g. Ports.
+
+         Der aufrufende Prozeß ist genau dann Anbieter von X, wenn der
+         lokale Rechner den Namen A und der aufrufende Prozeß die Prozedur
+         als erster aufgerufen hat; andernfalls ist er Kunde von X.
+
+         Wenn er Anbieter von X ist, hat er Kunden von X bei ihren Aufrufen der
+         Prozeduren einfuegen und entfernen bedient, bis er abgebrochen wurde.
+         Anweisungen nach dem Aufruf von initialisieren sind nicht mehr ausgeführt.
+         Danach ist er nicht mehr initialisiert; insbesondere sind die
+         o.g. Ports auf ihm nicht mehr von Netzwerkdiensten belegt.
+
+         Andernfalls, d.h. wenn er Kunde von X ist, steht ihm der Anbieter von X
+         bei seinen Aufrufen von einfuegen oder entfernen zur Verfügung. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß ist lesend oder schreibend in X.
+   Eff.: X ist nicht initialisiert. Die o.g. Ports von X sind auf dem
+         lokalen Rechner nicht mehr von Netzwerkdiensten belegt. *) 
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X,
+   Eff.: Der aufrufende Prozeß war ggf. solange blockiert,
+         bis Anzahl der Ströme in X < die Kapazität von X galt.
+         Jetzt ist der Strom ab A der Stromlänge von X als letzter Strom
+         in X eingefügt. *)
+    
+PROCEDURE entfernen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X.
+   Eff.: Der aufrufende Prozeß war ggf. solange blockiert,
+         bis X einen Strom enthielt.
+         Ab A steht jetzt der erste Strom aus X der Stromlänge von X
+         und dieser Strom ist jetzt aus X entfernt. *)
+
+END FBSchlangen.

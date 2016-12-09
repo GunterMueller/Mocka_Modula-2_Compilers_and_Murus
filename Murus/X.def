@@ -1,0 +1,375 @@
+FOREIGN MODULE X;
+
+(* (c) Christian Maurer   v. 7. September 2008 *)
+
+(* >>> Nur zur Implementierung von XKern von Murus;
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+FROM SYSTEM IMPORT WORD, ADDRESS;
+
+(* Spezifikationen: man (3x), X.h, Xatom.h, Xlib.h und Xutil.h *)
+
+TYPE Boolean = INTEGER; CONST True = 1; False = 0;
+TYPE Status = INTEGER;
+     Atom = CARDINAL;
+     Time = CARDINAL;
+     Font = CARDINAL;
+     Display = WORD; DPointer = POINTER TO Display;
+     Colormap = CARDINAL;
+     Window = CARDINAL;
+     Screen = WORD; SPointer = POINTER TO Screen;
+     VisualID = CARDINAL;
+     Visual = RECORD XExtData: ADDRESS; visualid: VisualID; class: INTEGER;
+                     red_mask, green_mask, blue_mask: BITSET;
+                     bits_per_rgb, map_entries: INTEGER END;
+     VPointer = POINTER TO Visual;
+     Pixmap = CARDINAL;
+     Cursor = CARDINAL;
+     Drawable = CARDINAL;
+CONST None = 0; CopyFromParent = 0; ParentRelative = 1; PointerWindow = 0;
+      InputFocus = 1; PointerRoot = 1; AnyPropertyType = 0; AnyKey = 0;
+      AnyButton = 0; AllTemporary = 0; CurrentTime = 0; NoSymbol = 0;
+
+PROCEDURE XOpenDisplay (N: ARRAY OF CHAR): DPointer;
+PROCEDURE XCloseDisplay (D: DPointer): INTEGER;
+PROCEDURE XBlackPixel (D: DPointer; S: INTEGER): CARDINAL;
+PROCEDURE XWhitePixel (D: DPointer; S: INTEGER): CARDINAL;
+PROCEDURE XDefaultRootWindow (D: DPointer): Window;
+PROCEDURE XDefaultScreen (D: DPointer): INTEGER;
+PROCEDURE XDefaultDepth (D: DPointer; S: INTEGER): INTEGER;
+PROCEDURE XDisplayWidth (D: DPointer; S: INTEGER): CARDINAL;
+PROCEDURE XDisplayHeight (D: DPointer; S: INTEGER): CARDINAL;
+PROCEDURE XDefaultColormap (D: DPointer; S: INTEGER): Colormap;
+PROCEDURE XDefaultVisual (D: DPointer; S: INTEGER): VPointer;
+PROCEDURE XFree (data: ADDRESS): INTEGER;
+PROCEDURE XConnectionNumber (D: DPointer): INTEGER;
+
+PROCEDURE XInitThreads (): Status;
+PROCEDURE XLockDisplay (D: DPointer);
+PROCEDURE XUnlockDisplay (D: DPointer);
+PROCEDURE XFlush (D: DPointer): INTEGER;
+PROCEDURE XSync (D: DPointer; b: Boolean): INTEGER;
+
+PROCEDURE XCreateFontCursor (D: DPointer; C: CARDINAL): Cursor;
+PROCEDURE XDefineCursor (D: DPointer; W: Window; C: Cursor): INTEGER;
+
+TYPE XSetWindowAttributes = RECORD background_pixmap: Pixmap; background_pixel: CARDINAL;
+                                   border_pixmap: Pixmap; border_pixel: CARDINAL;
+                                   bit_gravity, win_gravity, backing_store: INTEGER;
+                                   backing_planes, backing_pixel: CARDINAL; save_under: Boolean;
+                                   event_mask, do_not_propagate_mask: BITSET;
+                                   override_redirect: Boolean;
+                                   colormap: Colormap; cursor: Cursor END;
+     XSetWindowAttributesPointer = POINTER TO XSetWindowAttributes;
+
+PROCEDURE XCreateSimpleWindow (D: DPointer; P: Window; x, y: INTEGER; w, h, bw, bd, bg: CARDINAL): Window;
+PROCEDURE XSetWindowBorderWidth (D: DPointer; W: Window; b: CARDINAL): INTEGER;
+PROCEDURE XResizeWindow (D: DPointer; W: Window; w, h: CARDINAL): INTEGER;
+PROCEDURE XMoveResizeWindow (D: DPointer; W: Window; x, y, w, h: CARDINAL): INTEGER;
+PROCEDURE XDestroyWindow (D: DPointer; W: Window): INTEGER;
+PROCEDURE XMapWindow (D: DPointer; W: Window): INTEGER;
+PROCEDURE XMapRaised (D: DPointer; W: Window): INTEGER;
+
+CONST CWX = {0}; CWY = {1}; CWWidth = {2}; CWHeight = {3};
+      CWBorderWidth = {4}; CWSibling = {5}; CWStackMode = {6};
+      IsUnmapped = 0; IsUnviewable = 1; IsViewable = 2;
+TYPE XWindowChanges = RECORD x, y, width, height, border_width: INTEGER;
+                             sibling: Window; stack_mode: INTEGER END;
+     XWindowAttributes = RECORD x, y, width, height, border_width, depth: INTEGER;
+                                visual: VPointer; root: Window;
+                                class, bit_gravity, win_gravity, backing_store: INTEGER;
+                                backing_planes, backing_pixel: CARDINAL; save_under: Boolean;
+                                colormap: Colormap; map_installed: Boolean; map_state: INTEGER;
+                                all_event_masks, your_event_mask, do_not_propagate_mask: BITSET;
+                                override_redirect: Boolean; screen: SPointer END;
+CONST Above = 0; Below = 1; TopIf = 2; BottomIf = 3; Opposite = 4;
+
+PROCEDURE XConfigureWindow (D: DPointer; W: Window; M: BITSET; VAR C: XWindowChanges): INTEGER;
+PROCEDURE XGetWindowAttributes (D: DPointer; W: Window; VAR A: XWindowAttributes): Status;
+PROCEDURE XChangeWindowAttributes (D: DPointer; W: Window; M: BITSET;
+                                   VAR A: XWindowAttributes): INTEGER;
+PROCEDURE XStoreName (D: DPointer; W: Window; N: ARRAY OF CHAR): INTEGER;
+PROCEDURE XSelectInput (D: DPointer; W: Window; M: BITSET): INTEGER;
+
+PROCEDURE XCreateColormap (D: DPointer; W: Window; V: VPointer; A: INTEGER): Colormap;
+
+PROCEDURE XCreatePixmap (D: DPointer; W: Drawable; w, h, d: CARDINAL): Pixmap;
+PROCEDURE XFreePixmap (D: DPointer; P: Pixmap): INTEGER;
+
+TYPE XExtData = WORD; XExtDataPointer = POINTER TO XExtData;
+     XGCValues = RECORD function: INTEGER; plane_mask, foreground, background: CARDINAL;
+                        line_width, line_style, cap_style, join_style,
+                        fill_style, fill_rule, arc_mode: INTEGER;
+                        tile, stipple: Pixmap; ts_x_origin, ts_y_origin: INTEGER;
+                        font: Font; subwindow_mode: INTEGER; graphics_exposures: Boolean;
+                        clip_x_origin, clip_y_origin: INTEGER; clip_mask: Pixmap;
+                        dash_offset: INTEGER; dashes: CHAR END;
+     GC = ADDRESS;
+
+PROCEDURE XDefaultGC (D: DPointer; S: INTEGER): GC;
+PROCEDURE XChangeGC (D: DPointer; G: GC; M: BITSET; VAR V: XGCValues): INTEGER;
+PROCEDURE XSetGraphicsExposures (D: DPointer; G: GC; b: Boolean);
+PROCEDURE XFreeGC (D: DPointer; G: GC): INTEGER;
+PROCEDURE XGetGCValues (D: DPointer; G: GC; M: BITSET; VAR V: XGCValues): Status;
+PROCEDURE XSetForeground (D: DPointer; G: GC; f: CARDINAL);
+PROCEDURE XSetBackground (D: DPointer; G: GC; b: CARDINAL);
+CONST GXcopy = 3; GXinvert = 10; GXcopyInverted = 12;
+PROCEDURE XSetFunction (D: DPointer; G: GC; m: CARDINAL);
+PROCEDURE XSetFont (D: DPointer; G: GC; F: Font): INTEGER;
+
+PROCEDURE XClearArea (D: DPointer; W: Window; x, y: INTEGER; w, h: CARDINAL; e: Boolean): INTEGER;
+PROCEDURE XClearWindow (D: DPointer; W: Window): INTEGER;
+PROCEDURE XCopyArea (D: DPointer; W, W1: Drawable; G: GC; x, y: INTEGER; w, h: CARDINAL; x1, y1: INTEGER): INTEGER;
+PROCEDURE XCopyPlane (D: DPointer; W, W1: Drawable; G: GC; x, y: INTEGER; w, h: CARDINAL; x1, y1: INTEGER; p: CARDINAL): INTEGER;
+
+TYPE XPoint = RECORD x, y: SHORTINT END;
+     XRectangle = RECORD x, y: SHORTINT; width, height: SHORTCARD END;
+     XArc = RECORD x, y: SHORTINT; width, height: SHORTCARD; angle1, angle2: SHORTINT END;
+CONST CoordModeOrigin = 0; CoordModePrevious = 1;
+      Complex = 0; Nonconvex = 1; Convex = 2;
+
+PROCEDURE XDrawPoint (D: DPointer; W: Drawable; G: GC; x, y: INTEGER): INTEGER;
+PROCEDURE XDrawPoints (D: DPointer; W: Drawable; G: GC; A: ADDRESS; n, m: INTEGER): INTEGER;
+PROCEDURE XDrawLine (D: DPointer; W: Drawable; G: GC; x1, y1, x2, y2: INTEGER): INTEGER;
+PROCEDURE XDrawLines (D: DPointer; W: Drawable; G: GC; A: ADDRESS; n, m: INTEGER): INTEGER;
+PROCEDURE XDrawSegments (D: DPointer; W: Drawable; G: GC; A: ADDRESS; n, m: INTEGER): INTEGER;
+PROCEDURE XDrawRectangle (D: DPointer; W: Drawable; G: GC; x, y: INTEGER; w, h: CARDINAL): INTEGER;
+PROCEDURE XDrawArc (D: DPointer; W: Drawable; G: GC; x, y: INTEGER; w, h: CARDINAL; a, a1: INTEGER): INTEGER;
+PROCEDURE XFillRectangle (D: DPointer; W: Drawable; G: GC; x, y, w, h: INTEGER): INTEGER;
+PROCEDURE XFillPolygon (D: DPointer; W: Drawable; G: GC; A: ADDRESS; n, s, m: INTEGER): INTEGER;
+PROCEDURE XFillArc (D: DPointer; W: Drawable; G: GC; x, y: INTEGER; w, h: CARDINAL; a, a1: INTEGER): INTEGER;
+
+TYPE KeySym = CARDINAL;
+     KeyCode = CHAR; KeyCodePointer = POINTER TO KeyCode;
+(*
+TYPE XModifierKeymap = RECORD max_keypermod: INTEGER; modifiermap: KeyCodePointer END;
+     XModifierKeymapPointer = POINTER TO XModifierKeymap;
+*)
+TYPE Event = (Event0, Event1, KeyPress, KeyRelease, ButtonPress, ButtonRelease,
+              MotionNotify, EnterNotify, LeaveNotify, FocusIn, FocusOut,
+              KeymapNotify, Expose, GraphicsExpose, NoExpose, VisibilityNotify,
+              CreateNotify, DestroyNotify, UnmapNotify, MapNotify, MapRequest,
+              ReparentNotify, ConfigureNotify, ConfigureRequest, GravityNotify,
+              ResizeRequest, CirculateNotify, CirculateRequest, PropertyNotify,
+              SelectionClear, SelectionRequest, SelectionNotify,
+              ColormapNotify, ClientMessage, MappingNotify, LASTEvent);
+
+CONST NoEventMask = {};
+      KeyPressMask = {0}; KeyReleaseMask = {1};
+      ButtonPressMask = {2}; ButtonReleaseMask = {3};
+      EnterWindowMask = {4}; LeaveWindowMask = {5};
+      PointerMotionMask = {6}; PointerMotionHintMask = {7};
+      Button1MotionMask = {8}; Button2MotionMask = {9};
+      Button3MotionMask = {10}; Button4MotionMask = {11};
+      Button5MotionMask = {12}; ButtonMotionMask = {13};
+      KeymapStateMask = {14}; ExposureMask = {15};
+      VisibilityChangeMask = {16}; StructureNotifyMask = {17};
+      ResizeRedirectMask = {18}; SubstructureNotifyMask = {19};
+      SubstructureRedirectMask = {20}; FocusChangeMask = {21};
+      PropertyChangeMask = {22}; ColormapChangeMask = {23};
+      OwnerGrabButtonMask = {24};
+
+TYPE XKeyEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                        display: DPointer; window, root, subwindow: Window;
+                        time: Time; x, y, x_root, y_root: INTEGER;
+                        state: BITSET; keycode: CARDINAL; same_screen: Boolean END;
+     XKeyPressedEvent = XKeyEvent; XKeyReleasedEvent = XKeyEvent;
+     XButtonEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                           display: DPointer; window, root, subwindow: Window;
+                           time: Time; x, y, x_root, y_root: INTEGER;
+                           state, button: BITSET; same_screen: Boolean END;
+     XButtonPressedEvent = XButtonEvent; XButtonReleasedEvent = XButtonEvent;
+     XMotionEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                           display: DPointer; window, root, subwindow: Window;
+                           time: Time; x, y, x_root, y_root: INTEGER;
+                           state: BITSET; is_hint: CHAR; same_screen: Boolean END;
+     XPointerMovedEvent = XMotionEvent;
+     XCrossingEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                             display: DPointer; window, root, subwindow: Window;
+                             time: Time; x, y, x_root, y_root, mode, detail: INTEGER;
+                             same_screen, focus: Boolean; state: CARDINAL END;
+     XEnterWindowEvent = XCrossingEvent; XLeaveWindowEvent = XCrossingEvent;
+     XFocusChangeEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                display: DPointer; window: Window;
+                                mode, detail: INTEGER END;
+     XFocusInEvent = XFocusChangeEvent; XFocusOutEvent = XFocusChangeEvent;
+     XKeymapEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                           display: DPointer; window: Window;
+                           key_vector: ARRAY [0..31] OF CHAR END;	
+     XExposeEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                           display: DPointer; window: Window;
+                           x, y, width, height, count: INTEGER END;
+     XGraphicsExposeEvent = RECORD type: INTEGER; serial: CARDINAL; send_event: Boolean;
+                                   display: DPointer; drawable: Drawable;
+                                   x, y, width, height, count, major_code, minor_code: INTEGER END;
+     XNoExposeEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                             display: DPointer; drawable: Drawable;
+                             major_code, minor_code: INTEGER END;
+     XVisibilityEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                               display: DPointer; window: Window;
+                               state: INTEGER END;
+     XCreateWindowEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                 display: DPointer; parent, window: Window;
+                                 x, y, width, height, border_width: INTEGER;
+                                 override_redirect: Boolean END;
+     XDestroyWindowEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                  display: DPointer; event, window: Window END;
+     XUnmapEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                          display: DPointer; event, window: Window;
+                          from_configure: Boolean END;
+     XMapEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                        display: DPointer; event, window: Window;
+                        override_redirect: Boolean END;
+     XMapRequestEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                               display: DPointer; parent, window: Window END;
+     XReparentEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                             display: DPointer; event, window, parent: Window;
+                             x, y: INTEGER; override_redirect: Boolean END;
+     XConfigureEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                              display: DPointer; event, window: Window;
+                              x, y, width, height, border_width: INTEGER;
+                              above: Window; override_redirect: Boolean END;
+     XGravityEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                            display: DPointer; event, window: Window;
+                            x, y: INTEGER END;
+     XResizeRequestEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                  display: DPointer; window: Window;
+                                  width, height: INTEGER END;
+     XConfigureRequestEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                     display: DPointer; parent, window: Window;
+                                     x, y, width, height, border_width: INTEGER;
+                                     above: Window; detail: INTEGER; value_mask: BITSET END;
+     XCirculateEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                              display: DPointer; event, window: Window;
+                              place: INTEGER END;
+     XCirculateRequestEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                     display: DPointer; parent, window: Window;
+                                     place: INTEGER END;
+     XPropertyEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                             display: DPointer; window: Window;
+                             atom: Atom; time: Time; state: INTEGER END;
+     XSelectionClearEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                   display: DPointer; window: Window;
+                                   selection: Atom; time: Time END;
+     XSelectionRequestEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                     display: DPointer; owner, requestor: Window;
+                                     selection, target, property: Atom; time: Time END;
+     XSelectionEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                              display: DPointer; requestor: Window;
+                              selection, target, property: Atom; time: Time END;
+     XColormapEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                             display: DPointer; window: Window;
+                             colormap: Colormap; new: Boolean; state: INTEGER END;
+     XClientMessageEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                                  display: DPointer; window: Window;
+                                  message_type: Atom; format: INTEGER;
+                                  data: RECORD CASE : CARDINAL OF
+                                        0: b: ARRAY [0..19] OF CHAR |
+                                        1: s: ARRAY [0..9] OF SHORTINT |
+                                        2: l: ARRAY [0..4] OF INTEGER END END END;
+     XMappingEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                            display: DPointer; window: Window;
+                            request, first_keycode, count: INTEGER END;
+     XMappingEventPointer = POINTER TO XMappingEvent;
+     XErrorEvent = RECORD type: Event; display: DPointer;
+                          resourceid: CARDINAL; (* laut man _letztes_ Attribut ! *)
+                          serial: CARDINAL; error, request, minor: CHAR END;
+     XErrorEventPointer = POINTER TO XErrorEvent;
+     XAnyEvent = RECORD type: Event; serial: CARDINAL; send_event: Boolean;
+                        display: DPointer; window: Window END;
+     XEvent = RECORD CASE : CARDINAL OF 0: type: Event | 1: xany: XAnyEvent |
+                 2: xkey: XKeyEvent | 3: xbutton: XButtonEvent |
+                 4: xmotion: XMotionEvent | 5: xcrossing: XCrossingEvent |
+                 6: xfocus: XFocusChangeEvent | 7: xexpose: XExposeEvent |
+                 8: xgraphicsexpose: XGraphicsExposeEvent | 9: xnoexpose: XNoExposeEvent |
+                10: xvisibilty: XVisibilityEvent | 11: xcreatewindow: XCreateWindowEvent |
+                12: xdestroywindow: XDestroyWindowEvent | 13: xunmap: XUnmapEvent |
+                14: xmap: XMapEvent | 15: xmaprequest: XMapRequestEvent |
+                16: xreparent: XReparentEvent | 17: xconfigure: XConfigureEvent |
+                18: xconfigurerequest: XConfigureRequestEvent | 19: xgravity: XGravityEvent |
+                20: xresizerequest: XResizeRequestEvent | 21: xcirculate: XCirculateEvent |
+                22: xcirculaterequest: XCirculateRequestEvent |
+                23: xproperty: XPropertyEvent | 24: xselectionclear: XSelectionClearEvent |
+                25: xselectionrequest: XSelectionRequestEvent |
+                26: xselection: XSelectionEvent | 27: xcolormap: XColormapEvent |
+                28: xclient: XClientMessageEvent | 29: mapping: XMappingEvent |
+                30: xerror: XErrorEvent | 31: xkeymap: XKeymapEvent |
+                32: pad: ARRAY [0..23] OF INTEGER END END;
+TYPE XEventPointer = POINTER TO XEvent;
+
+PROCEDURE XPending (D: DPointer): CARDINAL;
+PROCEDURE XNextEvent (D: DPointer; VAR E: XEvent);
+PROCEDURE XMaskEvent (D: DPointer; M: BITSET; VAR E: XEvent);
+PROCEDURE XCheckMaskEvent (D: DPointer; M: BITSET; VAR E: XEvent): Boolean;
+PROCEDURE XCheckTypedEvent (D: DPointer; ET: Event; VAR E: XEvent): Boolean;
+PROCEDURE XCheckTypedWindowEvent (D: DPointer; W: Window; ET: Event; VAR E: XEvent): Boolean;
+PROCEDURE XPutBackEvent (D: DPointer; VAR E: XEvent);
+PROCEDURE XSendEvent (D: DPointer; W: Window; P: Boolean; B: BITSET; VAR E: XEvent);
+
+PROCEDURE XInternAtom (D: DPointer; T: ADDRESS; b: Boolean): Atom;
+
+CONST PropModeReplace = 0; PropModePrepend = 1; PropModeAppend = 2;
+PROCEDURE XChangeProperty (D: DPointer; W: Window; P, T: Atom; F, M: INTEGER; d: ADDRESS; N: INTEGER): INTEGER;
+PROCEDURE XGetWindowProperty (D: DPointer; W: Window; P: Atom; I, L: INTEGER; d: Boolean; R: Atom;
+                              VAR A: Atom; VAR F: INTEGER; VAR N, B: CARDINAL; data: ADDRESS): INTEGER;
+PROCEDURE XDeleteProperty (D: DPointer; W: Window; P: Atom): INTEGER;
+(**************************************************************************
+CONST (* Error Codes *)
+      Success = 0; BadRequest = 1; BadValue = 2; BadWindow = 3; BadPixmap = 4;
+      BadAtom = 5; BadCursor = 6; BadFont = 7; BadMatch = 8; BadDrawable = 9;
+      BadAccess = 10; BadAlloc = 11; BadColor = 12; BadGC = 13; BadIDChoice = 14;
+      BadName = 15; BadLength = 16; BadImplementation = 17;
+      FirstExtensionError = 128; LastExtensionError = 255;
+******************************************************************************)
+TYPE XCharStruct = RECORD lbearing, rbearing, width, ascent, descent: SHORTINT;
+                          attributes: SHORTCARD END;
+     XFontStruct = RECORD ext_data: XExtDataPointer; fid: Font;
+                          direction, min_char_or_byte2, max_char_or_byte2,
+                          min_byte1, max_byte1: CARDINAL; all_chars_exist: Boolean;
+                          default_char: CARDINAL; n_properties: INTEGER;
+                          properties: ADDRESS; min_bounds, max_bounds: XCharStruct;
+                          per_char: POINTER TO XCharStruct; ascent, descent: INTEGER END;
+     XFontStructPointer = POINTER TO XFontStruct;
+
+PROCEDURE XLoadQueryFont (D: DPointer; F: ADDRESS): XFontStructPointer;
+
+PROCEDURE XDrawString (D: DPointer; W: Drawable; G: GC;
+                       x, y: INTEGER; T: ADDRESS; n: INTEGER): INTEGER;
+
+PROCEDURE XLookupString (VAR K: XKeyEvent; T: ADDRESS; n: INTEGER;
+                         VAR k: KeySym; C: ADDRESS): CARDINAL;
+CONST XLookupNone = 1; XLookupChars = 2; XLookupKeySym = 3; XLookupBoth = 4;
+PROCEDURE XLookupKeysym (VAR K: XKeyEvent; i: INTEGER): KeySym;
+PROCEDURE XWarpPointer (D: DPointer; W, W1: Window;
+                        x, y: INTEGER; w, h: CARDINAL; x1, y1: INTEGER): INTEGER;
+
+TYPE XImage = RECORD
+                width, height, xoffset, format: INTEGER;
+                data: ADDRESS;
+                byte_order, bitmap_unit, bitmap_bit_order, bitmap_pad, depth, bytes_per_line, bits_per_pixel: INTEGER;
+                red_mask, green_mask, blue_mask: BITSET;
+                obdata: ADDRESS
+              END;
+     IPointer = POINTER TO XImage;
+CONST XYBitmap = 0; XYPixmap = 1; ZPixmap = 2;
+PROCEDURE XCreateImage (D: DPointer; V: VPointer; d: CARDINAL; f, o: INTEGER;
+                        A: ADDRESS; w, h: CARDINAL; p, b: INTEGER): IPointer;
+PROCEDURE XDestroyImage (I: IPointer): INTEGER;
+PROCEDURE XImageByteOrder (D: DPointer): INTEGER;
+PROCEDURE XInitImage (I: IPointer): Status;
+PROCEDURE XGetPixel (I: IPointer; x, y: INTEGER): CARDINAL;
+PROCEDURE XPutPixel (I: IPointer; x, y: INTEGER; pixel: CARDINAL): INTEGER;
+PROCEDURE XSubImage (I: IPointer; x, y: INTEGER; w, h: CARDINAL): IPointer;
+PROCEDURE XGetImage (D: DPointer; W: Drawable; x, y: INTEGER; w, h: CARDINAL;
+                     P: BITSET; f: INTEGER): IPointer;
+PROCEDURE XPutImage (D: DPointer; W: Drawable; G: GC; i: IPointer;
+                     x, y, x1, y1: INTEGER; w, h: CARDINAL): INTEGER;
+
+PROCEDURE XBitmapUnit (D: DPointer): INTEGER;
+PROCEDURE XBitmapBitOrder (D: DPointer): INTEGER;
+PROCEDURE XBitmapPad (D: DPointer): INTEGER;
+PROCEDURE XSetWindowBackgroundPixmap (D: DPointer; W: Window; P: Pixmap): INTEGER;
+
+PROCEDURE XSetWMProtocols (D: DPointer; W: Window; VAR A: Atom; n: CARDINAL): INTEGER;
+
+END X.

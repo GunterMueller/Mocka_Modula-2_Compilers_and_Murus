@@ -1,0 +1,18 @@
+DEFINITION MODULE Zeitkern;
+
+(* (c) Christian Maurer   v. 30. August 2005 *)
+
+PROCEDURE ZeitAktualisieren (VAR Stunde, Minute, Sekunde: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Stunde, Minute, Sekunde haben die Werte der Systemuhr. *)
+
+PROCEDURE DatumAktualisieren (VAR Tag, Monat, Jahr: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Tag, Monat, Jahr haben die Werte der Systemuhr. *)
+
+PROCEDURE relativAktualisieren (VAR Sekunde, Mikrosekunde: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Sekunde, Mikrosekunde haben die Werte der Systemuhr
+         relativ zum 1.1.1970, 0.00 Uhr. *)
+
+END Zeitkern.

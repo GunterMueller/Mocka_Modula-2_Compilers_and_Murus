@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 14. August 2006
+
+mkdir -p m2bin
+
+export MOCKAM2=
+export MOCKALINK=
+
+echo p Mc | $MOCKA/sys/m2
+
+mv Mc $MOCKA/sys
+
+rm -rf m2bin

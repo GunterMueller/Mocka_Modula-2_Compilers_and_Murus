@@ -1,0 +1,47 @@
+DEFINITION MODULE LSAbschnitte;
+
+(* (c) Christian Maurer   v. 23. Februar 2008 *)
+
+TYPE Objekte;
+(* Zugangsprotokolle zu kritischen Abschnitten, in denen mehrere
+   Prozesse lesend oder schreibend auf gemeinsame Daten zugreifen;
+   zu jedem Zeitpunkt im gleichen kritischen Abschnitt entweder
+   nur lesende Prozesse oder höchstens ein schreibender Prozeß
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 69).
+
+   Die Prozeduren Leser/Schreiber-Ein/Aus sind unteilbar, d.h. ihr
+   Ablauf kann von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert.
+         Kein Prozeß ist lesend oder schreibend in X. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß ist lesend oder schreibend in X.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE LeserEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist weder lesend noch schreibend in X.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß schreibend in X war.
+         Jetzt ist er lesend in X. *)
+
+PROCEDURE LeserAus (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist lesend in X.
+   Eff.: Er ist nicht lesend in X. *)
+
+PROCEDURE SchreiberEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist weder lesend noch schreibend in X.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß lesend oder schreibend
+         in X war. Jetzt ist er (als einziger) schreibend in X. *)
+
+PROCEDURE SchreiberAus (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist schreibend in X.
+   Eff.: Er ist nicht schreibend in X. *)
+
+END LSAbschnitte.

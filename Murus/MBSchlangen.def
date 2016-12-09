@@ -1,0 +1,39 @@
+DEFINITION MODULE MBSchlangen; 
+
+(* (c) Christian Maurer   v. 12. Dezember 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST M = 1024;
+TYPE Objekte;
+(* Mehrprozeßfähige beschränkte Warteschlangen der
+   Maximalkapazität M von Strömen beliebiger aber fester Länge
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 55 ff.).
+
+   Die Prozeduren einfuegen und entfernen sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; k, n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 0 < k <= M und n > 0.
+   Eff.: X ist initialisiert und hat die Kapazität k und
+         die Stromlänge n. X enthält keinen Strom. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Stromlänge von X
+         ist als letzter Strom in X eingefügt.
+         Der aufrufende Prozeß war ggf. solange blockiert,
+         bis Anzahl der Ströme in X < die Kapazität von X galt. *)
+
+PROCEDURE entfernen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Ab A steht der erste Strom von X der Stromlänge von X
+         und dieser Strom ist jetzt aus X entfernt.
+         Der aufrufende Prozeß war ggf. solange blockiert,
+         bis X einen Strom enthielt. *)
+
+END MBSchlangen.

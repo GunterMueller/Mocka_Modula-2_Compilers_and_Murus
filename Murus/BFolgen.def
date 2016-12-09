@@ -1,0 +1,34 @@
+DEFINITION MODULE BFolgen;
+
+(* (c) Christian Maurer   v. 5. Dezember 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Objekte;
+(* Beschränkte Folgen konstanter Länge von Strömen beliebiger,
+   aber fester Länge > 0 (zur Definition von Strömen s. Folgen); m.a.W.
+   Felder einer erst zur Laufzeit bestimmbaren Größe, die es in klassischen
+   Programmiersprachen nicht gibt, da in ihnen die Größe eines Feldes
+   bei der Übersetzung vereinbart, d.h. eine Konstante sein muß. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N, M: CARDINAL; L: ADDRESS);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: Für N = 0 oder M = 0 ist X = NIL und nicht initialisiert.
+         Ansonsten ist X initialisiert, hat die Stromlänge N und die Größe M.
+         Jeder Strom von X stimmt mit dem Strom ab L der Länge N überein. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE schreiben (X: Objekte; i: CARDINAL; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Für i >= Größe von X ist nichts verändert, ansonsten ist der i-te
+         Strom von X ist durch den Strom ab A der Stromlänge von X ersetzt. *)
+
+PROCEDURE lesen (X: Objekte; i: CARDINAL; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Für i >= Größe von X ist nichts verändert, ansonsten steht ab A
+         der i-te Strom von X der Stromlänge von X. *)
+
+END BFolgen.

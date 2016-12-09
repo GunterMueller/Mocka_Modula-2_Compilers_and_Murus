@@ -1,0 +1,13 @@
+DEFINITION MODULE Strichstaerken;
+
+(* (c) Christian Maurer   v. 15. September 2005 *)
+
+CONST max = 15;
+
+TYPE Staerken = [1..max];
+
+PROCEDURE auswaehlen (VAR S: Staerken);
+(* Vor.: Maus vorhanden.
+   Eff.: S ist die von Benutzer/in ausgewählte Stärke. *)
+
+END Strichstaerken.

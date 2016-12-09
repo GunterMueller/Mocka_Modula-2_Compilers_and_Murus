@@ -1,0 +1,34 @@
+DEFINITION MODULE Lehrerinnen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+  FROM Prozedurtypen IMPORT Relationen;
+IMPORT Farben;
+
+CONST Laenge = 4;
+TYPE Nummern = SHORTCARD;
+     Objekte;
+     Ordnungen = (nachNummer, nachKuerzel);
+VAR aktuelleOrdnung: Ordnungen;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+PROCEDURE terminieren (VAR X: Objekte);
+PROCEDURE leer (X: Objekte): BOOLEAN;
+PROCEDURE leeren (X: Objekte);
+PROCEDURE kopieren (X, X1: Objekte);
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+PROCEDURE faerben (X: Objekte; V, H: Farben.Objekte);
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+PROCEDURE Codelaenge (): CARDINAL;
+PROCEDURE Indexlaenge (): CARDINAL;
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+PROCEDURE IndexCodieren (A, I: ADDRESS);
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Lehrerinnen.

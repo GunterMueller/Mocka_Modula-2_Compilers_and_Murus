@@ -1,0 +1,13 @@
+FOREIGN MODULE Cardinalkern;
+
+(* (c) Christian Maurer   v. 5. April 2005 *)
+
+PROCEDURE multiplizieren (VAR a, b: CARDINAL);
+(* Vor.: Keine.
+   Eff.: a' = (a * b) MOD 2^32 und b' = (a * b) DIV 2^32. *)
+
+PROCEDURE dividieren (VAR a, b: CARDINAL; c: CARDINAL);
+(* Vor.: c > 0 und b < c (Verletzung führt zum Programmabbruch!).
+   Eff.: a' = (a + 2^32 * b) DIV c und b' = (a + 2^32 * b) MOD c. *)
+
+END Cardinalkern.

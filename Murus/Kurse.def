@@ -1,0 +1,63 @@
+DEFINITION MODULE Kurse;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben, Schulhalbjahre, Schulfaecher, Kurshalbjahre;
+
+TYPE Kursarten = (Leistungskurs, Grundkurs (* , Zusatzkurs *));
+     Objekte;
+VAR KursV, KursH: Farben.Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer und ein Grundkurs. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+
+PROCEDURE leeren (X: Objekte);
+
+PROCEDURE kopieren (X, X1: Objekte);
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und X1 gleich sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn . *)
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+ (* Vor.: X und X1 sind initialisiert. 
+    Eff.: Liefert genau dann TRUE, wenn X und X1 leer sind
+          oder das gleiche Fach haben. *)
+
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+
+PROCEDURE definieren (X: Objekte; A: Kursarten (* ; F: Schulfaecher.Objekte *));
+ (* Vor.: X ist initialisiert.
+    Eff.: X ist ein Kurs der Kursart A. *)
+
+PROCEDURE Art (X: Objekte): Kursarten;
+
+PROCEDURE Fach (X: Objekte): Schulfaecher.Faecher;
+
+PROCEDURE Halbjahr (X: Objekte): Kurshalbjahre.Objekte;
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Kurse.

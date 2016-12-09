@@ -1,0 +1,13 @@
+DEFINITION MODULE Sortierungen;
+
+(* (c) Christian Maurer   v. 20. Oktober 2004 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Relationen;
+
+PROCEDURE sortieren (A: ADDRESS; N, L: CARDINAL; R: Relationen);
+(* Vor.: Ab A steht ein Feld von N > 1 Strömen der Länge L > 0, auf
+         denen R eine strikte ("<", nicht "<=" !) Ordnungsrelation ist.
+   Eff.: Das Feld ab A ist gemäß der Ordnung R geordnet. *)
+
+END Sortierungen.

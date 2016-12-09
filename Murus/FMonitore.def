@@ -1,0 +1,120 @@
+DEFINITION MODULE FMonitore;
+
+(* (c) Christian Maurer   v. 7. Juli 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Anweisungen, Bearbeitungsspektren,
+       Bedingungsspektren, Praedikatsspektren;
+FROM Muruskern IMPORT MinPort;
+FROM IP IMPORT Namen;
+
+CONST M = 25; (* Maximalzahl der Operationen *)
+
+TYPE Objekte;
+(* Ferne Monitore, d.h. universelle Synchronisationsobjekte zur Sicherstellung
+   des gegenseitigen Ausschlusses von bis zu M auf mehrere Unix-Prozesse
+   oder Rechner verteilten Kunden aufrufbaren - evtl. bedingungsabhängigen -
+   fernen Operationen eines Anbieters auf von ihm verwalteten gemeinsam
+   nutzbaren Ressourcen und zur Bedingungssynchronisation zwischen ihnen
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 111 ff.).
+   
+   Ferne Operationen sind solche, die innerhalb eines anderen UNIX-Prozesses
+   auf dem gleichen Rechner oder die auf einem anderen Rechner laufen;
+   charakteristisches Merkmal ist dabei, daß der aufrufende Prozeß und
+   der Prozeß, der die Operation ausführt, nicht über gemeinsamen Speicher
+   verfügen.
+
+   Anbieter und Kunde verwenden bei fernen Monitoren den gleichen Quelltext,
+   wodurch die Übersetzung unterschiedlicher Varianten (wie bei RPCs) entfällt.
+   Ob ein gestarteter Prozeß der Anbieter oder ein Kunde ist, hängt vom Aufruf
+   der Prozedur aktivieren ab.
+
+   Die Operationen, die ein ferner Monitor zur Verfügung stellt, werden durch
+   fortlaufende Nummern (ab 0) identifiziert; sie sind in einem durch diese
+   Nummern parametrisierten Spektrum von Bearbeitungsprozeduren gebündelt,
+   das von den Klienten konstruiert und bei der Initialisierung des Monitors
+   übergeben wird. Die Klienten konstruieren auch die Bedingungen, auf die
+   ein aufrufender Kundenprozeß bei seiner Ausführung der Bearbeitungen durch
+   den Anbieter ggf. bis zu ihrer Erfüllung blockiert ist, in Form eines
+   (entsprechend parametrisierten) Spektrums Boolescher Funktionsprozeduren
+   und übergeben das dem fernen Monitor bei seiner Initialisierung.
+
+   Die fernen Monitore können zu übergeordneten Subjekten assoziiert sein,
+   von denen sie zur Synchronisation benutzt werden. Das ist erforderlich,
+   falls mehrere Exemplare eines fernen Monitors mit den gleichen Bearbeitungen
+   oder Bedingungen in einem verteilten Programm verwendet werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; S: ADDRESS; n: CARDINAL;
+                          C: Bedingungsspektren; B: Bearbeitungsspektren;
+                          N: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         S = NIL oder S ist ein Verweis auf ein übergeordnetes Subjekt,
+         von dem X zur Synchronisation benutzt wird.
+         0 < n <= M.
+         C und B sind für alle i < n definiert (wobei Bearbeitungen mit
+         NIL als drittem Parameter nichts anderes als Anweisungen sind).
+   Eff.: X ist initialisiert und hat die Operationszahl n.
+         Im Fall S # NIL hat X das synchronisierende Subjekt S. X hat für
+         alle i < n die Bedingung C (S, i) und die Bearbeitung B (S, i, -).
+         X hat die Stromlänge N und keine initiale Anweisung.
+         X ist nicht aktiv. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. Die Ports von X sind auf dem lokalen
+         Rechner nicht mehr von Netzwerkdiensten belegt. *) 
+
+PROCEDURE praeparieren (X: Objekte; I: Anweisungen);
+(* Vor.: X ist initialisiert, aber nicht aktiviert.
+   Eff.: X hat die initiale Anweisung I. *)
+
+PROCEDURE fraktionieren (X: Objekte; C: Bedingungsspektren; P: Praedikatsspektren;
+                                     B, V: Bearbeitungsspektren);
+(* Vor.: X ist initialisiert, aber nicht aktiviert.
+   Eff.: X hat ... noch nicht dokumentiert. *)
+
+PROCEDURE aktivieren (X: Objekte; R: Namen; N: CARDINAL);
+(* Vor.: X ist initialisiert, aber nicht aktiv.
+         R ist der Name des lokalen oder eines fernen im Netz erreichbaren
+         Rechners. N + n <= Kanaele.M. Die Ports P + N, ..., P + N + n - 1
+         (n = Operationszahl von X) sind nicht von Netzwerkdiensten belegt.
+         Ein Prozess hat auf einem Rechner, der Anbieter von X ist, einen
+         fernen Monitor mit den gleichen Bedingungs- und Bearbeitungsspektren,
+         der gleichen Stromlänge und der gleichen Nummer aktiviert.
+   Eff.: Der aufrufende Prozeß ist genau dann der Anbieter von X, wenn der
+         lokale Rechner den Namen R und der aufrufende Prozeß die Prozedur
+         als erster aufgerufen hat; andernfalls ist er Kunde von X.
+
+         Der Botschaftenaustausch zwischen dem Anbieter und den Kunden
+         erfolgt unter TCP/IP über die o.g. Ports.
+
+         Wenn der aufrufende Prozeß der Anbieter von X ist, ist die initiale
+         Anweisung ausgeführt; danach hat er Kunden von X bei ihren Aufrufen
+         der Prozedur operieren bedient, d.h. von ihnen Daten empfangen und
+         sie nach Bearbeitung wieder an sie zurückgesendet, bis er abgebrochen
+         wurde.
+         Anweisungen nach dem Aufruf von aktivieren sind nicht mehr ausgeführt.
+         Danach ist er nicht mehr initialisiert; insbesondere sind die Ports
+         nicht mehr von Netzwerkdiensten belegt.
+
+         Andernfalls, d.h. wenn er als Kunde von X aktiv ist, steht ihm der
+         Anbieter von X bei seinen Aufrufen von operieren zur Verfügung. *)
+
+PROCEDURE operieren (X: Objekte; i: CARDINAL; A: ADDRESS);
+(* Vor.: X und der Anbieter von X sind aktiviert.
+         i < Operationszahl von X. 
+         A = NIL oder ab A steht der zu bearbeitende Strom, dessen Länge die
+         maximale Stromlänge von X nicht überschreitet.
+   Eff.: Wenn der aufrufende Prozeß Anbieter von X ist, ist nichts verändert.
+         Andernfalls, d.h. wenn er Kunde von X ist, gilt:
+         Auf den Strom ab A ist vom Anbieter von X die i-te Bearbeitung von X
+         unter der i-ten Bedingung von X angewandt, d.h. B (S, A, i) ist auf
+         dem Anbieter von X ausgeführt, nachdem der aufrufende Kundenprozeß
+         ggf. bis zur Sicherstellung von C (S, i) blockiert war (wobei S das
+         synchronisierende Subjekt, C die Bedingungs- und B die Bearbeitungs-
+         prozedur von X und A der Parameter für einen Zeiger auf Daten sind
+         und A der Parameter für einen Zeiger auf Daten ist, ggf. NIL).
+         Die Prozedur ist unteilbar, d.h. sie kann von anderen Prozessen
+         nicht unterbrochen werden. *)
+
+END FMonitore.

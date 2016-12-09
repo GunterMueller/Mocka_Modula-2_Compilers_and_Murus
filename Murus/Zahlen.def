@@ -1,0 +1,298 @@
+DEFINITION MODULE Zahlen;
+
+(* (c) Christian Maurer   v. 10. Dezember 2006
+   >>>                    experimenteller Modul *)
+
+IMPORT Farben;
+  FROM Tastatur IMPORT Kommandos;
+
+TYPE Zahlen = LONGREAL; (* Reelle Zahlen, die im 64-bit-Gleitkommaformat
+                           nach IEEE darstellbar sind (einschließlich
+                           unendlich, minus unendlich und Nichtzahlen)
+                           mit der externen Darstellung im "Normalformat"
+                                 ["-"] Nat1 [ "." Nat ]
+                           oder im "wissenschaftlichen Format"
+                                 ["-"] Ziffer1 "." { Ziffer } "E" ["-"] Nat,
+                           wobei Ziffer1 = "1" | "2" | ... | "9",
+                                 Ziffer = "0" | Ziffer1,
+                                 Nat = Ziffer { Ziffer }
+                                 Nat1 = Ziffer1 { Ziffer } . *)
+
+     Konstanten = (pi, e, log10, log2);
+     Operationen = (plus, minus, mal, durch, hoch, prozent);
+     Funktionen = (int, neg, rez, qu, wurzel, exp, exp10, exp2, log, lg, ld,
+                   sin, cos, tan, cot, arcsin, arccos, arctan, arccot,
+                   sinh, cosh, tanh, coth, arsinh, arcosh, artanh, arcoth,
+                (* nur für symbolisches Ableiten (f1 = f', f2 = f" usw.): *)
+                   f, f1, f2, g, g1, g2, h, h1, h2);
+
+CONST epsilon = 10.0E-15;
+
+PROCEDURE ganzIEEE (x: Zahlen): BOOLEAN;
+(* >>>>> experimentelle Version *)
+(* Vor: x ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn x in seiner IEEE-Darstellung
+         eine ganze Zahl repräsentiert. *)
+
+PROCEDURE null (): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert 0.0. *)
+
+PROCEDURE eins (): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert 1.0. *)
+
+PROCEDURE einhalb (): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert 0.5. *)
+
+PROCEDURE Unzahl (): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert eine 'Nichtzahl' gemäß IEEE-Spezifikation. *)
+
+PROCEDURE gueltig (x: Zahlen): BOOLEAN;
+(* Vor.: Liefert genau dann TRUE, wenn x weder unendlich
+         noch minus unendlich noch eine Nichtzahl ist. *)
+
+PROCEDURE enthalten (T: ARRAY OF CHAR; VAR x: Zahlen;
+                                       VAR p: CARDINAL): BOOLEAN;
+PROCEDURE enthalten1 (T: ARRAY OF CHAR; VAR x: Zahlen;
+                                        VAR p: CARDINAL): BOOLEAN;
+(* Vor.: T enthält mehr als p Zeichen. 
+   Eff.: Liefert genau dann TRUE, wenn in T ab Position p eine Zeichenkette
+         enthalten ist, die eine Zahl im oben angegebenen Format definiert,
+         die im Bereich von LONGREAL liegt. In diesem Fall ist p um die
+         Länge dieser Zeichenkette erhöht und X ist die entsprechende Zahl;
+         andernfalls ist x = 0.0 und p unverändert. *)
+
+PROCEDURE definiert (VAR x: Zahlen; T: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE definiert1 (VAR x: Zahlen; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T eine Zahl im oben angegebenen Format
+         im Bereich von LONGREAL bezeichnet.
+         In diesem Fall ist x diese Zahl, sonst ist x = Unzahl. *)
+
+PROCEDURE vertexten (X: Zahlen; VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T ist die X entsprechende Zeichenkette,
+         dabei wird eine Zahl im Bereich LONGREAL dann als INTEGER dargestellt,
+         wenn die Epsilon-Genauigkeit eine Rundung zulässt und 10E-4 < X < 10E4
+         gilt. *)
+
+PROCEDURE formatieren (w: BOOLEAN; l, n: CARDINAL);
+(* Vor.: Für w = TRUE:  8 <= l <= 22, 2 <= n <= l - 6,
+         für w = FALSE: 8 <= l <= 22, 0 <= n <= .... .
+   Eff.: Aktuelles Format ist für w bzw. NOT w das wissenschafliche bzw.
+         das Normalformat mit insgesamt höchstens l Zeichen und n Ziffern
+         nach dem Komma. Wenn eine Zahl im Normalformat nicht darstellebar ist,
+         weil l zu klein ist, wird sie im wissenschaftl. Format dargestellt. *)
+
+PROCEDURE faerben (S, H: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: S ist die aktuelle Schriftfarbe, H die aktuelle Hintergrundfarbe. *)
+
+PROCEDURE ausgeben (x: Zahlen; Z, S: CARDINAL);
+(* Vor.: Z < Bildschirm.Zeilenzahl; S + .... < Bildschirm.Spaltenzahl.
+   Eff.: x ist ab Bildschirmposition (Z, S) in den aktuellen Farben
+         im aktuellen Format rechtsbündig ausgegeben. *)
+
+PROCEDURE ausgebenIEEE (x: Zahlen; Z, S: CARDINAL);
+(* Vor.: Z < Bildschirm.Zeilenzahl; S + 66 < Bildschirm.Spaltenzahl.
+   Eff.: Die interne Darstellung von x als Bitfolge entsprechend IEEE
+         ist ab der Bildschirmposition (Z, S) ausgegeben. *)
+
+PROCEDURE ganz (X: Zahlen; VAR n: INTEGER): BOOLEAN;
+(* >>>>> experimentelle Version *)
+(* Vor.: X ist definiert. 
+   >>>>> Diese Prozedur ist sehr problematisch.
+   >>>>> Zur Zeit ist erst folgendes implementiert:
+   Eff.: Liefert genau dann TRUE, wenn der relative Unterschied von X zu 
+         einer ganzen Zahl aus dem Bereich der INTEGER-Zahlen < epsilon ist,
+         d.h. X im Rahmen der betrachteten Genauigkeit nicht von einer ganzen
+         Zahl zu unterscheiden ist. In diesem Fall ist n diese ganze Zahl,
+         andernfalls ist n undefiniert.
+   >>>>> Für praktische Zwecke reicht das vorerst,
+   >>>>> obwohl es konzeptionell unbefriedigend ist.
+   >>>>> Eine Präzisierung ist in Arbeit, es wird um Geduld gebeten. *)
+
+PROCEDURE TRModusSchalten (ein: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Für ein = TRUE bzw. FALSE ist der Taschenrechnermodus zum Editieren
+         ein- bzw. ausgeschaltet (Voreinstellung: aus). Wenn er eingeschaltet
+         ist, wird die Eingabe einer rellen Zahl abgebrochen, sowie ein von
+         '0'..'9', '.', 'E' oder 'v' verschiedenes Zeichen eingegeben wird
+         (mit 'v' wird das Vorzeichen der Zahl gewechselt - vor der Eingabe
+         von 'E' bei der Mantisse, danach beim Exponenten). *)
+
+PROCEDURE editieren (VAR x: Zahlen; Z, S: CARDINAL);
+PROCEDURE editieren1 (VAR x: Zahlen; Z, S: CARDINAL);
+(* Vor.: Z < Bildschirm.Zeilenzahl; S + 22 < Bildschirm.Spaltenzahl.
+   Eff.: x ist die Zahl, die ab Bildschirmposition (Z, S) editiert wurde. *)
+
+PROCEDURE Abschlusskommando (): Kommandos;
+(* Vor.: Keine. 
+   Eff.: Liefert das Kommando, mit dem das letzte Editieren einer Zahl beendet
+         wurde, wenn das im Taschenrechnermodus der Fall war, anderfalls keins.
+         Im Taschenrechnermodus ist dieses Kommando genau dann # keins, wenn
+         das Abschlusszeichen = 0C ist. *)
+
+PROCEDURE Abschlusszeichen (): CHAR;
+(* Vor.: Taschenrechnermodus eingeschaltet.
+   Eff.: Liefert das Zeichen, mit dem das letztes Editieren einer Zahl beendet
+         wurde, wenn das der Fall war; andernfalls 0C. *)
+
+PROCEDURE editiert (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann FALSE, wenn die Eingabe im Taschenrechnermodus
+         beim letzten Editieren sofort mit einem Zeichen abgebrochen wurde,
+         ohne die zu editierende Zahl zu verändern. *)
+
+PROCEDURE OperationDefiniert (VAR O: Operationen; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C eins der Zeichen '+', '-',
+          '*', '/' oder '^' ist. In diesem Fall ist O = plus, minus,
+         mal, durch bzw. hoch, sonst ist O nicht definiert. *)
+
+PROCEDURE StrichoperationDefiniert (VAR O: Operationen; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C = '+' oder C = '-' ist. In diesem
+         Fall ist O = plus bzw. O = minus, sonst ist O nicht definiert. *)
+
+PROCEDURE PunktoperationDefiniert (VAR O: Operationen; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C = '*' oder C = '/' ist. In diesem
+         Fall ist O = mal bzw. O = durch, sonst ist O nicht definiert. *)
+
+PROCEDURE PotenzoperationDefiniert (VAR O: Operationen; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C = '^' ist.
+         In diesem Fall ist O = hoch, sonst ist O nicht definiert. *)
+
+PROCEDURE istStrichoperation (O: Operationen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn O = plus oder O = minus gilt. *)
+
+PROCEDURE istPunktoperation (O: Operationen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn O = mal oder O = durch gilt. *)
+
+PROCEDURE istPotenzoperation (O: Operationen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn O = hoch ist. *)
+
+PROCEDURE OperationVertexten (O: Operationen; VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T ist die Zeichenkette für das Symbol von O. *)
+
+PROCEDURE Wert (O: Operationen; X, X1: Zahlen): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert den Wert der Operation O, angewendet auf X und X1, wenn er
+         endlich ist, sonst unendlich, minus unendlich oder eine Nichtzahl. *)
+
+PROCEDURE KonstanteEnthalten (T: ARRAY OF CHAR; VAR K: Konstanten;
+                              VAR p: CARDINAL): BOOLEAN;
+(* Vor.: T enthält mindestens p Zeichen.
+   Eff.: Liefert genau dann TRUE, wenn in T ab Position p eine Zeichenkette
+         enthalten ist, die eine der definierten Konstanten bezeichnet, die
+         nach hinten durch das Ende von T oder durch ein Zeichen, das kein
+         Buchstabe ist, abgegrenzt ist. In diesem Fall ist p um die Länge
+         dieser Zeichenkette erhöht und f ist die entsprechende Funktion;
+         andernfalls ist f leer und p unverändert. *)
+
+PROCEDURE KonstanteVertexten (K: Konstanten; VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T ist die Zeichenkette für K. *)
+
+PROCEDURE Konstantenwert (K: Konstanten): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert den Wert von K. *)
+
+PROCEDURE KonstanteDefiniert (VAR k: Konstanten; T: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE KonstanteDefiniert1 (VAR k: Konstanten; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T bzw. C eine der Konstanten bezeichnet.
+         In diesem Fall ist k diese Konstante. *)
+
+PROCEDURE FunktionEnthalten (T: ARRAY OF CHAR; VAR f: Funktionen;
+                             VAR p: CARDINAL): BOOLEAN;
+(* Vor.: T enthält mindestens p Zeichen.
+   Eff.: Liefert genau dann TRUE, wenn in T ab Position p eine Zeichenkette
+         enthalten ist, die eine der definierten Funktionen bezeichnet, die
+         nach hinten durch das Ende von T oder durch ein Zeichen, das kein
+         Buchstabe ist, abgegrenzt ist. In diesem Fall ist p um die Länge
+         dieser Zeichenkette erhöht und f ist die entsprechende Funktion;
+         andernfalls ist f leer und p unverändert. *)
+
+PROCEDURE FunktionDefiniert (VAR f: Funktionen; T: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE FunktionDefiniert1 (VAR f: Funktionen; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T bzw. C eine der Funktionen bezeichnet.
+         In diesem Fall ist f diese Funktion. *)
+
+PROCEDURE FunktionVertexten (f: Funktionen; VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T ist die Bezeichnung von f. *)
+
+PROCEDURE Funktionswert (f: Funktionen; x: Zahlen): Zahlen;
+(* Vor.: Keine.
+   Eff.: Liefert den Wert der Funktion f an der Stelle x, wenn er definiert und
+         endlich ist, sonst unendlich, minus unendlich oder eine Nichtzahl. *)
+
+PROCEDURE UmkehrfunktionBekannt (f: Funktionen; VAR g: Funktionen): BOOLEAN;
+(* >>>>> experimentelle Version *)
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn f oder die Einschränkung von f auf einen
+         bestimmten Teil ihres Definitionsbereichs eine Umkehrfunktion hat,
+         die eine den oben definierten Funktionen ist.
+         In diesem Fall ist g diese Umkehrfunktion, sonst ist g undefiniert.
+         Auf die Probleme, die damit verbunden sind, daß f oder g nur
+         auf gewissen Teilmengen der reellen Zahlen definiert sind,
+         wird hierbei nicht eingegangen. *)
+
+PROCEDURE ableiten (f: Funktionen; VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T ist eine Zeichenkette, die die Ableitung von f in der mathematisch
+         üblichen Weise unter Benutzung der definierten Konstanten, Zahlen,
+         Operationen und Funktionen darstellt. Als Variable ist dabei die
+         Zeichenkette verwendet, die nur aus dem Buchstaben "x" besteht.
+         Beispiele: ableiten (sqrt, T) -> T = "1/(2*sqrt(x))",
+                    ableiten (log, T)  -> T = "1/x",
+                    ableiten (tan, T)  -> T = "1/sqr(cos(x))". *)
+
+PROCEDURE skalierenX (x0, x1: Zahlen; n: CARDINAL; VAR X: ARRAY OF Zahlen);
+(* Vor.: x0 < x1, n > 1, HIGH (X) >= n - 1.
+   Eff.: x ist eine monotone äquidistante Zahlenfolge aus n Gliedern
+         mit x[0] = x0, x[1] = x1. *)
+
+PROCEDURE skalierenY (y0, y1: Zahlen; n,k: CARDINAL; VAR y: ARRAY OF Zahlen;
+                      VAR Y: ARRAY OF CARDINAL);
+(* Vor.: y0 < y1, n > 1, k > 1, HIGH (y) >= k - 1, HIGH (Y) >= k.
+   Eff.: Y ist eine Folge natürlicher Zahlen mit Y[i] <= k für alle i < n,
+         Y ist eine Diskretisierung der linearen Transformation des Intervalls
+         [y0..y1] auf die Menge der natürlichen Zahlen [0..k-1], d.h. für
+         y[i] = y0 ist Y[i] = 0 und für y[i] = y1 ist Y[i] = k - 1 und
+         Y[i] ist eine Approximation an (y[i] - y0) / (y1 - y0) * (k - 1).
+         Für alle i < n mit y[i] < y0 oder y[i] > y1 gilt Y[i] = k. *)
+
+PROCEDURE Achsen (x0, y0, x1, y1: Zahlen; px, py: CARDINAL;
+                  VAR SX, SY: ARRAY OF CARDINAL; VAR sx, sy, nx, ny: CARDINAL);
+(* Vor.: Geheim.
+   Eff.: Noch geheimer. *)
+
+PROCEDURE Schnickschnack (ein: BOOLEAN; V, H: Farben.Objekte; Z, S: CARDINAL);
+(* Vor.: TRModus ist eingeschaltet.
+   Eff.: Geheim. *)
+
+PROCEDURE KonstanteAngeklickt (VAR K: Konstanten): BOOLEAN;
+(* Vor.: TRModus ist eingeschaltet.
+   Eff.: Geheim. *)
+
+PROCEDURE OperationAngeklickt (VAR O: Operationen): BOOLEAN;
+(* Vor.: TRModus ist eingeschaltet.
+   Eff.: Geheim. *)
+
+PROCEDURE FunktionAngeklickt (VAR F: Funktionen): BOOLEAN;
+(* Vor.: TRModus ist eingeschaltet.
+   Eff.: Geheim. *)
+
+END Zahlen.

@@ -1,0 +1,34 @@
+DEFINITION MODULE Aktionen;
+
+(* (c) Christian Maurer   v. 25. Januar 2006 *)
+
+FROM Prozedurtypen IMPORT Anweisungen;
+
+TYPE Objekte;
+(* In Menüs enthaltene Aktionen. Eine Aktion ist entweder eine Menüaktion
+   ohne Anweisung mit einer nichtleeren Menge von Folgeaktionen, von denen
+   eine ausgewählt werden kann, oder eine Aktion mit einer Anweisung, die
+   bei der Auswahl der Aktion aufgerufen wird. Der Text einer Aktion dient
+   bei Menüaktionen ihrer Bezeichnung zur Auswahl, kann andernfalls als
+   Kopfzeile des Bildschirms bei der Durchführung der Anweisung erscheinen. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; T: ARRAY OF CHAR);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist eine Menueaktion mit dem Text T. *)
+
+PROCEDURE definieren (X: Objekte; mit: BOOLEAN; P: Anweisungen);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist keine Menueaktion. X hat die Anweisung P.
+         Bei der Ausführung von P erscheint der Titel von X genau
+         dann in der obersten Bildschirmzeile, wenn mit = TRUE ist. *)
+
+PROCEDURE anhaengen (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. X ist eine Menueaktion.
+   Eff.: X1 ist eine Folgeaktion von X. *)
+
+PROCEDURE durchfuehren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X eine Menüaktion ist, ist das Menü der Folgeaktionen von X zur
+         Auswahl aufgerufen, andernfalls ist die Anweisung von X ausgeführt. *)
+
+END Aktionen.

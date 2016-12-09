@@ -1,0 +1,81 @@
+DEFINITION MODULE Kanten;
+
+(* (c) Christian Maurer   v. 11. März 2006
+
+   >>> Nur zur Implementierung von GraphEditor,
+       soll weiter oben nicht verwendet werden ! *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben, Ecken;
+
+TYPE Objekte; (* Kanten mit natürlichen Zahlen < 10^... als Werten,
+                 dargestellt als Strecken auf dem Bildschirm.
+                 Die Endpunkte der Kanten sind durch ihre beiden Ecken definiert. *)
+     Bearbeitungen = PROCEDURE (Objekte, Ecken.Objekte, Ecken.Objekte, CARDINAL);
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE definieren (X: Objekte; n: CARDINAL);
+(* Vor.: X ist initialisiert.
+         n < 10^... .
+   Eff.: X hat den Wert n. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat den Wert 1. *)
+
+PROCEDURE Wert (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert den Wert von X. *)
+
+PROCEDURE AWert (A: ADDRESS): CARDINAL;
+(* Vor.: Ab A ist ein Objekt codiert.
+   Eff.: Liefert den Wert dieses Objekts. *)
+
+PROCEDURE faerben (F, A: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: F ist die normale und A die aktuelle Farbe der Objekte. *)
+
+VAR mitWerten: BOOLEAN;
+(* Eff.: Anfangs TRUE. *)
+
+PROCEDURE ausgeben (X: Objekte; E, E1: Ecken.Objekte; R: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: K ist zwischen E und E1 ausgegeben. *)
+
+PROCEDURE bedingtAusgeben (X: Objekte; E, E1: Ecken.Objekte; u: BOOLEAN; R: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist an seiner Position ausgegeben;
+         für u = TRUE ... *)
+
+PROCEDURE invertieren (X: Objekte; E, E1: Ecken.Objekte; R: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Die von K zur Ausgabe zwischen E und E1 benötigten Pixel
+         sind in ihrer Farbe komplementiert. *)
+
+PROCEDURE loeschen (X: Objekte; E, E1: Ecken.Objekte; R: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: K ist mit der Hintergrundfarbe zwischen E und E1 ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; E, E1: Ecken.Objekte; R: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X trägt den Namen und die Zahl, die Benutzer/in editiert hat. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines Objekts als Zeichenfolge notwendig sind.
+         Diese Zahl ist für alle Objekte gleich. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Objekt als Zeichenfolge codiert.
+   Eff.: X ist dieses Objekt. *)
+
+END Kanten.

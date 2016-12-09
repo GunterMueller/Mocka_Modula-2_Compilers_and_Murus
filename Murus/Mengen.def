@@ -1,0 +1,170 @@
+DEFINITION MODULE Mengen;
+
+(* (c) Christian Maurer   v. 29. Januar 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Praedikate, Relationen, Bearbeitungen,
+                          bedingteBearbeitungen, Ausgaben, Ausgaben2;
+
+TYPE Objekte;
+(* Geordnete Mengen von Strömen beliebiger, aber fester Länge > 0
+   (zur Definition von Strömen s. Folgen.def).
+   In jeder nichtleeren Menge ist genau ein Strom der aktuelle Strom. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL; K: Relationen);
+(* Vor.: X ist nicht initialisiert. n > 0. K ist eine strikte ("<",
+         nicht "<=" !) Ordnungsrelation auf Strömen der Länge n.
+   Eff.: X ist initialisiert und leer, hat die Stromlänge n und
+         die Ordnung K. Es gibt keinen aktuellen Strom in X. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keinen Strom enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. Es gibt keinen aktuellen Strom in X. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht die gleiche Stromlänge oder die gleiche
+         Ordnung haben, ist nichts verändert. Andernfalls gilt:
+         X1 enthält genau die gleichen Ströme wie X. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert FALSE, wenn X und X1 nicht die gleiche Stromlänge oder
+         die gleine Ordnung haben. Liefert andernfalls genau dann TRUE,
+         wenn X und X1 genau die gleichen Ströme enthalten. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert FALSE, wenn X und X1 nicht die gleiche Stromlänge oder
+         die gleine Ordnung haben. Liefert andernfalls genau dann TRUE,
+         wenn alle Ströme aus X auch in X1 enthalten sind, es aber
+         mindestens einen Strom aus X1 gibt, der nicht in X enthalten ist. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert und enthält <= MAX (CARDINAL) Ströme.
+   Eff.: Liefert die Anzahl der Ströme in X. *)
+
+PROCEDURE enthalten (X: Objekte; A: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Strom ab A der Stromlänge von X
+         in X enthalten ist. In diesem Fall ist dieser Strom aktueller Strom,
+         sonst ist aktueller Strom von X der, der vorher aktuell war. *)
+
+PROCEDURE positionieren1 (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt:
+         aktueller Strom von X ist der nach (für w = TRUE) bzw.
+         vor (für w = FALSE) dem aktuellen Strom vorher.
+         War der aktuelle Strom vorher bereits der erste (bzw. letzte) Strom
+         aus X, ist für w = FALSE (bzw. w = TRUE) nichts verändert. *)
+
+PROCEDURE positionieren (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt: 
+         für w = TRUE (bzw. w = FALSE) ist der letzte 
+         (bzw. der erste) Strom aus X aktueller Strom. *)
+
+PROCEDURE positioniert1 (X: Objekte; w: BOOLEAN): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer ist und 
+         aktueller Strom von X der letzte (für w = TRUE) 
+         bzw. der erste (für w = FALSE) Strom in X ist. *)
+
+PROCEDURE lesen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert. 
+   Eff.: Wenn X leer ist, ist nichts verändert, sonst steht 
+         ab A der aktuelle Strom aus X der Stromlänge von X. *)
+
+PROCEDURE schreiben (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X nicht leer ist, ist der aktuelle Strom aus X entfernt.
+         Der Strom ab A der Stromlänge von X ist in X eingeordnet
+         und ist neuer aktueller Strom. *)
+
+PROCEDURE entfernen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt: 
+         Wenn X nur einen Strom enthielt, ist X jetzt leer.
+         Sonst ist der vorher aktuelle Strom aus X entfernt und
+         aktueller Strom von X ist jetzt der auf ihn folgende,
+         falls es einen solchen gibt, sonst der letzte Strom von X. *)
+
+PROCEDURE existiert (X: Objekte; A: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn es einen Strom in X gibt, der 
+         größer oder gleich dem Strom ab A der Stromlänge von X ist. 
+         In diesem Fall ist dieser Strom aktueller Strom und steht ab A,
+         sonst ist der aktuelle Strom von X der, der vorher aktuell war
+         und der Strom ab A ist unverändert. *)
+
+PROCEDURE wahr (X: Objekte; P: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn P auf alle Ströme aus X zutrifft
+         (auch wenn X leer ist).
+         Aktueller Strom von X ist der, der vorher aktuell war. *)
+
+PROCEDURE ordnen (X: Objekte; R: Relationen);
+(* Vor.: X ist initialisiert. R ist eine Ordnung.
+   Eff.: Die Ordnung von X ist durch R ersetzt und X ist bzgl. R geordnet.
+         Wenn X nicht leer ist, ist der erste Strom von X aktueller Strom. *)
+
+PROCEDURE einordnen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn der Strom ab A der Stromlänge von X nicht einordenbar ist,
+         ist nichts verändert, andernfalls ist er in X eingeordnet,
+         d.h. er ist jetzt in X enthalten und X ist geordnet.
+         Aktueller Strom von X ist in diesem Fall der eingeordnete. *)
+
+PROCEDURE traversieren (X: Objekte; B: Bearbeitungen);
+(* Vor.: X ist initialisiert. B ist streng monoton, d.h. wenn der Strom ab A
+         bzgl. der Ordnung von X kleiner als der Strom ab A1 ist, dann ist
+         auch B(A) kleiner als B(A1).
+   Eff.: Auf alle Ströme in X ist (in ihrer Reihenfolge in X) B angewandt.
+         Aktueller Strom von X ist der, der vorher aktuell war. *)
+
+PROCEDURE bedingtTraversieren (X: Objekte; P: Praedikate;
+                                           B: bedingteBearbeitungen);
+(* Vor.: X ist initialisiert. B ist streng monoton (s. traversieren).
+   Eff.: Auf alle Ströme in X ist (in ihrer Reihenfolge in X) B(-, TRUE)
+         angewandt, wenn P auf sie zutrifft, sonst B(-, FALSE) 
+         (d.h. auf jeden Strom ab A in X ist B(A, P(A)) angewandt.
+         Aktueller Strom von X ist der, der vorher aktuell war. *)
+
+PROCEDURE filtrieren (X, X1: Objekte; P: Praedikate);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht die gleiche Stromlänge haben, ist nichts
+         verändert. Sonst gilt: X1 besteht aus den Strömen aus X voher
+         auf die P zutrifft, in ihrer vorherigen Reihenfolge. X1 hat die
+         gleiche Ordnung wie X und ist geordnet. Aktueller Strom von X1
+         ist der erste, sofern X1 nicht leer ist. X ist unverändert. *)
+
+PROCEDURE separieren (X, X1: Objekte; P: Praedikate);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht die gleiche Stromlänge haben, ist nichts 
+         verändert. Sonst gilt: X1 besteht aus den Strömen aus X vorher,
+         auf die P zutrifft, in ihrer vorherigen Reihenfolge und genau
+         diese Ströme sind jetzt aus X entfernt. X1 hat die gleiche Ordnung
+         wie X und ist geordnet. Aktueller Strom von X bzw. X1 ist jeweils
+         der erste, sofern X bzw. X1 nicht leer ist. *)
+
+PROCEDURE vereinigen (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht die gleiche Stromlänge oder die gleiche
+         Ordnung haben, ist nichts verändert. Andernfalls gilt:
+         Alle Ströme aus X1 sind in X eingeordnet. Aktueller Strom von X
+         ist der erste, sofern X nicht leer ist. X1 ist leer. *)
+
+PROCEDURE ausgeben (X: Objekte; x, x1, y, y1: CARDINAL; E: Ausgaben; K: Ausgaben2);
+(* >>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Vorerst nicht bekanntgegebener Spezialeffekt. *)
+
+END Mengen.

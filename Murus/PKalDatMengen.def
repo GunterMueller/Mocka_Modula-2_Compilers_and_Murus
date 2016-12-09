@@ -1,0 +1,47 @@
+DEFINITION MODULE PKalDatMengen;
+
+(* (c) Christian Maurer   v. 7. Februar 2006 *)
+
+IMPORT Kalenderdaten;
+
+TYPE Objekte; (* Persistente Mengen von Kalenderdaten *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+         N ist ein im Betriebssystem gültiger Dateiname.
+   Eff.: X ist mit dem Namen N definiert, d.h. X enthält 
+         die Kalenderdaten der letzten mit N definierten Folge. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Kalenderdaten enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X enthält keine Kalenderdaten. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Kalenderdaten in X. *)
+
+PROCEDURE einordnen (X: Objekte; D: Kalenderdaten.Objekte);
+(* Vor.: L und D sind initialisiert.
+   Eff.: D ist in X enthalten. *)
+
+PROCEDURE entfernen (X: Objekte; D: Kalenderdaten.Objekte);
+(* Vor.: X und D sind initialisiert.
+   Eff.: D ist nicht in X enthalten. *)
+
+PROCEDURE enthalten (X: Objekte; D: Kalenderdaten.Objekte): BOOLEAN;
+(* Vor.: X und D sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn D in X enthalten ist. *)
+
+END PKalDatMengen.

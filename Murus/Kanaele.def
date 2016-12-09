@@ -1,0 +1,128 @@
+DEFINITION MODULE Kanaele;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Muruskern IMPORT MinPort;
+FROM IP IMPORT Namen;
+
+TYPE Objekte;
+(* Kanäle zum synchronen Austausch von Strömen beliebiger, aber fester Länge
+   zwischen je zwei verteilten Prozessen bei exklusiver Nutzung, d.h.
+   auf eine Weise, in der jeder Kanal nur von zwei Prozessen genutzt wird
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 140 ff., 154). *)
+
+CONST maxNr = MAX (SHORTCARD) - MinPort;
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL;
+                          R: Namen; N: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         R ist der Name eines in /etc/hosts eingetragenen Rechners oder ein
+         DNS auflösbarer Name eines Rechners, der ist im Netz erreichbar ist.
+         N < maxNr. Der Port MinPort + N ist weder auf diesem noch
+         auf dem lokalen Rechner mit einem Netzwerkdienst belegt.
+   Eff.: X ist initialisiert, hat die Kanalbreite n und die Nummer N.
+         X ist ein 1:1-Kanal mit R als (Kommunikations-)Partner des aufrufenden
+         Prozesses auf X. Der Port MinPort + N ist auf dem lokalen Rechner
+         und auf seinem Partner unter X mit einem Netzwerkdienst belegt. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE aktivieren (X: Objekte);
+(* Vor.: X ist initialisiert, aber nicht aktiv.
+         Auf dem Partner des aufrufenden Prozesses unter X hat ein Prozeß
+         einen Kanal mit der gleichen Kanalbreite und der gleichen Nummer
+         wie X und den lokalen Rechner als Kommunikationspartner aktiviert.
+   Eff.: X ist aktiv, d.h. wenn er ein 1:1-Kanal ist, ist der aufrufende
+         Prozeß ist mit dem entsprechenden Prozeß verbunden; wenn er ein
+         Multiplexkanal ist, ist der aufrufende Prozeß, falls er Kunde ist,
+         beim Anbieter angemeldet, andernfalls ist er bereit, Anmeldungen
+         von Kunden zu entgegenzunehmen und für sie einen Subkanal
+         zum Botschaftenaustausch zu erzeugen. *)
+
+PROCEDURE senden (X: Objekte; A: ADDRESS);
+(* Vor.: X ist aktiv.
+   Eff.: Der Strom ab A der Stromlänge von X ist auf X (bzw. falls X
+         ein Multiplexkanal und der aufrufende Prozeß ein Anbieter ist,
+         auf dem aktuellen Subkanal von X) an den Kommunikationspartner
+         des aufrufenden Prozesses gesendet, wobei der aufrufende Prozeß
+         ggf. bis zum Empfang des Stroms blockiert war. *)
+
+PROCEDURE empfangen (X: Objekte; A: ADDRESS): BOOLEAN;
+(* Vor.: X ist aktiv.
+   Eff.: Liefert genau dann TRUE, wenn der auf X (bzw. falls X ein
+         Multiplexkanal und der aufrufende Prozeß ein Anbieter ist, auf dem
+         aktuellen Subkanal von X) vom Kommunikationspartner gesendete Strom
+         in voller Länge, d.h. der Stromlänge von X, empfangen ist.
+         In diesem Fall steht ab A dieser Strom;
+         andernfalls ist der Inhalt ab A undefiniert.
+         Der aufrufende Prozeß war ggf. bis zur Sendung eines (evtl. leeren)
+         Stroms blockiert.
+         
+         Der auf X gesendete Strom ist empfangen, d.h. ab A steht der auf X
+         (bzw. falls X ein Multiplexkanal und der aufrufende Prozeß ein
+         Anbieter ist, auf dem aktuellen Subkanal von X) vom Kommunikations-
+         partner gesendete Strom der Stromlänge von X, nachdem der aufrufende
+         Prozeß ggf. bis zur Sendung eines Stroms blockiert war.
+         Liefert andernfalls FALSE,  *)
+
+(* >>>>> Der folgende Teil der Spezifikation dient nur der Implementierung
+         der FMonitore und soll auf keinen Fall weiter oben verwendet werden ! *)
+
+PROCEDURE multiplexen (X: Objekte);
+(* Vor.: X ist initialisiert, aber nicht aktiv.
+   Eff.: Wenn der aufrufende Prozeß ein Kunde ist, ist nichts verändert.
+         Wenn er ein Anbieter ist, ist X ist ein Multiplexkanal, d.h. nimmt nur
+         Anmeldungen von Kunden entgegen und kommuniziert mit jedem von ihnen
+         über einen eigens für ihn bei seiner Anmeldung erzeugten Subkanal. *)
+
+PROCEDURE istAnbieter (X: Objekte): BOOLEAN;
+(* Vor.: X ist aktiv und ein Multiplexkanal.
+   Eff.: Liefert genau dann TRUE,
+         wenn der aufrufende Prozeß ein Anbieter ist. *)
+
+TYPE Objektmengen; (* Mengen von anbieterseitigen Multiplexkanälen
+                      mit Überwachung auf Eingang von Botschaften. *)
+
+PROCEDURE Initialisieren (VAR M: Objektmengen);
+(* Vor.: M ist nicht initialisiert.
+         Der aufrufende Prozeß ist ein Anbieter.
+   Eff.: M ist initialisiert und leer. *)
+
+PROCEDURE Terminieren (VAR M: Objektmengen);
+(* Vor.: M ist initialisiert.
+   Eff.: M ist nicht initialisiert. *)
+
+PROCEDURE definieren (M: Objektmengen; X: ARRAY OF Objekte; n: CARDINAL);
+(* Vor.: M ist initialisiert und leer. n = HIGH (X) + 1.
+         X [i] ist für alle i < n initialisiert und ein Multiplexkanal. 
+   Eff.: M besteht genau aus den X[i] (i < n). *)
+
+PROCEDURE selektieren (M: Objektmengen);
+(* Vor.: M ist initialisiert und nicht leer.
+   Eff.: Es ist überprüft, auf welchen Subkanälen der Kanäle aus M Botschaften
+         eingegangen sind. Falls ein Kunde auf einem der Kanäle aus M Kontakt
+         zum Anbieter aufgenommen hat, ist ein neuer Subkanal zum Botschaften-
+         austausch mit ihm erzeugt (der aber noch nicht überprüft ist) und
+         in M eingefügt. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+         X ist ein Multiplexkanal und der aufrufende Prozeß ein Anbieter.
+   Eff.: Liefert die Anzahl der Subkanäle von X. *)
+
+PROCEDURE selektiert (M: Objektmengen; i, k: CARDINAL): BOOLEAN;
+(* Vor.: M ist initialisiert und nicht leer. i < Anzahl der Kanäle aus M und
+         k < Anzahl der Subkanäle des i-ten Kanals aus M.
+   Eff.: Liefert genau dann TRUE, wenn auf dem k-ten Subkanal des i-ten Kanals
+         aus M ein Strom oder eine Abmeldung eingegangen ist. In diesem Fall
+         ist dieser Subkanal der aktuelle Kanal zum Botschaftenaustausch. *)
+
+PROCEDURE ausgeben (X: Objekte; s: BOOLEAN; k, Z, S: CARDINAL);
+(* >>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Noch nicht dokumentiert. *)
+
+END Kanaele.

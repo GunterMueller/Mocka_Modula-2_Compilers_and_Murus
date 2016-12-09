@@ -1,0 +1,32 @@
+DEFINITION MODULE Schloesser; 
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+TYPE Objekte;
+(* Boolesche Schlösser (gesperrt oder nicht) als Zugangsprotokolle
+   zu kritischen Abschnitten zum nebenläufigen Zugriff mehrerer Prozesse
+   auf gemeinsame Daten gemäß Definition der Sperrsynchronisation
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 14).
+
+   Die Prozeduren sperren und entsperren sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR S: Objekte);
+(* Vor.: S ist nicht initialisiert.
+   Eff.: S ist initialisiert und nicht gesperrt.
+         Kein Prozeß ist auf S blockiert. *)
+
+PROCEDURE terminieren (VAR S: Objekte);
+(* Vor.: S ist initialisiert und nicht gesperrt.
+   Eff.: S ist nicht initialisiert. *)
+
+PROCEDURE sperren (S: Objekte);
+(* Vor.: S ist initialisiert.
+   Eff.: Der aufrufende Prozeß war ggf. solange auf S blockiert,
+         bis S nicht gesperrt war. Jetzt hat S gesperrt. *)
+
+PROCEDURE entsperren (S: Objekte);
+(* Vor.: S ist initialisiert und gesperrt.
+   Eff.: S ist nicht gesperrt. *)
+
+END Schloesser.

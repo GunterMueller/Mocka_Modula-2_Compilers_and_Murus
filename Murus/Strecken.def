@@ -1,0 +1,79 @@
+DEFINITION MODULE Strecken;
+
+(* (c) Christian Maurer   v. 11. Mai 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+  FROM Prozedurtypen IMPORT Bearbeitungen;
+IMPORT Farben, Vektoren;
+
+TYPE Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert FALSE. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Es ist nichts verändert. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X1 stimmt mit X überein, X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert FALSE. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert FALSE. *)
+
+PROCEDURE definieren (X: Objekte; V, V1: Vektoren.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die Strecke zwischen den Endpunkten von V und V1. *)
+
+PROCEDURE faerben (X: Objekte; F: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farbe F. *)
+
+PROCEDURE FarbeLesen (X: Objekte; VAR F: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: F ist die Farbe von X. *)
+
+PROCEDURE FarbeLesenA (A: ADDRESS; VAR F: Farben.Objekte);
+(* Vor.: Ab A ist eine Strecke codiert.
+   Eff.: F ist die Farbe dieser Strecke. *)
+
+PROCEDURE ausgebbar (A: ADDRESS; VAR x, y, x1, y1: CARDINAL; VAR d: LONGREAL): BOOLEAN;
+(* Vor.: Ab A ist eine Strecke codiert.
+   Eff.: Liefert genau dann TRUE, wenn bei einem Betrachtungsabstand
+         in Größe der 2-fachen Bildschirmhöhe das Bild dieser Strecke
+         vollständig auf dem Bildschirm liegt. In diesem Fall sind (x, y)
+         bzw. (x1, y1) die Bildschirmkoordinaten der Endpunkte der Strecke,
+         andernfalls gilt x = x1 = y1 = MAX (CARDINAL). *)
+
+PROCEDURE bearbeiten2 (A: ADDRESS; B: Bearbeitungen);
+(* Vor.: Ab A ist eine Strecke codiert.
+   Eff.: Auf jeden der beiden Endpunkte dieser Strecke ist B angewandt. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Bytes, die zur Codierung notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom der Codelaenge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die Strecke, die ab A codiert ist. *)
+
+END Strecken.

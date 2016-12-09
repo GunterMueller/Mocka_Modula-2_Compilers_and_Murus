@@ -1,0 +1,49 @@
+DEFINITION MODULE MinMengen;
+
+(* (c) Christian Maurer   v. 9. November 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Relationen, Bearbeitungen;
+
+TYPE Objekte;
+(* Geordnete Mengen von Strömen beliebiger, aber fester Länge > 0, 
+   bei denen auf das Minimum zugegriffen werden kann
+   (zur Definition von Strömen s. Folgen.def). *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N: CARDINAL; R: Relationen);
+(* Vor.: X ist nicht initialisiert. N > 0. R ist eine strikte
+         ("<", nicht "<=" !) Ordnung auf Strömen der Länge N.
+   Eff.: X ist initialisiert und leer, hat die Stromlänge N
+         und die Ordnung R. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keinen Strom enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Ströme in X. *)
+
+PROCEDURE einordnen (H: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Stromlänge von X ist in X enthalten. *)
+
+PROCEDURE lesen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Ansonsten steht ab A der bezüglich der Ordnung von X kleinste Strom
+         von X vorher und dieser Strom ist jetzt nicht mehr in X enthalten. *)
+
+PROCEDURE traversieren (X: Objekte; B: Bearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Alle Ströme von X sind durch B bearbeitet. *)
+
+END MinMengen.

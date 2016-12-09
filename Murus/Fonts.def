@@ -1,0 +1,18 @@
+DEFINITION MODULE Fonts;
+
+(* (c) Christian Maurer   v. 15. Dezember 2004 *)
+
+VAR normal, fett, kursiv, italic: CARDINAL;
+(* Vor.: Diese Variablen werden nicht verändert.
+   Eff.: Diese Variablen sind Fonts. *)
+
+PROCEDURE Code (F: CARDINAL): CHAR;
+(* Vor.: Keine.
+   Eff.: Liefert ein Zeichen, das F eindeutig definiert, wenn F ein Font ist,
+         andernfalls 0C. *)
+
+PROCEDURE istFont (C: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C ein Font ist. *)
+
+END Fonts.

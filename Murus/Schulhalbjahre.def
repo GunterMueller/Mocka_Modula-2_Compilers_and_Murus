@@ -1,0 +1,117 @@
+DEFINITION MODULE Schulhalbjahre;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben, Kalenderdaten, Kurshalbjahre;
+
+TYPE
+  Objekte;
+  Formate = (lang,      (* z.B. "04/05-2" = 1.2.05-31.7.05 *)
+             kurz,      (* z.B. "05/1"    = 04/05-2
+                                "05/2"    = 05/06-1        *)
+             ganzKurz); (* z.B. "05"      = 04/05-2        *)
+VAR
+  aktuellesHalbjahr: ARRAY [1..Kurshalbjahre.Max] OF Objekte;
+
+PROCEDURE initialisieren (VAR H: Objekte);
+(* Vor.: H ist nicht initialisiert. 
+   Eff.: H ist initialisiert und leer und hat das Format "kurz". *)
+
+PROCEDURE terminieren (VAR H: Objekte);
+(* Vor.: H ist initialisiert. 
+   Eff.: H ist nicht initialisiert. *)
+
+PROCEDURE leer (H: Objekte): BOOLEAN;
+(* Vor.: H ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn H leer ist. *)
+
+PROCEDURE leeren (H: Objekte);
+(* Vor.: H ist initialisiert. 
+   Eff.: H ist leer. *)
+
+PROCEDURE kopieren (H, H1: Objekte);
+(* Vor.: H und H1 sind initialisiert. 
+   Eff.: H ist unverändert, H1 stimmt mit H überein. *)
+
+PROCEDURE gleich (H, H1: Objekte): BOOLEAN;
+(* Vor.: H und H1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn H und H1 gleich sind. *)
+
+PROCEDURE kleiner (H, H1: Objekte): BOOLEAN;
+(* Vor.: H und H1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn H nicht leer und H1 leer 
+         ist, oder wenn H und H1 nicht leer sind und H zeitlich 
+         vor H1 liegt. *)
+
+PROCEDURE aktualisieren (H: Objekte);
+(* Vor.: H ist initialisiert. 
+   Eff.: H ist das Schulhalbjahr, in dem das Datum der Systemuhr liegt. *)
+
+PROCEDURE normieren (H: Objekte);
+(* Vor.: H ist initialisiert. 
+   Eff.: H ist das 1. Schulhalbjahr in dem Schuljahr, das am 
+         1. August im Jahr des Datums der Systemuhr beginnt. *)
+
+PROCEDURE ungerade (H: Objekte): BOOLEAN;
+(* Vor.: 
+   Eff.: Liefert genau dann TRUE, wenn H ein Schulhalbjahr 
+         vom 1. August bis 31. Januar ist. *)
+
+PROCEDURE definieren (H: Objekte; D: Kalenderdaten.Objekte);
+(* Vor.: H und D sind initialisiert. 
+   Eff.: Wenn D leer ist, ist auch H leer. 
+         Sonst ist H das 1.Schulhalbjahr (beginnend am 1.August) 
+         des Jahres, in dem D liegt. *)
+
+PROCEDURE Abstand (H, E: Objekte): CARDINAL;
+(* Vor.: H und E sind initialisiert. 
+   Eff.: Liefert 0, wenn H oder E leer ist. 
+         Liefert H - H1, falls H1 <= H <= H1 + 4, wobei H1 das 
+         1. Schulhalbjahr des auf E folgenden Jahres ist, sonst 0. *)
+
+PROCEDURE inkrementieren (H: Objekte);
+(* Vor.: H ist initialisiert.
+   Eff.: Wenn H leer ist, ist nichts verändert, 
+         sonst ist H um ein Schulhalbjahr erhöht. *)
+
+PROCEDURE dekrementieren (H: Objekte);
+(* Vor.: H ist initialisiert.
+   Eff.: Wenn H leer ist, ist nichts verändert, 
+         sonst ist H um ein Schulhalbjahr erniedrigt. *)
+
+PROCEDURE berechnen (E, R, H: Objekte; K: Kurshalbjahre.Objekte);
+(* Vor.: E, R, H sind initialisiert. E ist nicht leer. 
+         K > 0.
+   Eff.: H ist das Schulhalbjahr im K-ten Kurshalbjahr, 
+         das sich aus dem Eintritt in die E-Phase E und 
+         dem Schulhalbjahr R vor einem Rücktritt ergibt. *)
+
+PROCEDURE aktuellesKurshalbjahr (E, R: Objekte): Kurshalbjahre.Objekte;
+(* Vor.: E und R sind initialisiert. E ist nicht leer. 
+   Eff.: Liefert das aktuelle Kurshalbjahr, 
+         das sich aus dem Eintritt in die E-Phase E und 
+         dem Schulhalbjahr R vor einem Rücktritt ergibt, 
+         wenn ..., und 0 sonst. *)
+
+PROCEDURE vertexten (H: Objekte; VAR T: ARRAY OF CHAR);
+
+PROCEDURE definiert (H: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+
+PROCEDURE formatieren (H: Objekte; F: Formate);
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE ausgeben (H: Objekte; Z, S: CARDINAL);
+
+PROCEDURE editieren (H: Objekte; Z, S: CARDINAL);
+
+PROCEDURE drucken (H: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (H: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (H: Objekte; A: ADDRESS);
+
+END Schulhalbjahre.

@@ -1,0 +1,62 @@
+DEFINITION MODULE BPrioSchlangen;
+
+(* (c) Christian Maurer   v. 11. Februar 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Relationen, Bearbeitungen;
+
+TYPE Objekte;
+(* Beschränkte Prioritätsschlangen, d.h. geordnete Folgen von Strömen
+   beliebiger, aber fester Länge mit schnellem Zugriff auf das Minimum.
+   Zur Definition von Strömen siehe Folgen.def *)
+
+PROCEDURE Max (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die größtmögliche Anzahl von Strömen, 
+         die in einer Schlange enthalten sein können. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N: CARDINAL; R: Relationen);
+(* Vor.: X ist nicht initialisiert. N > 0. R ist eine Ordnung (reflexiv,
+         transitiv und antisymmetrisch) auf Strömen der Länge N.
+   Eff.: X ist initialisiert und leer, hat die Stromlänge N und
+         die Ordnung R. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn kein Strom in X enthalten ist. *)
+
+PROCEDURE voll (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X voll ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Ströme in X. *)
+
+PROCEDURE einordnen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X voll ist, ist nichts verändert.
+         Der Strom ab A der Stromlänge von X ist (falls er vorher
+         schon in X enthalten war, ein weiteres Mal) in X enthalten
+         und X ist bezüglich seiner Ordnung geordnet. *)
+
+PROCEDURE lesen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Ansonsten steht ab A der bezüglich der Ordnung von X kleinste
+         (wenn die Ordnung von X nicht strikt ist, ein kleinster) Strom
+         von X vorher und dieser Strom ist jetzt nicht mehr in X enthalten. *)
+
+PROCEDURE traversieren (X: Objekte; B: Bearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Alle Ströme in X sind durch B bearbeitet. *)
+
+END BPrioSchlangen.

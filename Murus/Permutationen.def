@@ -1,0 +1,28 @@
+DEFINITION MODULE Permutationen;
+
+(* (c) Christian Maurer   v. 31. Januar 2007 *)
+
+TYPE Objekte; (* Folgen zufälliger Permutationen der
+                 Zahlenmenge 0, 1, ..., n-1 für ein n > 0. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. n > 0.
+   Eff.: X ist initialisiert und hat die Anzahl n,
+         d.h sie enthält die Zahlen 0, 1, ..., n - 1;
+         die Reihenfolge dieser Zahlen ist zufällig. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE permutieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Die Reihenfolge der Zahlen 0, 1, ..., Anzahl - 1
+         in X ist zufällig verändert. *)
+
+PROCEDURE f (X: Objekte; i: CARDINAL): CARDINAL;
+(* Vor.: X ist initialisiert. i < Anzahl von X.
+   Eff.: Liefert die i-te Zahl der Folge X (0 <= i < n).
+         Für i # k gilt f(i) # f(k). *)
+
+END Permutationen.

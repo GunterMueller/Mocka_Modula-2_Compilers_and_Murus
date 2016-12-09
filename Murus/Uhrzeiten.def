@@ -1,0 +1,152 @@
+DEFINITION MODULE Uhrzeiten;
+
+(* (c) Christian Maurer   v. 11. August 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte;
+     Formate = (hhomm,     (* z.B. "07.32"    *)
+                hhommoss,  (* z.B. "13.45:27" *)
+                mmoss);    (* z.B. "04:19"    *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und zeitlos, 
+         hat die Farben des Bildschirms und das Format hhomm. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE aktualisieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die Uhrzeit der Systemuhr. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X zeitlos ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist zeitlos. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X ist unverändert; X1 stimmt mit X überein. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 gleich 
+         (auch, wenn beide zeitlos) sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, 
+         wenn X zeitlos und X1 nicht zeitlos ist oder 
+         beide nicht zeitlos sind und X zeitlich vor X1 liegt. *)
+
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A bzw. A1 sind Uhrzeiten X bzw. X1 codiert.
+   Eff.: Liefert genau dann TRUE, wenn kleiner (X, X1). *)
+
+PROCEDURE vergangen (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht zeitlos ist 
+         und vor der Uhrzeit der Systemuhr liegt. *)
+
+PROCEDURE Abstand (X, X1: Objekte): CARDINAL;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert MAX (CARDINAL), wenn X oder X1 zeitlos ist, sonst 
+         den Absolutbetrag der Anzahl der Sekunden zwischen X und X1. *)
+
+PROCEDURE Stunden (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 24, wenn X zeitlos ist,
+         sonst die Stunden von X. *)
+
+PROCEDURE Minuten (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 60, wenn X zeitlos ist,
+         sonst die Minuten von X. *)
+
+PROCEDURE Sekunden (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 60, wenn X zeitlos ist,
+         sonst die Sekunden von X. *)
+
+PROCEDURE AnzahlSekunden (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert MAX (CARDINAL), wenn X zeitlos ist,
+         sonst die Anzahl der Sekunden von X seit 0.00 Uhr. *)
+
+PROCEDURE inkrementieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Ist X oder X1 zeitlos, ist nichts verändert. 
+         Andernfalls ist X um X1 modulo 24 Stunden erhöht. *)
+
+PROCEDURE dekrementieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Ist X oder X1 zeitlos, ist nichts verändert. 
+         Andernfalls ist X um X1 modulo 24 Stunden erniedrigt. *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat das Format F. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: T ist der Text von X im Format von X. 
+         Wenn X zeitlos ist, besteht T nur aus Leerzeichen. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist an der Bildschirmposition (Z, S) 
+         in seinem Format und seinen Farben ausgegeben. 
+         Ist X zeitlos, sind nur Leerzeichen ausgegeben. *)
+
+PROCEDURE definieren (X: Objekte; Stunde, Minute, Sekunde: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn Stunde, Minute, Sekunde eine Uhrzeit darstellen,
+         ist X diese Uhrzeit, andernfalls ist X leer. *)
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn T nur aus Leerzeichen besteht, wird TRUE geliefert 
+         und X ist leer; wenn T eindeutig eine Uhrzeit darstellt, 
+         wird TRUE geliefert und X ist diese Uhrzeit. 
+         Andernfalls wird FALSE geliefert und X ist zeitlos. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die an der Bildschirmposition (Z, S) 
+         im Format von X (Echo in ihrer Farbe) editierte Uhrzeit. 
+         Sind nur Leerzeichen eingegeben, ist X zeitlos. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+TYPE Attribute = RECORD
+                   Z, S: CARDINAL;
+                   V, H: Farben.Objekte
+                 END;
+
+PROCEDURE anzeigen (A: ADDRESS);
+(* Vor.: A = ADR (a) für eine Variable a vom Typ Attribute,
+         die beim Aufruf definierte Werte für Z, S, V und H hat.
+   Eff.: Die aktuelle Uhrzeit wird laufend im Sekundentakt an der Bildschirmposition
+         (Zeile, Spalte) = (a.Z, a.S) in der Vorder-/Hintergrundfarbe a.V/a.H ausgegeben.
+         Diese Prozedur terminiert nicht. *)
+
+END Uhrzeiten.

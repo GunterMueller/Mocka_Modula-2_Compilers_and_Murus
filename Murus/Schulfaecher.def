@@ -1,0 +1,160 @@
+DEFINITION MODULE Schulfaecher;
+
+(* (c) Christian Maurer   v. 17. März 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE
+  Faecher = (keinFach,
+        (* Aufgabenfeld I: *)
+             Deutsch,
+             Englisch, Franzoesisch, Italienisch, Spanisch,
+             Polnisch, Russisch, Tuerkisch, Japanisch, Chinesisch,
+             Latein, Griechisch,
+             Musik, BildendeKunst, DarstellendesSpiel, 
+        (* Aufgabenfeld II: *)
+             Politikwissenschaft, Geschichte, Geografie, 
+             Sozialwissenschaften, Psychologie, Philosophie, 
+             Wirtschaftswissenschaft,
+             Rechnungswesen, Recht, 
+        (* Aufgabenfeld III: *)
+             Mathematik, Physik, Chemie, Biologie, Informatik, 
+             Technik,
+             Chemietechnik, Physiktechnik, Biologietechnik,
+             Ernaehrungslehre, Lebensmitteltechnologie, 
+        (* nicht an Aufgabenfeld gebunden: *)
+             Sport);
+(*
+        (* Sek I-Fächer *)
+             Ethik, Sozialkunde, Arbeitslehre);
+*)
+  Fremdsprachen = [Englisch..Griechisch];
+CONST
+  MaxSprachen = 4;
+TYPE
+  Sprachnummern = [0..MaxSprachen];
+  Objekte; (* Faecher, bei Fremdsprachen mit Sprachnummer *)
+  Formate = (klein,  (* z.B. "de", "e1" *)
+             gross,  (* z.B. "MA", "I2" *)
+             lang);  (* z.B. "Latein", "Politikwissenschaft" *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer und hat das Format klein. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X kein Fach hat. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X1 stimmt mit X überein (X ist unverändert). *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und X1 die gleichen Fächer 
+         und, wenn das eine Fremdsprache ist, die gleiche Nummer haben. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn das Fach von X (bei der 
+         Typangabe von Faecher) vor dem von X1 steht; haben X 
+         und X1 die gleiche Fremdsprache als Fach, genau dann, 
+         wenn die Sprachnummer von X kleiner als die von X1 ist. 
+         Das leere Schulfach ist größer als jedes nichtleere. *)
+
+PROCEDURE Fach (X: Objekte): Faecher;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert das Fach von S. *)
+
+PROCEDURE definieren (X: Objekte; F: Faecher);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Fach F. Falls das eine Fremdsprache ist, 
+         hat X keine Sprachnummer. *)
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn T ein Fach im Format 
+         von X definiert. In diesem Fall ist X dieses Fach, 
+         sonst ist X leer. *)
+
+PROCEDURE istFremdsprache (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X eine Fremdsprache ist. *)
+(*
+PROCEDURE istSekIFach (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X kein Fach der GO ist. *)
+*)
+PROCEDURE Nummer (X: Objekte): Sprachnummern;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Sprachnummer von X, wenn X eine Fremdsprache ist, 
+         sonst 0. *)
+
+PROCEDURE numerieren (X: Objekte; N: Sprachnummern);
+(* Vor.: Das Fach von X ist eine Fremdsprache. 
+   Eff.: X hat die Sprachnummer N. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: F ist initialisiert.
+   Eff.: T ist ein Text, der X in seinem Format wiedergibt 
+         (in den Formaten klein/gross die Fachabkürzung in 
+         Klein-/Großbuchstaben, im Format lang die Fachbezeichnung). 
+         Wenn das Fach von X eine Fremdsprache ist, 
+         ist das zweite Zeichen die Sprachnummer von X. *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Format F. *)
+
+PROCEDURE Format (X: Objekte): Formate;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert das Format von X. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind hinreichend klein (s. Bildschirm).
+   Eff.: X ist in seinem Format an der Bildschirmposition (Z, S) 
+         in seinen Farben ausgegeben. 
+         Form der Ausgabe: s. vertexten. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind hinreichend klein (s. Bildschirm).
+   Eff.: X ist das an der Bildschirmposition (Z, S) 
+         (in seinem Format) editierte Schulfach. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor.: X ist initialisiert. F ist ein Font.
+   Eff.: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht in seinem Format an der Seitenposition (Z, S) 
+         im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur Codierung 
+         eines Schulfachs als Zeichenfolge notwendig ist. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das Schulfach, das ab A als Zeichenfolge codiert ist. *)
+
+END Schulfaecher.

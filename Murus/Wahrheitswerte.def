@@ -1,0 +1,122 @@
+DEFINITION MODULE Wahrheitswerte;
+
+(* (c) Christian Maurer   v. 24. September 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Wahrheitswerte, angereichert um den Wert unbestimmt. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer und hat die Darstellung
+         "n" für falsch und "j" für wahr. *)
+   
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X unbestimmt,
+         d.h. weder wahr noch falsch ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X1 stimmt mit X überein; X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 übereinstimmen. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X < X1,
+         wobei unbestimmt < falsch < wahr. *)
+
+PROCEDURE definieren (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist genau dann wahr, wenn w = TRUE, sonst falsch. *)
+
+PROCEDURE falsch (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X falsch ist. *)
+
+PROCEDURE wahr (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X wahr ist. *)
+
+PROCEDURE formatieren (X: Objekte; F, W: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+         1 <= Länge von F bzw. W <= 15.
+   Eff.: Wenn X falsch ist, hat X die Darstellung F;
+         Wenn X wahr ist, die Darstellung W;
+         wenn X unbestimmt ist, eine Darstellung durch Leerzeichen. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Die Darstellung von X ist ab Zeile Z, Spalte S auf dem Bildschirm
+         in den Farben von X ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das Objekt, das von Benutzer/in ab Zeile Z, Spalte S
+         auf dem Bildschirm editiert ist. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor.: X ist initialisiert.
+         F ist ein definierter Font.
+   Eff.: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht ab Zeile Z, Spalte S auf der Seite im Druckerpuffer. *)
+
+PROCEDURE negieren (X, Y: Objekte);
+(* Vor.: X und Y sind initialisiert.
+   Eff.: Wenn X leer ist, ist Y leer. Andernfalls gilt:
+         Wenn X falsch ist, ist Y wahr; wenn X wahr ist, ist Y falsch. *)
+
+PROCEDURE konjungieren (X, X1, Y: Objekte);
+(* Vor.: X, X1 und Y sind initialisiert.
+   Eff.: Wenn X oder X1 leer sind, ist Y leer. Andernfalls gilt:
+         Wenn X und X1 wahr sind, ist Y wahr; sonst ist Y falsch. *)
+
+PROCEDURE disjungieren (X, X1, Y: Objekte);
+(* Vor.: X, X1 und Y sind initialisiert.
+   Eff.: Wenn X oder X1 leer sind, ist Y leer. Andernfalls gilt:
+         Wenn X und X1 falsch sind, ist Y falsch; sonst ist Y wahr. *)
+
+PROCEDURE exklusivDisjungieren (X, X1, Y: Objekte);
+(* Vor.: X, X1 und Y sind initialisiert.
+   Eff.: Wenn X oder X1 leer sind, ist Y leer. Andernfalls gilt:
+         Wenn X und X1 übereinstimmen, ist Y falsch; sonst ist Y wahr. *)
+
+PROCEDURE implizieren (X, X1, Y: Objekte);
+(* Vor.: X, X1 und Y sind initialisiert.
+   Eff.: Wenn X oder X1 leer sind, ist Y leer. Andernfalls gilt:
+         Wenn X wahr und X1 falsch ist, ist Y falsch; sonst ist Y wahr. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen, die für die eindeutig umkehrbare
+         Codierung eines Objekts als Strom notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom der Codelaenge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A steht ein Strom, der ein Objekt codiert.
+   Eff.: X ist dieses Objekt. *)
+
+END Wahrheitswerte.

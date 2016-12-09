@@ -1,0 +1,48 @@
+DEFINITION MODULE Streckenfolge;
+ 
+(* (c) Christian Maurer   v. 23. August 2007 *)
+
+FROM Prozedurtypen IMPORT Bearbeitungen;
+FROM Strecken IMPORT Objekte;
+
+(* Verwaltet eine - ggf. mit einem Namen persistente - Folge von gefärbten
+   Strecken im Raum, deren Endpunkte durch Vektoren gegeben sind.
+   Anfangs ist die Folge leer. *)
+
+PROCEDURE leeren;
+(* Vor.: Keine.
+   Eff.: Die Folge ist leer. *)
+
+PROCEDURE leer (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn die Folge keine Strecken enthält. *)
+
+PROCEDURE einfuegen (S: Objekte);
+(* Vor.: S ist initialisiert.
+   Eff.: S ist in der aktuellen Folge enthalten. *)
+
+PROCEDURE traversieren2 (B: Bearbeitungen);
+(* Vor.: Keine.
+   Eff.: Auf jeweils beide Endpunkte aller Strecken aus der Folge
+         ist B angewandt. *)
+
+PROCEDURE ausgeben;
+(* Vor.: Keine.
+   Eff.: Alle Strecken aus der Folge, für deren Endpunkte V und V1
+         Auge.ausgebbar (V, V1, x, y, x1, y1) gilt, sind als Strecken
+         zwischen (x, y) und (x1, y1) in ihren jeweiligen Farben
+         auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE definieren (N: ARRAY OF CHAR);
+(* Vor.: N enthält keinen ".", keinen "/" und keine Leerzeichen.
+         Länge (N) < 30.
+   Eff.: Die Folge ist mit dem Namen N persistent. Wenn es vorher schon
+         eine persistente Folge mit diesem Namen gab, ist sie jetzt leer. *)
+
+PROCEDURE auswaehlen;
+(* Vor.: Keine.
+   Eff.: Die Folge ist mit demjenigen Namen persistent, der von Benutzerin
+         interaktiv ausgewählt wurde. Wenn es vorher keine persistente
+         Streckenfolge mit diesem Namen gab, ist die Folge leer. *)
+
+END Streckenfolge.

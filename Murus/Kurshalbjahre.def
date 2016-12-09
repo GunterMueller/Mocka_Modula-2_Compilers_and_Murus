@@ -1,0 +1,57 @@
+DEFINITION MODULE Kurshalbjahre;
+
+(* (c) Christian Maurer   v. 14. September 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+CONST
+  Max = 4;
+TYPE
+  Objekte = [0..Max]; (* 0 für das "leere" Kurshalbjahr *)
+  maxKurshalbjahre = ARRAY [1..Max] OF Objekte;
+  Mengen = ARRAY [1..Max] OF BOOLEAN;
+
+PROCEDURE Zeichen (H: Objekte): CHAR;
+(* Vor.: Keine.
+   Eff.: Liefert ein Leerzeichen, wenn H = 0 ist,
+         sonst den Wert von H als Ziffer. *)
+
+PROCEDURE definiert (VAR H: Objekte; C: CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C ein Kurshalbjahr definiert.
+         Für C = "1".."4" ist H das entsprechende Kurshalbjahr,
+         andernfalls ist H = 0. *)
+
+PROCEDURE faerben (S, H: Farben.Objekte);
+(* Vor.: S und H sind Farben.
+   Eff.: S und H sind die aktuellen Farben für Schrift und Hintergrund. *)
+
+PROCEDURE ausgeben (H: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind genügend klein.
+   Eff.: H ist an der Position (Z, S) auf dem Bildschirm 
+         in den aktuellen Farben ausgegeben. *)
+
+PROCEDURE editieren (VAR H: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind genügend klein.
+   Eff.: H ist das Kurshalbjahr, das an der Bildschirmposition (Z, S)
+         editiert wurde. *)
+
+PROCEDURE drucken (H: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind genügend klein.
+   Eff.: H steht an der Stelle (Z, S) im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines Kurshalbjahrs als Zeichenfolge notwendig ist. *)
+
+PROCEDURE codieren (H: Objekte; A: ADDRESS);
+(* Vor.: Ab A sind Codelaenge Bytes alloziert.
+   Eff.: H ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (VAR H: Objekte; A: ADDRESS);
+(* Vor.: Ab A ist ein Kurshalbjahr als Zeichenfolge codiert. 
+   Eff.: X ist das Kurshalbjahr, das ab A als Zeichenfolge codiert ist. *)
+
+END Kurshalbjahre.

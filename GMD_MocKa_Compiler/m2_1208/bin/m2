@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 5. August 2012
+
+OUT=$M2OUT/${PWD##*/}
+mkdir -p $OUT
+Mc -range -index -S -g -d $OUT -D $OUT $MOCKAM2 -elf $*

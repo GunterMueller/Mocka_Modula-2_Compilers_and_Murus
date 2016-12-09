@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# (c) GMD Karlsruhe   v. 5. August 2012
+
+LIST=/tmp/$1.$$
+SRC=$1
+ERROR=$2
+
+BIN=/usr/local/m2/bin
+
+trap "rm -f $LIST; exit 5" 3
+$BIN/Lister $SRC $ERROR $LIST
+vi +'map v j/^@[ ]*^/\^k|1' $LIST < /dev/tty; 
+$BIN/Unlister $SRC $LIST
+rm -f $LIST $ERROR

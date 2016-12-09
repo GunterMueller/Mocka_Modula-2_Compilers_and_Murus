@@ -1,0 +1,149 @@
+DEFINITION MODULE Figuren;
+
+(* (c) Christian Maurer   v. 4. Juli 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+  FROM Bildschirm IMPORT Schriftarten;
+
+TYPE Objekte; (* 2-dimensionale Elementarfiguren auf dem Bildschirm:
+                 Folgen von maximal 512 Punkten,
+                 Strecken und Streckenzüge,
+                 Geraden,
+                 Polygone,
+                 Bezier-Kurven mit <= Bildschirm.maxBezier Stützstellen,
+                 achsenparallele Rechtecke,
+                 Kreise, Ellipsen,
+                 Texte aus höchstens 40 Zeichen,
+                 Bilder im ppm-Format *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn . *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE meta (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X Träger von Metainformationen ist:
+         Farbe, Position, Schriftart, Text. *)
+
+PROCEDURE vermetaen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist Träger von Metainformationen. *)
+
+PROCEDURE definieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die von Benutzer/in interaktiv bestimmte Art. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 übereinstimmen. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X ist unverändert und X1 stimmt mit X überein. *)
+
+PROCEDURE PositionLesen (X: Objekte; VAR x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: (x, y) ist die Bildschirmposition
+         der linken oberen Ecke von X, wenn X ...,
+         dem ersten Punkt von X, wenn X ...,
+         dem Mittelpunkt von X, wenn X ... . *)
+
+PROCEDURE positionierbar (X: Objekte; x, y: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X ... . *)
+
+PROCEDURE positionieren (X: Objekte; x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat als linke obere Ecke / ersten Punkt / Mittelpunkt /
+         die Bildschirmposition (x, y). *)
+
+PROCEDURE repositionierbar (X: Objekte; x, y: INTEGER): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn ... . *)
+
+PROCEDURE repositionieren (X: Objekte; x, y: INTEGER);
+(* Vor.: X ist initialisiert. X ist um (x, y) repositionierbar.
+   Eff.: X ist um (x, y) verschoben. *)
+
+PROCEDURE inzident (X: Objekte; x, y, t: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn ... . *)
+
+PROCEDURE unterMaus (X: Objekte; t: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die Mausposition horizontal oder
+         vertikal um höchstens t Pixel vom Rand von X entfernt ist. *)
+
+PROCEDURE faerben (X: Objekte; F: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farbe F. *)
+
+PROCEDURE FarbeHolen (X: Objekte; VAR F: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: F ist die Farbe von X. *)
+
+PROCEDURE setzen (X: Objekte; A: Schriftarten);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X ein Text ist, hat X hat die Schriftart A,
+         andernfalls ist nichts verändert. *)
+
+PROCEDURE loeschen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist in der Hintergrundfarbe des Bildschirms ausgegeben. *)
+
+PROCEDURE invertieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Alle Punkte von X sind invertiert. *)
+
+PROCEDURE markiert (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X markiert ist. *)
+
+PROCEDURE markieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist markiert. *)
+
+PROCEDURE demarkieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht markiert. *)
+
+PROCEDURE ausgeben (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist in seiner Farbe an seiner Position auf dem Bildschirm
+         ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte);
+(*
+PROCEDURE verschieben (X: Objekte);
+*)
+(* Vor.: X ist initialisiert und hat eine definierte Art.
+   Eff.: Wenn X vorher leer war, ist X jetzt die von Benutzer/in interaktiv
+         erzeugte Figur, andernfalls hat X die von Benutzer/in interaktiv
+         bestimmte Position. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: . *)
+
+PROCEDURE maximaleCodelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: . *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: . *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: . *)
+
+END Figuren.

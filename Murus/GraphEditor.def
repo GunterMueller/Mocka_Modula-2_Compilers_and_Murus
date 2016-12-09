@@ -1,0 +1,40 @@
+DEFINITION MODULE GraphEditor;
+
+(* (c) Christian Maurer   v. 10. April 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+  FROM Graphen IMPORT Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte; g, k: BOOLEAN; n: CARDINAL;
+                                          N: ARRAY OF CHAR);
+(* Vor.: n <= 22, k < 10.
+   Eff.: X ist initialisiert und genau dann gerichtet, wenn g = TRUE gilt.
+         Die Ecken von X können Namen aus bis zu n Zeichen haben.
+         Für k = FALSE haben alle Kanten den Wert 0, sonst können
+         die Kanten von X natürliche Zahlen < 10^... als Werte haben.
+         X ist der Graph, der in der Datei namens N abgespeichert war. *)
+
+PROCEDURE FarbenSetzen (F, A: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: F ist die normale Farbe der Ecken und Kanten in allen Graphen 
+         und A deren Farbe zur Darstellung in aktuellen Untergraphen. *)
+
+PROCEDURE ausgeben (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist der von Benutzer/in editierte Graph. *)
+
+PROCEDURE StartUndZielGewaehlt (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Start ist postaktuelle Ecke, Ziel aktuelle Ecke;
+         diese Ecken fallen nicht zusammen. *)
+
+PROCEDURE EckeGewaehlt (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Ecke ist postaktuelle Ecke; fällt mit aktueller Ecke zusammen. *)
+
+END GraphEditor.

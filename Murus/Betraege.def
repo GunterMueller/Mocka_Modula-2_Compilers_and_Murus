@@ -1,0 +1,95 @@
+DEFINITION MODULE Betraege;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Geldbeträge unterhalb zehn Millionen Euro *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+PROCEDURE terminieren (VAR X: Objekte);
+PROCEDURE leer (X: Objekte): BOOLEAN;
+PROCEDURE leeren (X: Objekte);
+PROCEDURE kopieren (X, X1: Objekte);
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE gerundet (X: Objekte; E: LONGREAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn 0 <= x < 9 999 999,995 ist. 
+         In diesem Fall ist X der durch E definierte (auf Cent 
+         gerundete) Betrag, andernfalls ist X leer. *)
+
+PROCEDURE Wert (X: Objekte): LONGREAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert den Wert von X in Euro auf zwei Nachkommastellen, 
+         wobei Rundungsfehler nicht auszuschließen sind. *)
+
+PROCEDURE null (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn (X nicht leer und) 
+         Euro- und Cent-Betrag von X Null sind. *)
+
+PROCEDURE definieren (X: Objekte; E, C: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Ist E < 10 000 000 und C < 100, hat X den Wert von 
+         E Euro und C Ct, sonst ist X leer. *)
+
+PROCEDURE inkrementieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X oder X1 leer ist, ist X leer. Andernfalls ist X 
+         um X1 erhöht, wenn dabei weniger als 10 Millionen Euro 
+         herauskommen, sonst ist X leer. X1 ist unverändert. *)
+
+PROCEDURE dekrementieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X oder X1 leer ist, ist X leer. Andernfalls ist 
+         X der Absolutbetrag der Differenz von X vorher und X1. 
+         X1 ist unverändert. *)
+
+PROCEDURE operieren (X: Objekte; P, Q: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer oder Q = 0 ist, ist nichts verändert. 
+         Andernfalls ist X mit P multipliziert und durch Q geteilt 
+         (ggf. auf Cent gerundet). Läge X danach außerhalb 
+         des implementierten Bereichs, ist X leer. *)
+
+PROCEDURE verzinsen (X: Objekte; p, n: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: Wenn X leer ist, ist nichts verändert. Andernfalls ist X mit 
+         (1 + p/100 %)^n multipliziert (ggf. auf Cent gerundet). *) 
+
+PROCEDURE abrunden (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X oder X1 leer ist, ist X leer; andernfalls ist X 
+         auf den nächsten durch X1 teilbaren Betrag abgerundet. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn T eindeutig einen Geldbetrag 
+         unterhalb einer Million darstellt. In diesem Fall hat X 
+         den entsprechenden Wert, sonst ist X leer. *) 
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: T ist der Text von B.
+         Wenn X leer ist, besteht T nur aus Leerzeichen. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. S + 10 < Spaltenzahl. 
+   Eff.: X ist ab Position (Z, S) auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. S + 10 < Spaltenzahl.
+   Eff.: X ist der ab der Position (Z, S) editierte Betrag. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+PROCEDURE Codelaenge (): CARDINAL;
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Betraege.

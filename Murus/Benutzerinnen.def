@@ -1,0 +1,19 @@
+DEFINITION MODULE Benutzerinnen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+TYPE Objekte;
+     Formate = (ganzKurz, kurz, lang);
+
+PROCEDURE initialisieren (VAR B: Objekte);
+PROCEDURE terminieren (VAR B: Objekte);
+PROCEDURE leer (B: Objekte): BOOLEAN;
+PROCEDURE leeren (B: Objekte);
+PROCEDURE gleich (B, B1: Objekte): BOOLEAN;
+PROCEDURE definieren (B: Objekte; id: CARDINAL);
+PROCEDURE aktualisieren (B: Objekte);
+PROCEDURE ausgeben (B: Objekte; Z, S: CARDINAL);
+PROCEDURE vertexten (B: Objekte; VAR N: ARRAY OF CHAR);
+PROCEDURE Nummer (B: Objekte): CARDINAL;
+
+END Benutzerinnen. 

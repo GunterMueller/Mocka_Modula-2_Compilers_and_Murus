@@ -1,0 +1,64 @@
+DEFINITION MODULE Meldungen;
+
+(* (c) Christian Maurer   v. 24. November 2006 *)
+
+IMPORT Farben;
+
+TYPE Textzeilen = ARRAY [0..200] OF CHAR;
+
+VAR zumWarten, zumFortsetzen, zumFortsetzenOderNicht, zumAbbrechen,
+    zumBlaettern, zumAuswaehlen, zumAendern, zumUmschalten, 
+    zumAuswaehlenMitDruck, zumDrucken: Textzeilen;
+
+PROCEDURE HinweisAusgeben (T: ARRAY OF CHAR);
+(* Vor.: Länge (T) <= Spaltenzahl. *)
+PROCEDURE Hinweis2Ausgeben (T, T1: ARRAY OF CHAR);
+(* Vor.: Länge (T), Länge (T1) <= Spaltenzahl.
+   Eff.: T ist in der letzten bzw. T in der vorletzten und T1 in der letzten
+         Bildschirmzeile ausgegeben. *)
+PROCEDURE HinweisLoeschen;
+(* Vor.: Hinweis ist ausgegeben.
+   Eff.: Der Hinweis ist gelöscht und der ursprüngliche Bildschirminhalt
+         der letzten bzw. der letzten und vorletzten Zeile ist restauriert. *)
+
+PROCEDURE FehlerMelden (T: ARRAY OF CHAR; n: CARDINAL);
+(* Vor.: Länge (T) <= Spaltenzahl. *)
+PROCEDURE FehlerAusgeben (T: ARRAY OF CHAR; n, Z, S: CARDINAL);
+(* Vor.: Z < Zeilenzahl, S + Länge (T) <= Spaltenzahl.
+   Eff.: T und n sind in der letzten Zeile des Bildschirms bzw.
+         in Zeile Z ab Spalte S ausgegeben.
+         Der aufrufende Prozeß war solange blockiert, bis Benutzer/in die
+         Fehlermeldung mit dem dafür vorgesehenen Kommando quittiert hat;
+         die durch die Fehlermeldung überschriebene Stelle des Bildschirms
+         ist jetzt wiederhergestellt. *)
+
+PROCEDURE Fehler2Melden (T:  ARRAY OF CHAR; n:  CARDINAL;
+                         T1: ARRAY OF CHAR; n1: CARDINAL);
+PROCEDURE Fehler2Ausgeben (T: ARRAY OF CHAR; n: CARDINAL;
+                          T1: ARRAY OF CHAR; n1, Z, S: CARDINAL);
+(* Vor.: Analog zu FehlerMelden/Ausgeben.
+   Eff.: Analog zu FehlerMelden/Ausgeben, aber mit Text T, dann Zahl n,
+         dann Text T1, am Ende Zahl n1. *)
+
+PROCEDURE bestaetigt (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Der aufrufende Prozeß war solange blockiert, bis Benutzer/in mit
+         den dafür vorgesehenen Kommandos seine Entscheidung getroffen hat,
+         ob bestätigt oder nicht. Liefert im ersten Fall TRUE, sonst FALSE. *)
+
+VAR DokuVorhanden: BOOLEAN;
+
+PROCEDURE GPL (Projekt, Datum, Autor: ARRAY OF CHAR;
+               V1, V, H: Farben.Objekte; VAR Titel: ARRAY OF CHAR);
+
+PROCEDURE Titelzeile (Projekt, Datum, Autor: ARRAY OF CHAR; VAR T: ARRAY OF CHAR);
+
+PROCEDURE Kopf (Projekt, Datum, Autor: ARRAY OF CHAR; V, H: Farben.Objekte; VAR T: Textzeilen);
+
+PROCEDURE HilfeAusgeben (H: ARRAY OF Textzeilen; n, B: CARDINAL);
+(* Vor.: .
+   Eff.: . *)
+
+PROCEDURE Hilfe1Ausgeben;
+
+END Meldungen.

@@ -1,0 +1,430 @@
+DEFINITION MODULE Graphen;
+
+(* (c) Christian Maurer   v. 13. Mai 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Praedikate, Bearbeitungen, TripelBearbeitungen,
+       Bewertungen, bedingteBearbeitungen, bedingteTripelBearbeitungen;
+
+TYPE Objekte;
+(* Graphen, d.h. Mengen von Strömen beliebiger, aber fester Länge > 0 als
+   Ecken mit einer irreflexiven Relation: zwei Ecken stehen in Relation,
+   wenn sie durch eine Kante verbunden sind, wobei es keine Schlingen
+   gibt (d.h. keine Ecke mit sich selbst durch eine Kante verbunden ist).
+   Die Kanten können auch Ströme einer beliebigen, aber festen Länge > 0
+   sein, die mit einer natürlichen Zahl <= MAX (CARDINAL) bewertet sind
+   (zur Definition von Strömen siehe Folgen.def).
+   Wenn die Relation symmetrisch ist, heißt der Graph ungerichtet, sonst
+   (d.h. wenn alle Kanten eine Richtung haben), gerichtet.
+   Die von einer Ecke abgehenden Kanten sind (beginnend mit 0) durchgehend
+   nummmeriert; diejenige Ecke, mit der eine Ecke durch die n-te abgehende
+   Kante verbunden ist, wird als ihre n-te Nachbarecke bezeichnet.
+   In jedem nichtleeren Graphen ist jeweils genau eine Ecke als postaktuelle
+   und eine als aktuelle Ecke ausgezeichnet, die auch zusammenfallen können,
+   darüberhinaus ein aktueller Untergraph, der auch leer sein kann.
+   (Ein Untergraph ist eine Teilmenge der Ecken eines Graphen und eine
+   Teilmenge seiner Kanten, die nur Ecken des Untergraphen verbinden.
+   Ein Weg in einem Graphen ist eine Folge von Ecken und von jeder dieser
+   Ecken - mit Ausnahme der letzten - zur jeweils nächsten Ecke gehenden
+   Kanten; ein einfacher Weg ist ein Weg aus paarweise verschiedenen Ecken;
+   ein Kreis ist ein einfacher Weg mit einer zusätzlichen Kante von der
+   letzten zur ersten Ecke. Wege und Kreise sind natürlich Untergraphen.) *)
+
+PROCEDURE initialisieren (VAR X: Objekte; g: BOOLEAN; e: CARDINAL);
+(* Vor.: X ist nicht initialisiert. e > 0.
+   Eff.: X ist initialisiert und leer.
+         X ist genau dann gerichtet, wenn g = TRUE ist.
+         X hat die Eckenlänge e (d.h. X hat Ströme der Länge e als Ecken).
+         X hat keine Kantenattribute; alle Kanten von X sind mit 1 bewertet. *)
+
+PROCEDURE initialisieren1 (VAR X: Objekte; g: BOOLEAN; e, k: CARDINAL; B: Bewertungen);
+(* Vor.: X ist nicht initialisiert. e > 0 und k > 0.
+   Eff.: X ist initialisiert und leer.
+         X ist genau dann gerichtet, wenn g = TRUE ist.
+         X hat die Eckenlänge e (d.h. X hat Ströme der Länge e als Ecken).
+         X hat Kantenattribute der Kantenlänge k (d.h. X hat Ströme der
+         Länge k als Kanten) und die Bewertung B (d.h. ein Strom ab A
+         als Kante ist mit B(A) bewertet). *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist unter dem Namen N persistent. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE gerichtet (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X gerichtet ist. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Ecken enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. Postaktuelle und aktuelle Ecke von X sind undefiniert. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Ecken in X. *)
+
+PROCEDURE partielleAnzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Ecken im aktuellen Untergraphen von X. *)
+
+PROCEDURE relativeAnzahl (X: Objekte; P: Praedikate): CARDINAL;
+(* Vor.: X ist initialisiert und enthält <= MAX (CARDINAL) Ecken.
+   Eff.: Liefert die Anzahl der Ecken in X, auf die P zutrifft. *)
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Eckenlänge von X ist als Ecke in X eingefügt
+         (wenn er vorher schon in X enthalten war, ist nichts verändert).
+         Wenn X vorher leer war, ist das jetzt die postaktuelle und aktuelle
+         Ecke von X, sonst ist die neue Ecke jetzt aktuelle Ecke und die
+         vorherige aktuelle Ecke postaktuelle Ecke von X. *)
+
+PROCEDURE singulaer (X: Objekte): BOOLEAN;
+(* >>>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer ist oder wenn die aktuelle Ecke
+         von X mit der postaktuellen Ecke zusammenfällt. *)
+
+PROCEDURE verbinden (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist oder eine Kantenlänge > 0 hat oder die postaktuelle
+         Ecke von X mit der aktuellen zusammenfällt, ist nichts verändert.
+         Ansonsten ist in X eine Kante von der postaktuellen zur aktuellen
+         Ecke von X eingefügt (wenn diese beiden Ecken schon vorher durch
+         eine Kante verbunden waren, ist ggf. deren Richtung verändert). *)
+
+PROCEDURE verbinden1 (X: Objekte; K: ADDRESS);
+(* Vor.: X ist initialisiert und hat Kantenattribute.
+   Eff.: Wenn X leer ist oder die Kantenlänge 0 hat oder die postaktuelle
+         Ecke von X mit der aktuellen zusammenfällt, ist nichts verändert.
+         Ansonsten ist der Strom ab K der Kantenlänge von X als Kante von der
+         postaktuellen zur aktuellen Ecke von X eingefügt (wenn diese beiden
+         Ecken schon vorher durch eine Kante verbunden waren, ist die
+         vorherige Kante durch den Strom ab K überschrieben und dabei ggf.
+         ihre Richtung verändert). *)
+
+PROCEDURE benachbart (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die postaktuelle Ecke von X nicht mit
+         der aktuellen Ecke zusammenfällt und von der postaktuellen Ecke in X
+         eine Kante zur aktuellen Ecke geht. *)
+
+PROCEDURE inversBenachbart (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die postaktuelle Ecke von X nicht mit
+         der aktuellen Ecke zusammenfällt und von der aktuellen Ecke in X
+         eine Kante zur postaktuellen Ecke geht. *)
+
+PROCEDURE enthalten (X: Objekte; E: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Strom ab E der Eckenlänge von X als
+         Ecke in X enthalten ist. In diesem Fall ist diese Ecke jetzt aktuelle
+         Ecke von X. Die postaktuelle Ecke von X ist die gleiche wie vorher. *)
+
+PROCEDURE enthalten2 (X: Objekte; E, E1: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die Ströme ab E und E1 der Eckenlänge
+         von X nicht übereinstimmen und als Ecken in X enthalten sind.
+         In diesem Fall ist die durch E definierte Ecke jetzt postaktuelle
+         und die durch E1 definierte Ecke aktuelle Ecke von X. *)
+
+PROCEDURE existiert (X: Objekte; P: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn in X eine Ecke enthalten ist, auf die
+         P zutrifft. In diesem Fall ist eine solche Ecke jetzt die aktuelle
+         Ecke von X. Die postaktuelle Ecke von X ist die gleiche wie vorher. *)
+
+PROCEDURE existiert2 (X: Objekte; P, P1: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn in X zwei verschiedene Ecken enthalten
+         sind, auf die P bzw. P1 zutrifft. In diesem Fall ist eine durch P
+         definierte Ecke jetzt postaktuelle und eine durch P1 definierte Ecke
+         aktuelle Ecke von X. *)
+
+PROCEDURE lesen (X: Objekte; E: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert, sonst steht ab E der Strom
+         der aktuellen Ecke von X. *)
+
+PROCEDURE lesen2 (X: Objekte; E, E1: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert, sonst steht ab E der Strom aus
+         der postaktuellen Ecke und ab E1 der aus der aktuellen Ecke von X. *)
+
+PROCEDURE lesen1 (X: Objekte; K: ADDRESS);
+(* Vor.: X ist initialisiert und hat Kantenattribute.
+         Es gibt eine Kante von der postaktuellen zur aktuellen Ecke von X.
+   Eff.: Wenn X leer ist oder die postaktuelle Ecke von X mit der aktuellen Ecke
+         zusammenfällt, ist nichts verändert.
+         Andernfalls steht ab K der Strom der Kantenlänge von X aus der Kante
+         von der postaktuellen Ecke zur aktuellen Ecke von X. *)
+
+PROCEDURE lesen3 (X: Objekte; K, E, E1: ADDRESS);
+(* Vor.: X ist initialisiert und hat Kantenattribute.
+   Eff.: Wenn X leer ist oder die postaktuelle Ecke mit der aktuellen Ecke von X
+         zusammenfällt oder wenn es keine Kante von der postaktuellen Ecke zur
+         aktuellen Ecke gibt, ist nichts verändert.
+         Andernfalls steht ab K der Strom der Kantenlänge von G aus der Kante
+         von der postaktuellen Ecke zur aktuellen Ecke von X, ab E der Strom
+         der Eckenlänge von X aus der postaktuellen und ab E1 der Strom der
+         Eckenlänge von X aus der aktuellen Ecke. *)
+
+PROCEDURE schreiben (X: Objekte; E: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X vorher leer war, ist nichts verändert. Sonst ist die aktuelle
+         Ecke von X durch den Strom ab E der Eckenlänge von X ersetzt. *)
+
+PROCEDURE schreiben2 (X: Objekte; E, E1: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn vorher leer war oder die aktuelle Ecke mit der postaktuellen Ecke
+         von X zusammenfällt, ist nichts verändert. Sonst ist die postaktuelle
+         Ecke von X durch den Strom ab E der Eckenlänge von X und die aktuelle
+         Ecke von X durch den Strom ab E1 der Eckenlänge von X ersetzt. *)
+
+PROCEDURE entfernen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten sind die vorherige
+         aktuelle Ecke von X und alle von ihr abgehenden und zu ihr führenden
+         Kanten aus X entfernt. Sofern X jetzt nicht leer ist, ist irgendeine
+         andere Ecke von X aktuelle Ecke und fällt mit der postaktuellen Ecke
+         zusammen. Aktueller Weg und aktueller Untergraph von X sind leer. *)
+
+PROCEDURE KanteEntfernen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn es eine Kante zwischen der postaktuellen und der aktuellen Ecke
+         von X gab, ist sie aus X entfernt. *)
+
+PROCEDURE verbunden (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer ist oder es von der postaktuellen
+         Ecke von X einen Weg zur aktuellen Ecke gibt. *)
+
+PROCEDURE bedingtVerbunden (X: Objekte; P: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer ist oder wenn P auf die aktuelle
+         Ecke zutrifft und es von der postaktuellen Ecke von X einen Weg zur
+         aktuellen Ecke gibt, der - außer der postaktuellen Ecke - nur Ecken
+         enthält, auf die P zutrifft. *)
+
+PROCEDURE ZahlenSetzen (X: Objekte; n: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Alle Ecken von G haben die Zahl n. *)
+
+PROCEDURE ZahlSetzen (X: Objekte; n: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Die aktuelle Ecke von G hat die Zahl n. *)
+
+PROCEDURE Zahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 0, wenn G leer ist,
+         andernfalls die Zahl der aktuellen Ecke von G. *)
+
+PROCEDURE aktualisieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten gilt:
+         Wenn es von der postaktuellen Ecke von X einen Weg zur aktuellen Ecke
+         gibt, ist der aktuelle Weg von X ein bzgl. der Summe der Werte seiner
+         Kanten (d.h. bei Kantenlänge 0 bzgl. deren Anzahl) kürzester solcher
+         Weg, sonst besteht der aktuelle Weg nur aus der postaktuellen Ecke.
+         Der aktuelle Untergraph von X ist der aktuelle Weg von X. *)
+
+PROCEDURE bedingtAktualisieren (X: Objekte; P: Praedikate);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten gilt:
+         Wenn P auf die aktuelle Ecke zutrifft und es von der postaktuellen
+         Ecke von X einen Weg zur aktuellen Ecke gibt, der - außer der
+         postaktuellen Ecke - nur Ecken enthält, auf die P zutrifft, ist der
+         der aktuelle Weg von X ein bzgl. der Summe der Werte seiner Kanten
+         (d.h. bei Kantenlänge 0 bzgl. deren Anzahl) kürzester solcher Weg,
+         sonst besteht der aktuelle Weg nur aus der postaktuellen Ecke.
+         Der aktuelle Untergraph von X ist der aktuelle Weg von X. *)
+
+PROCEDURE Laenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Summe der Zahlen, mit der die Kanten von X bewertet sind
+         (d.h. im unbewerteten Fall die Anzahl der Kanten von X). *)
+
+PROCEDURE partielleLaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Summe der Zahlen, mit der die Kanten des aktuellen
+         Untergraphen von X bewertet sind, d.h. im unbewerteten Fall die
+         Anzahl der Kanten im Untergraphen. *)
+
+PROCEDURE Kantenzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 0, wenn X leer ist, sonst die Anzahl der von der aktuellen
+         Ecke von X abgehenden Kanten. *)
+
+PROCEDURE invertieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X nicht gerichtet ist, ist nichts verändert,
+         sonst ist die Richtung aller Kanten von X umgedreht. *)
+
+PROCEDURE repositionieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Aktuelle und postaktuelle Ecke von X sind vertauscht.
+         Der aktuelle Weg besteht nur aus der postaktuellen Ecke;
+         der aktuelle Untergraph von X ist der aktuelle Weg. *)
+
+PROCEDURE positionieren (X: Objekte; v: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten gilt:
+         Postaktuelle und aktuelle Ecke von X fallen zusammen, wobei das
+         für v = TRUE diejenige Ecke ist, die vorher aktuelle Ecke von X war,
+         und für v = FALSE diejenige, die vorher postaktuelle Ecke von X war.
+         Der aktuelle Weg von X besteht nur aus dieser Ecke; der aktuelle
+         Untergraph von X ist der aktuelle Weg. *)
+
+PROCEDURE positionieren1 (X: Objekte; i: CARDINAL; v: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist oder i >= Anzahl der von der aktuellen Ecke gehenden
+         Kanten ist, ist nichts verändert. Ansonsten ist für
+         v = TRUE die i-te Nachbarecke der letzten Ecke des aktuellen Wegs
+             von X als neue letzte Ecke an ihn angefügt,
+         v = FALSE die letzte Ecke des aktuellen Wegs von X aus ihm entfernt,
+             sofern er nicht nur eine Ecke hatte (i spielt dabei keine Rolle).
+         Die letzte Ecke des aktuellen Wegs von X ist die aktuelle Ecke von X;
+         der aktuelle Untergraph von X ist sein aktueller Weg. *)
+
+PROCEDURE archivieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Die aktuelle Ecke von X ist auf dem Eckenstapel abgelegt. *)
+
+PROCEDURE restaurieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn der Eckenstapel leer ist, ist nichts verändert;
+         sonst ist die aktuelle Ecke die oberste vom Eckenstapel
+         und diese Ecke ist vom Eckenstapel entfernt. *)
+
+PROCEDURE markieren (X: Objekte; m: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten ist die aktuelle
+         Ecke von X genau dann markiert, wenn m = TRUE gilt. *)
+
+PROCEDURE markiert (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert FALSE, wenn X leer ist. Liefert ansonsten genau dann TRUE, 
+         wenn die aktuelle Ecke von X markiert ist. *)
+
+PROCEDURE wahr (X: Objekte; P: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X leer ist oder wenn P auf alle Ecken
+         von X zutrifft. *)
+
+PROCEDURE partiellWahr (X: Objekte; P: Praedikate): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X leer ist oder wenn P auf alle Ecken
+         aus dem aktuellen Untergraphen von X zutrifft. *)
+
+PROCEDURE traversieren (X: Objekte; E: Bearbeitungen);
+(* Vor.: X ist initialisiert. 
+   Eff.: Auf alle Ecken in X ist E angewandt. Postaktuelle bzw. aktuelle
+         Ecke von X sind die, die vorher postaktuell bzw. aktuell waren. *)
+
+PROCEDURE traversieren1 (X: Objekte; E, K: Bearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X die Kantenlänge 0 hat, ist nichts verändert.
+         Ansonsten ist E auf alle Ecken und K auf alle Kanten in X angewandt.
+         Postaktuelle bzw. aktuelle Ecke von X sind die,
+         die vorher postaktuell bzw. aktuell waren. *)
+
+PROCEDURE traversieren2 (X: Objekte; K: Bearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X die Kantenlänge 0 hat, ist nichts verändert.
+         Ansonsten ist K auf alle Kanten in X angewandt.
+         Postaktuelle bzw. aktuelle Ecke von X sind die,
+         die vorher postaktuell bzw. aktuell waren. *)
+
+PROCEDURE traversieren3 (X: Objekte; K: TripelBearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: ................................................
+         ..........     Beschreibung fehlt     ..........
+         ................................................ *)
+
+PROCEDURE bedingtTraversieren (X: Objekte; E: bedingteBearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Auf alle Ecken in X, die im aktuellen Untergraphen von X enthalten
+         sind, ist E(-, TRUE) angewandt, auf die anderen Ecken E(-, FALSE).
+         Postaktuelle bzw. aktuelle Ecke von X sind die,
+         die vorher postaktuell bzw. aktuell waren. *)
+
+PROCEDURE bedingtTraversieren1 (X: Objekte; E, K: bedingteBearbeitungen);
+(* Vor.: X ist initialisiert. X hat eine Kantenlänge > 0.
+   Eff.: Wenn X die Kantenlänge 0 hat, ist nichts verändert.
+         Ansonsten ist E(-, TRUE) auf alle Ecken und K(-, TRUE) auf alle
+         Kanten in X angewandt, die im aktuellen Untergraphen von X enthalten
+         sind, E(-, FALSE) bzw. K(-, FALSE) auf die anderen Ecken bzw. Kanten.
+         Postaktuelle bzw. aktuelle Ecke von X sind die,
+         die vorher postaktuell bzw. aktuell waren. *)
+
+PROCEDURE bedingtTraversieren3 (X: Objekte; K: bedingteTripelBearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: ................................................
+         ..........     Beschreibung fehlt     ..........
+         ................................................ *)
+
+PROCEDURE kreisfrei (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn es in X keinen Kreis gibt. *)
+
+PROCEDURE Komponente (X: Objekte);
+PROCEDURE Komponenten (X: Objekte);
+(* >>>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Der aktuelle Untergraph von X besteht aus allen Ecken, für die gilt,
+         daß sie von der aktuellen Ecke aus und die aktuelle Ecke von ihnen aus
+         durch Wege erreichbar sind, und allen Kanten zwischen diesen Ecken.
+         Der aktuelle Weg von X ist leer. *)
+(*
+PROCEDURE aequivalent (G: Objekte);
+(* >>>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn die aktuelle und die postaktuelle Ecke
+         von G in der gleichen starken Zusammenhangskomponente liegen. *)
+*)
+PROCEDURE minimieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X gerichtet ist, ist nichts verändert.
+         Ansonsten ist der aktuelle Untergraph von X ein (bzgl. der Werte
+         der Summe seiner Kanten, d.h. wenn X die Kantenlänge 0 hat,
+         bzgl. der Anzahl seiner Ecken) minimaler aufspannender Baum der
+         Zusammenhangskomponente, in der die postaktuelle Ecke liegt.
+         Der aktuelle Weg besteht nur aus dieser Ecke (?). *)
+
+PROCEDURE ordnen (X: Objekte);
+(* Vor.: G ist initialisiert.
+   Eff.: Wenn G leer, ungerichtet oder gerichtet, aber nicht kreisfrei ist,
+         ist nichts verändert. Ansonsten ist bei jedem Traversieren von X
+         die Reihenfolge so bestimmt, daß jede Ecke, von der Kanten abgehen,
+         immer vor allen denjenigen Ecken bearbeitet wird, bei denen diese
+         Kanten ankommen. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren
+         Codierung von X als Strom notwendig ist. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Graph als Strom codiert.
+   Eff.: X ist der Graph, der ab A als Strom codiert ist.
+         Der aktuelle Untergraph von X ist leer. *)
+
+PROCEDURE demonstrieren (E: bedingteBearbeitungen; K: bedingteTripelBearbeitungen);
+(* Vor.: E gibt Ecken, K Kanten aus.
+   Eff.: Die Ausführung der Prozedur aktualisieren (weitere in Arbeit) ist
+         jeweils an algorithmisch entscheidenden Stellen solange unterbrochen,
+         bis Benutzer/in die Eingabetaste gedrückt hat. *)
+
+END Graphen.

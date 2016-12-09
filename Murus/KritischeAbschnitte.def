@@ -1,0 +1,95 @@
+DEFINITION MODULE KritischeAbschnitte;
+
+(* (c) Christian Maurer   v. 12. Dezember 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Bedingungsspektren, Anweisungsspektren;
+
+TYPE Objekte;
+(* Universelle Synchronisationsobjekte zur Realisierung von Zugangsprotokollen
+   zu allgemeinen bedingten kritischen Abschnitten zur Nutzung gemeinsamer
+   Ressourcen, deren Zustand dabei verändert werden könnte, von Prozessen
+   mindestens zweier Klassen.
+
+   Unter allgemeinen kritischen Abschnitten werden dabei solche verstanden, 
+   die von mehreren Prozessen einer Klasse nebenläufig betreten werden dürfen,
+   von Prozessen verschiedener Klassen aber nur unter gegenseitigem Ausschluß
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 72 ff.).
+
+   Die Klassen werden durch fortlaufende natürliche Zahlen (ab 0) identifiziert.
+
+   Der gegenseitige Ausschluß zwischen Prozessen verschiedener Klassen wird von
+   den Klienten durch Bedingungen in Form Boolescher Ausdrücke sichergestellt,
+   unter denen ein Kritischer Abschnitt betreten werden darf; beim Eintritt in
+   einen und beim Austritt aus einem Abschnitt werden Anweisungen ausgeführt,
+   die die Bedingungen steuern.
+
+   Diese - von den Klassen abhängigen - Eintrittsbedingungen, auf die ein
+   aufrufender Prozeß ggf. bis zu ihrer Erfüllung beim Eintritt vor der Aus-
+   führung der zugehörigen Anweisungen blockiert ist, und diese Anweisungen
+   sind jeweils in einem (durch die Nummern der Klassen parametrisierten)
+   Spektrum von Prozeduren gebündelt, das von den Klienten konstruiert
+   und bei der Initialisierung eines Kritischen Abschnitts übergeben wird.
+
+   Die Kritischen Abschnitte können zu übergeordneten Subjekten assoziiert sein,
+   von denen sie zur Synchronisation verwendet werden. Das ist erforderlich,
+   wenn mehrere Exemplare eines Kritischen Abschnitts mit den gleichen
+   Bedingungen oder Anweisungen in einem Programm verwendet werden.
+
+   Anwendung der Protokolle (nach dem initialisieren) für die Prozesse
+   der Klasse k mit dem synchronisierenden Subjekt S:
+
+     eintreten (S, k);
+     ...; (* Code des kritischen Abschnitts *)
+     austreten (S, k);
+
+   Die Prozeduren eintreten und austreten sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; S: ADDRESS; n: CARDINAL;
+                          B: Bedingungsspektren; E, A: Anweisungsspektren);
+(* Vor.: X ist nicht initialisiert.
+         S = NIL oder S ist ein Verweis auf ein übergeordnetes Subjekt,
+         von dem X zur Synchronisation benutzt wird.
+         n > 1. B, E und A sind für alle k < n definiert.
+   Eff.: X ist initialisiert und hat die Klassenzahl n.
+         Im Fall S # NIL hat X das synchronisierende Subjekt S.
+         X hat für alle k < n die Eintrittsbedingung B (S, k) und die
+         Anweisungen E (S, k) bzw. A (S, k) zum Ein- bzw. Austritt in die
+         bzw. aus der k-ten Klasse von X. Alle Eintrittsbedingungen für X
+         sind erfüllt, aber kein Prozeß befindet sich in X. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß befindet sich in einem kritischen Abschnitt.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE blockiert (X: Objekte; k: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert. k < Klassenzahl von X.
+         Die Funktion wird nur innerhalb der Eintrittsbedingungen von X
+         aufgerufen (s. Bem.).
+   Eff.: Liefert genau dann TRUE, wenn mindestens ein Prozeß der k-ten Klasse
+         von X blockiert ist.
+   Bem.: Der Wert kann sich unmittelbar nach dem Aufruf geändert haben.
+         Zu seiner Verwertbarkeit gehört folglich, daß die Unteilbarkeit
+         des Aufrufs von folgenden Anweisungen, die von dem Wert abhängen,
+         durch geeignete Synchronisationsmaßnahmen sichergestellt ist. Das ist
+         bei einem Aufruf innerhalb der Eintrittsbedingungen von X der Fall. *)
+
+PROCEDURE eintreten (X: Objekte; k: CARDINAL);
+(* Vor.: X ist initialisiert. k < Klassenzahl von X.
+         Der aufrufende Prozeß befindet sich nicht in X.
+   Eff.: Der aufrufende Prozeß befindet sich in der k-ten Klasse von X, d.h. er
+         war ggf. solange blockiert, bis B (S, k) galt, und jetzt ist E (S, k)
+         ausgeführt (wobei S das synchronisierende Subjekt, B die Eintritts-
+         bedingung von X und E die Anweisung zum Eintritt in X sind). *)
+
+PROCEDURE austreten (X: Objekte; k: CARDINAL);
+(* Vor.: X ist initialisiert. k < Klassenzahl von X.
+         Der aufrufende Prozeß befindet sich in der k-ten Klasse von X.
+   Eff.: Der aufrufende Prozeß befindet sich nicht mehr in X, d.h.
+         A (S, k) ist ausgeführt (wobei S das synchronisierende Subjekt
+         und A die Anweisung zum Austritt aus X sind).
+         B (S, k) von X ist nicht mehr sichergestellt. *)
+
+END KritischeAbschnitte.

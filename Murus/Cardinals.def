@@ -1,0 +1,52 @@
+DEFINITION MODULE Cardinals;
+
+(* (c) Christian Maurer   v. 19. April 2005 *)
+
+IMPORT Farben;
+
+PROCEDURE Ziffernfolgenanzahl (S: ARRAY OF CHAR; 
+                               VAR P, L: ARRAY OF CARDINAL): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der zusammenhängenden Ziffernfolgen von S. 
+         Ist diese Zahl > 0, gibt P [i] die Startposition in S und 
+         L [i] die Länge der i-ten Ziffernfolge an. *)
+
+PROCEDURE istZahl (S: ARRAY OF CHAR; VAR N: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE, wenn S leer ist. In diesem Fall ist N = 0.
+         Liefert ansonsten genau dann TRUE, wenn S eine Zahl im Bereich 
+         von CARDINAL darstellt. In diesem Fall ist N diese Zahl. *)
+
+PROCEDURE Stellenzahl (N: CARDINAL): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert 0 für N = 0, sonst die Anzahl der Ziffern von N 
+         (ohne führende Nullen). *)
+
+PROCEDURE vertexten (N: CARDINAL; VAR S: ARRAY OF CHAR; L: CARDINAL;
+                                                        f: BOOLEAN);
+(* Vor.: L >= Stellenzahl von N.
+   Eff.: S ist die rechtsbündige Darstellung von N als Zeichenkette 
+         der Länge L. S ist genau dann mit führenden Nullen aufgefüllt, 
+         wenn f = TRUE ist. *)
+
+PROCEDURE faerben (V, H: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: Alle folgenden Ein-/Ausgaben erfolgen in der
+         Schriftfarbe V und der Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (N: CARDINAL; Z, S, B: CARDINAL);
+(* Vor.: Z und S klein genug;
+         Stellenzahl (N) <= B <= Stellenzahl (MAX (CARDINAL)).
+   Eff.: N ist auf dem Bildschirm an der Position (Z, S) ausgegeben. *)
+
+PROCEDURE editieren (VAR N: CARDINAL; Z, S, B: CARDINAL);
+(* Vor.: N hat einen Wert.
+         Z und S klein genug; 2 <= B <= Stellenzahl (MAX (CARDINAL)).
+   Eff.: N ist die Zahl, die am Bildschirm editiert wurde. *)
+
+PROCEDURE setzen (F: CARDINAL);
+(* Vor.: F ist ein Font. *)
+
+PROCEDURE drucken (N: CARDINAL; Z, S, B: CARDINAL);
+
+END Cardinals.

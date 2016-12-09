@@ -1,0 +1,33 @@
+DEFINITION MODULE Stroeme;
+
+(* (c) Christian Maurer   v. 20. Juli 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+PROCEDURE kopieren (A, A1: ADDRESS; n: CARDINAL);
+(* Vor.: A + n <= A1 oder A1 + n <= A, d.h. die Ströme
+         der Länge n ab A und A1 überlappen sich nicht.
+   Eff.: Für n = 0 ist nichts verändert. Andernfalls gilt:
+         Ab A1 steht der gleiche Strom der Länge n wie ab A; 
+         der Strom ab A der Länge n ist unverändert. *)
+
+PROCEDURE verschieben (A, A1: ADDRESS; n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Für n = 0 oder A = A1 ist nichts verändert. Andernfalls gilt:
+         Ab A1 steht der gleiche Strom der Länge n wie vorher ab A. 
+         Wenn sich die Ströme der Länge n ab A und A1 nicht überlappen,
+         ist der Strom ab A der Länge n unverändert; wenn A < A1 < A + n
+         oder A1 < A < A1 + n gilt, d.h. wenn sie sich überlappen,
+         ist der Strom ab A entsprechend verändert. *)
+
+PROCEDURE gleich (A, A1: ADDRESS; n: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn der Strom ab A 
+         mit dem Strom ab A1 in der Länge n übereinstimmt. *)
+
+PROCEDURE fuellen (A: ADDRESS; C: CHAR; n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Wenn n = 0, ist nichts verändert. Andernfalls gilt:
+         Der Strom ab A der Länge n besteht nur aus C. *)
+
+END Stroeme.

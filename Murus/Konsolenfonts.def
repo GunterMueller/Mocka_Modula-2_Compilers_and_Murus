@@ -1,0 +1,23 @@
+DEFINITION MODULE Konsolenfonts;
+
+(* (c) Christian Maurer   v. 22. August 2006
+
+   >>> Nur zur Implementierung von Bildschirm,
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+TYPE Fonts = (zierlich, normal, groesser, nochgroesser);
+
+PROCEDURE Zeichenhoehe (F: Fonts): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Pixelhoehe der Zeichen des aktuellen Fonts. *)
+
+PROCEDURE Zeichenbreite (F: Fonts): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Pixelbreite der Zeichen des aktuellen Fonts. *)
+
+PROCEDURE gesetzt (F: Fonts; C: CHAR; Z, S: CARDINAL): BOOLEAN;
+(* Vor.: Z < Zeichenhoehe, S < Zeichenbreite.
+   Eff.: Liefert genau dann TRUE, wenn an der Stelle (Z, S)
+         im Zeichen C des Fonts F ein Pixel gesetzt ist. *)
+
+END Konsolenfonts.

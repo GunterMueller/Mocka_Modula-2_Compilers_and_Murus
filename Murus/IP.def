@@ -1,0 +1,38 @@
+DEFINITION MODULE IP;
+
+(* (c) Christian Maurer   v. 9. Mai 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST Laenge = 15; (* "aaa.bbb.ccc.ddd" *)
+TYPE Adressen = ARRAY [0..Laenge] OF CHAR; (* in Punkt-Notation *)
+
+(* >>>>>>>>>  fliegt hier noch raus:  >>>>>>>>> *)
+CONST HOST_NAME_MAX = 255; (* bits/posix1_lim.h *)
+TYPE Namen = ARRAY [0..HOST_NAME_MAX] OF CHAR;
+(* <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< *)
+
+PROCEDURE aktuell (N: Namen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn N der IP-Name des aktuellen Rechners,
+         d.h. des Rechners, auf dem der aufrufende Prozeß läuft, ist. *)
+
+PROCEDURE aktualisieren (VAR N: Namen);
+(* Vor.: Keine.
+   Eff.: N ist der IP-Name des aktuellen Rechners,
+         d.h. des Rechners, auf dem der aufrufende Prozeß läuft. *)
+
+PROCEDURE Nummer (N: Namen): CARDINAL;
+(* Vor.: Keine. 
+   Eff.: Liefert den Wert der IP-Nummer des Rechners mit dem Namen N, wenn N in
+         /etc/hosts eingetragen oder über DNS auflösbar ist; andernfalls 0. *)
+
+PROCEDURE Wert (A: Adressen): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert den Wert von I. *)
+
+PROCEDURE vertexten (N: CARDINAL; VAR A: Adressen);
+(* Vor.: Keine.
+   Eff.: A ist die Darstellung von N in Form einer IP-Adresse. *)
+
+END IP.

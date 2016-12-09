@@ -1,0 +1,224 @@
+DEFINITION MODULE Zeichenketten;
+
+(* (c) Christian Maurer   v. 5. August 2008 *)
+
+(* Felder von Elementen vom Typ CHAR, beginnend mit dem Index 0, d.h. die
+   Positionen werden ab 0 gezählt. CHR (0) wird als Endemarke interpretiert;
+   d.h. zu einer Zeichenkette gehören nur die Zeichen vor dem ersten CHR (0).
+   Die Länge einer Zeichenkette T ist folglich HIGH (T) + 1, wenn T keine
+   Endemarke enthält, sonst die Anzahl der Zeichen vor dem ersten CHR (0). *)
+
+PROCEDURE initialisieren (VAR T: ARRAY OF CHAR; n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: T besteht aus m Leerzeichen mit m = min (n, HIGH (T) + 1).
+         Für n = 0 gilt T[0] = 0C, d.h. T enthält keine Zeichen. *)
+
+PROCEDURE definieren (VAR T: ARRAY OF CHAR; T1: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: T enthält genau die Zeichen aus T1, wobei UTF-8-Zeichen aus T1 in latin1
+         gewandelt sind. Wenn HIGH (T) zu klein ist, besteht T nur aus dem
+         Anfangsstück von T1 der Länge HIGH (T) - 1. *)
+
+PROCEDURE setzen (VAR T: ARRAY OF CHAR; p: CARDINAL; C: CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn p < Laenge (T) ist, ist das Zeichen an der p-ten Stelle von T
+         durch C ersetzt; andernfalls ist T unverändert. *)
+
+PROCEDURE leer (T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T keine Zeichen oder nur
+         Leerzeichen enthält. *)
+
+PROCEDURE konstantDefinieren (VAR T: ARRAY OF CHAR; c: CHAR; n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: T besteht aus m Zeichen c mit m = min (n, HIGH (T) + 1). *)
+
+PROCEDURE Laenge (T: ARRAY OF CHAR): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen von T 
+         (ggf. bis vor das erste 0C). *)
+
+PROCEDURE echteLaenge (T: ARRAY OF CHAR): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen von T 
+         ohne Berücksichtigung von Leerzeichen am Ende. *)
+
+PROCEDURE kopieren (T: ARRAY OF CHAR; VAR T1: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn T höchstens n Zeichen für n = HIGH (T1) + 1 enthält,
+         stimmt T1 mit T überein, sonst ist T1 entsprechend kürzer. *)
+
+PROCEDURE gleich (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T und T1 übereinstimmen, d.h.
+         die gleichen Zeichen in der gleichen Reihenfolge enthalten. *)
+
+PROCEDURE quasigleich (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T und T1 bis auf Leerzeichen am Ende
+         übereinstimmen, d.h. die gleichen Zeichen in der gleichen Reihenfolge
+         enthalten, wobei hintere Leerzeichen unberücksichtigt bleiben. *)
+
+PROCEDURE vergroessern (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Alle Kleinbuchstaben in T (einschl. der Umlaute, ausschl. 'ß') 
+         sind durch die entsprechenden Großbuchstaben ersetzt. *)
+
+PROCEDURE verkleinern (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Alle Großbuchstaben in T (einschl. der Umlaute) 
+         sind durch die entsprechenden Kleinbuchstaben ersetzt. *)
+
+PROCEDURE aequivalent (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T und T1 übereinstimmen, 
+         wobei Groß- und Kleinbuchstaben als gleich angesehen werden. *)
+
+PROCEDURE quasiaequivalent (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T und T1 übereinstimmen, 
+         wobei Groß- und Kleinbuchstaben als gleich angesehen werden
+         und hintere Leerzeichen unberücksichtigt bleiben. *)
+
+PROCEDURE kleiner (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T lexikographisch vor T1 kommt 
+         (insbesondere ist ein leerer Text kleiner als ein nichtleerer).
+         Großbuchstaben kommen vor den entsprechenden Kleinbuchstaben.
+         Das Problem der Äquivalenzen 'ä'/"ae", 'ö'/"oe", 'ü'/"ue" und 'ß'/"ss"
+         sowie das der Zeichen mit "deadkeys" ist noch nicht gelöst. *)
+
+PROCEDURE quasikleiner (T, T1: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T lexikographisch vor T1 kommt,
+         wobei Groß- und Kleinbuchstaben als gleich angesehen werden. *)
+
+PROCEDURE quasienthalten (C: CHAR; T: ARRAY OF CHAR; VAR p: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C in T vorkommt, wobei Groß- und
+         Kleinbuchstaben nicht unterschieden werden (also z.B. für C = 'x',
+         wenn 'X' in T vorkommt, und für C = 'X', wenn 'x' in T vorkommt).
+         In diesem Fall ist p der Index des ersten Vorkommens des ent-
+         sprechenden Zeichens in T; andernfalls ist p die Länge von T. *)
+
+PROCEDURE enthalten (C: CHAR; T: ARRAY OF CHAR; VAR p: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn C in T vorkommt.
+         In diesem Fall ist p der Index des ersten Vorkommens von C in T;
+         andernfalls ist p die Länge von T. *)
+
+PROCEDURE istTeil (T, T1: ARRAY OF CHAR; VAR p: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T als zusammenhängender Teil 
+         in T1 enthalten ist. In diesem Fall ist p der Index in T, 
+         bei dem T1 anfängt; andernfalls ist p die Länge von T1. *)
+
+PROCEDURE istAequivalenterTeil (T, T1: ARRAY OF CHAR; VAR p: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T als zusammenhängender Teil 
+         in T1 enthalten ist, wobei Groß- und Kleinbuchstaben nicht 
+         unterschieden werden. In diesem Fall ist p der Index in T, 
+         bei dem T1 anfängt; andernfalls ist p die Länge von T1. *)
+
+PROCEDURE verketten (T, T1: ARRAY OF CHAR; VAR T2: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn T und T1 zusammen nicht mehr als HIGH (T2) + 1 Zeichen
+         enthalten, besteht T2 aus der Aneinanderreihung der Zeichen
+         aus T und T1, sonst ist T2 entsprechend verkürzt. *)
+
+PROCEDURE anhaengen (VAR T: ARRAY OF CHAR; T1: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn Laenge (T) + Laenge (T1) <= HIGH (T) ist, ist T1 an T angehängt,
+         andernfalls ist T unverändert. *)
+
+PROCEDURE anhaengen1 (VAR T: ARRAY OF CHAR; C: CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn Laenge (T) < HIGH (T) ist, ist C an T angehängt,
+         andernfalls ist T unverändert. *)
+
+PROCEDURE einfuegen1 (VAR T: ARRAY OF CHAR; C: CHAR; p: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Wenn p < Laenge (T) ist, ist C als p-tes Zeichen in T eingefügt;
+         wenn Laenge (T) <= p < HIGH (T) ist, ist C an T angehängt,
+         andernfalls ist T unverändert. *)
+
+PROCEDURE einfuegen (VAR T: ARRAY OF CHAR; T1: ARRAY OF CHAR; p: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Wenn Laenge (T) + Laenge (T1) > HIGH (T) ist, ist T unverändert.
+         Andernfalls gilt:
+         Wenn p < Laenge (T) ist, ist T1 ab der Position p in T eingefügt,
+         d.h.  T besteht aus den ersten p Zeichen von T vorher, dann den
+         Zeichen von T1, und dann den Zeichen ab der Position p von T vorher;
+         andernfalls ist T1 an T (ohne Zwischenraum) angehängt. *)
+
+PROCEDURE entfernen (VAR T: ARRAY OF CHAR; p, n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Enthielt T mindestens p + n Zeichen, sind n Zeichen,
+         sonst alle Zeichen ab der Position p aus T entfernt.
+         Enthielt T weniger als p Zeichen, ist T unverändert. *)
+
+PROCEDURE ausschneiden (T: ARRAY OF CHAR; p, n: CARDINAL;
+                        VAR T1: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Wenn n <= HIGH (T1) + 1 und T mindestens p + n Zeichen
+         enthält, besteht T1 aus den n Zeichen von T ab Position p;
+         wenn nicht, ist T1 entsprechend kürzer. *)
+
+PROCEDURE normieren (VAR T: ARRAY OF CHAR; n: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Wenn T die Länge n hat, ist nichts verändert.
+         Enthielt T mehr Zeichen, sind die Zeichen hinter
+         den ersten n entfernt; war T kürzer, ist T auf die Länge
+         min (HIGH (T) + 1, n) mit Leerzeichen aufgefüllt. *)
+
+PROCEDURE LeerzeichenEntfernen (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Soweit vorhanden, sind Leerzeichen am Ende aus T entfernt. *)
+
+PROCEDURE alleLeerzeichenEntfernen (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Alle Leerzeichen sind aus T entfernt. *)
+
+PROCEDURE schieben (VAR T: ARRAY OF CHAR; nachLinks: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Soweit vorhanden, sind für nachLinks = TRUE bzw. FALSE führende
+         Leerzeichen bzw. Leerzeichen am Ende aus T entfernt und T ist mit
+         Leerzeichen am anderen Ende auf seine vorherige Länge aufgefüllt. *)
+
+PROCEDURE zentrieren (T: ARRAY OF CHAR; VAR T1: ARRAY OF CHAR; n: CARDINAL);
+(* Vor.: Laenge (T) <= n <= HIGH (T1).
+   Eff.: T1 besteht aus T und ist links und rechts gleichmäßig
+         mit Leerzeichen auf die Länge n aufgefüllt. *)
+
+PROCEDURE ZeilenvorschubAnhaengen (VAR T: ARRAY OF CHAR);
+(* Vor.: T ist genügend groß dimensioniert.
+   Eff.: An T ist das Zeichen CHR (10) angehängt. *)
+
+PROCEDURE ZeileAusschneiden (VAR T, Z, T1: ARRAY OF CHAR; n: CARDINAL; b: BOOLEAN);
+(* Vor.: .
+   Eff.: . *)
+
+PROCEDURE ZeileAbtrennen (VAR T, T1: ARRAY OF CHAR);
+(* Vor.: T1 ist genügend groß dimensioniert.
+   Eff.: T1 ist der vordere Teil von T bis ausschließlich zum ersten
+         Zeichen Z mit ORD (Z) < " "; T ist der Teil ab dieser Position,
+         wobei alle führenden Zeichen Z mit ORD (Z) < " " entfernt sind. *)
+
+PROCEDURE ZeileAnhaengen (VAR T: ARRAY OF CHAR; T1: ARRAY OF CHAR);
+(* Vor.: .
+   Eff.: . *)
+
+PROCEDURE NichtziffernEntfernen (VAR T: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: Alle Zeichen, die keine Ziffer sind, sind aus T entfernt;
+         die anderen Zeichen sind nach links aufgerückt und T ist
+         auf seine ursprüngliche Länge mit Leerzeichen aufgefüllt. *)
+
+PROCEDURE Wortanzahl (T: ARRAY OF CHAR; VAR P, L: ARRAY OF CARDINAL): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der zusammenhängenden Zeichenketten
+         (= Zeicheketten, in denen kein Leerzeichen vorkommt).
+         Ist diese Zahl > 0, gibt P [i] die Startposition in S
+         und L [i] die Länge der i-ten Zeichenkette an. *)
+
+END Zeichenketten.

@@ -1,0 +1,23 @@
+DEFINITION MODULE Zufall;
+
+(* (c) Christian Maurer   v. 12. Februar 2006 *)
+
+PROCEDURE initialisieren;
+(* Vor.: Keine.
+   Eff.: Der Zufallszahlengenerator ist initialisiert. 
+         Er ist nicht mehr reproduzierbar. *)
+
+PROCEDURE Zahl (n: CARDINAL): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert für n > 0 eine Zufallszahl < n, 
+         für n = 0 eine Zufallszahl <= MAX (CARDINAL). *)
+
+PROCEDURE reelleZahl (): REAL;
+(* Vor.: Keine.
+   Eff.: Liefert eine reelle Zufallszahl r mit 0 <= r < 1. *)
+
+PROCEDURE langeReelleZahl (): LONGREAL;
+(* Vor.: Keine.
+   Eff.: Liefert eine reelle Zufallszahl r mit 0 <= r < 1. *)
+
+END Zufall.

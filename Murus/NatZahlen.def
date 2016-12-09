@@ -1,0 +1,236 @@
+DEFINITION MODULE NatZahlen;
+
+(* (c) Christian Maurer   v. 28. August 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST max = 10000;
+TYPE Objekte; (* Natürliche Zahlen mit Stellenzahl <= max *)
+
+(* Allg. Eff.: Wenn das Ergebnis der Berechnung einer Zahl einen Wert mit
+               Stellenzahl > max liefern würde, ist die entsprechende Zahl leer. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE Stellenzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 0, wenn X leer ist, sonst die Anzahl der 
+         Dezimalziffern des Wertes von X (1, wenn er 0 ist). *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X keinen Wert hat. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Wenn X leer ist, ist X1 auch leer. 
+         Andernfalls hat X1 den Wert von X.
+         X ist unverändert. *)
+
+PROCEDURE gleich (X, Y: Objekte): BOOLEAN;
+(* Vor.: X und Y sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und Y leer sind 
+         oder wenn die Werte von X und Y gleich sind. *)
+
+PROCEDURE kleiner (X, Y: Objekte): BOOLEAN;
+(* Vor.: X und Y sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und Y nicht leer ist
+         oder wenn beide nicht leer sind
+         und der Wert von X kleiner als der von Y ist. *)
+
+PROCEDURE kleinergleich (X, Y: Objekte): BOOLEAN;
+(* Vor.: X und Y sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und Y nicht leer ist
+         oder wenn beide nicht leer sind
+         und der Wert von X kleiner oder gleich dem von Y ist. *)
+
+PROCEDURE null (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer ist 
+         und den Wert 0 hat. *)
+
+PROCEDURE eins (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer ist 
+         und den Wert 1 hat. *)
+
+PROCEDURE ungerade (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer ist 
+         und einen ungeraden Wert hat. *)
+
+PROCEDURE definieren (X: Objekte; N: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat den Wert N. *)
+
+PROCEDURE Wert (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert den Wert von X, falls X nicht leer ist und einen Wert
+         kleiner als MAX (CARDINAL) hat, sonst MAX (CARDINAL). *)
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn T leer
+         oder eine Folge von Dezimalziffern ist.
+         Wenn T leer oder keine Folge von Dezimalziffern ist, ist X leer,
+         andernfalls hat X den Wert dieser Ziffernfolge. 
+         Führende Nullen werden außer Betracht gelassen. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer oder die Länge von T kleiner als
+         die Stellenzahl von X ist, ist, ist T leer.
+         Andernfalls ist T die Folge der Dezimalziffern des Wertes von X. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* >>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Noch nicht implementiert. *)
+(*
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Noch nicht implementiert. *)
+*)
+PROCEDURE inkrementieren1 (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Andernfalls ist der Wert von X um 1 erhöht, falls das im Bereich
+         der implementierten Zahlen liegt, andernfalls ist X leer. *)
+
+PROCEDURE addieren (X, Y, S: Objekte);
+(* Vor.: X, Y und S sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, ist S leer.
+         Andernfalls ist der Wert von S die Summe der Werte von X und Y. *)
+
+PROCEDURE inkrementieren (X, Y: Objekte);
+(* Vor.: X und Y sind initialisiert.
+   Eff.: Wenn X oder Y leer ist, ist nichts verändert. 
+         Andernfalls ist der Wert von Z um den Wert von Y erhöht. *)
+
+PROCEDURE dekrementieren1 (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist oder den Wert 0 hat, ist nichts verändert. 
+         Andernfalls ist der Wert von X um 1 vermindert. *)
+
+PROCEDURE subtrahieren (X, Y, D: Objekte);
+(* Vor.: X, Y und D sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, ist D leer. Andernfalls gilt: 
+         Wenn der Wert von X größer oder gleich dem von Y ist, ist der
+         Wert von D die Differenz der Werte von X und Y, sonst ist D leer. *)
+
+PROCEDURE dekrementieren (X, Y: Objekte);
+(* Vor.: X und Y sind initialisiert.
+   Eff.: Wenn X oder Y leer ist, ist nichts verändert. 
+         Andernfalls gilt: wenn der Wert von X größer oder gleich dem Wert
+         von Y ist, ist der Wert von X um den Wert von Y vermindert. *)
+
+PROCEDURE multiplizieren (X, Y, P: Objekte);
+(* Vor.: X, Y und P sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, ist P leer. Andernfalls ist 
+         der Wert von P das Produkt der Werte von X und Y. *)
+
+PROCEDURE multiplizierenMod (X, Y, M, P: Objekte);
+(* Vor.: X, Y, M und P sind initialisiert. 
+   Eff.: Wenn X, Y oder M leer ist, ist P leer. 
+         Andernfalls ist der Wert von P das Produkt 
+         der Werte von X und Y modulo des Wertes von M. *)
+
+PROCEDURE quadrieren (X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: Wenn X leer ist, ist nicht verändert. 
+         Andernfalls ist der Wert von X das Quadrat des alten Wertes von X. *)
+
+PROCEDURE dividieren (X, Y, Q, R: Objekte);
+(* Vor.: X, Y und Q sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, sind Q und R leer. 
+         Wenn X den Wert 0 hat, hat Q den Wert 1 und R den Wert von X.
+         Andernfalls ist der Wert von Q der ganzzahlige Quotient der Werte
+         von X und Y und der Wert von R der entsprechende Divisionsrest. *)
+
+PROCEDURE ggTBerechnen (X, Y, T: Objekte);
+(* Vor.: X, Y und T sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, ist T leer. 
+         Andernfalls ist der Wert von T der größte 
+         gemeinsame Teiler der Werte von X und Y. *)
+
+PROCEDURE kgVBerechnen (X, Y, V: Objekte);
+(* Vor.: X, Y und V sind initialisiert. 
+   Eff.: Wenn X oder Y leer ist, ist V leer. 
+         Andernfalls ist der Wert von V das kleinste 
+         gemeinsame Vielfache der Werte von X und Y. *)
+
+PROCEDURE potenzieren (Z: Objekte; E: CARDINAL; P: Objekte);
+(* Vor.: X und P sind initialisiert.
+   Eff.: Wenn X leer ist, ist P leer.
+         Andernfalls ist der Wert von P gleich dem Wert von X hoch E,
+         falls das im Bereich der implementierten Zahlen liegt. *)
+
+PROCEDURE potenzierenMod (X, Y, M, P: Objekte);
+(* Vor.: X, Y, M und P sind initialisiert. 
+   Eff.: Wenn X, Y oder M leer ist, ist P leer.
+         Andernfalls ist der Wert von P die Potenz von dem Wert von X
+         hoch dem Wert von Y modulo dem Wert von M. *)
+
+PROCEDURE log2 (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert MAX (CARDINAL), wenn X leer ist oder den Wert 0
+         hat, andernfalls die größte natürliche Zahl kleiner oder 
+         gleich dem Logarithmus des Wertes von X zur Basis X. *)
+
+PROCEDURE FakultaetBerechnen (F: Objekte; N: CARDINAL);
+(* Vor.: F ist initialisiert. 
+         N ist genügend klein. 
+   Eff.: Der Wert von F ist die Fakultät des Wertes von N, 
+         definiert durch F (0) = 1 und F (n + 1) = (n + 1) * F (n). *)
+
+PROCEDURE Quersumme (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert 0, wenn X leer ist, 
+         andernfalls die Quersumme des Wertes von X. *)
+
+PROCEDURE prim (X, T: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer und der Wert von X eine
+         Primzahl ist. Der Wert von T ist der kleinste Teiler des Wertes von X.
+         Für Werte von X > X * 10^10 ist die Laufzeit nicht mehr akzeptabel,
+         für Werte von X > 4 * 10^10 ist die Implementierung unbrauchbar. *)
+
+PROCEDURE BinomialkoeffizientBerechnen (X: Objekte; N, K: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Wert von X ist der Binomialkoeffizient N über K, 
+         definiert durch B (n, 0) = 1, B (0, k) = 0 für k > 0 
+         und B (n + 1, k + 1) = B (n, k) + B (n, k + 1). *)
+
+PROCEDURE fallendeFaktorielleBerechnen (X: Objekte; N, K: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Wert von X ist die fallende Faktorielle N über K,
+         definiert durch F (n, 0) = 1, F (0, k) = 0
+         und F (n, k + 1) = (n - k) * F (n, k). *)
+
+PROCEDURE Stirlingzahl2Berechnen (X: Objekte; N, K: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Wert von X ist die Stirlingzahl 2. Art N über K, definiert durch
+         S (0, 0) = 1, S (n, 0) = 0 für n > 0, S (0, k) = 0 für k > 0
+         und S (n + 1, k + 1) = S (n, k) + (k + 1) * S (n, k + 1). *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END NatZahlen.

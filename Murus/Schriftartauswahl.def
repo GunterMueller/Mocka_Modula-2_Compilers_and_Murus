@@ -1,0 +1,10 @@
+DEFINITION MODULE Schriftartauswahl;
+
+(* (c) Christian Maurer   v. 22. August 2006 *)
+
+FROM Farben IMPORT Objekte;
+FROM Bildschirm IMPORT Schriftarten;
+
+PROCEDURE auswaehlen (VAR A: Schriftarten; F: Objekte);
+
+END Schriftartauswahl.

@@ -1,0 +1,10 @@
+DEFINITION MODULE Abbruch;
+
+(* (c) Christian Maurer   v. 3. April 2006
+
+   >>> Nur zur Implementierung von Tastatur und Bildschirm;
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+PROCEDURE AbbruchInstallieren (p: PROC);
+
+END Abbruch.

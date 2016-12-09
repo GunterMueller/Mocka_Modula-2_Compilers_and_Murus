@@ -1,0 +1,32 @@
+DEFINITION MODULE Barrieren;
+
+(* (c) Christian Maurer   v. 23. Februar 2008 *)
+
+TYPE Objekte;
+(* Synchronisationspunkte, die Prozesse nach Erledigung ihres Teils
+   einer gemeinsamen Aufgabe abwarten müssen, bis eine bestimmte
+   Anzahl maxP von Prozessen ihre Teilaufgabe erledigt haben
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 85).
+
+   Die Prozedur warten ist unteilbar, d.h. ihr Ablauf
+   kann von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; M: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         M > 1.
+   Eff.: X ist initialisiert. maxP = M.
+         Kein Prozeß wartet auf X. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozess wartet auf X.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE warten (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Die Anzahl der auf X wartenden Prozesse ist inkrementiert.
+         Der aufrufende Prozeß war ggf. solange blockiert, bis
+         die Anzahl der wartenden Prozesse = maxP ist.
+         Jetzt wartet kein Prozeß auf X. *)
+
+END Barrieren.

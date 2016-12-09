@@ -1,0 +1,179 @@
+DEFINITION MODULE Dateibaum;
+
+(* (c) Christian Maurer   v. 29. Juli 2007 *)
+
+FROM Prozedurtypen IMPORT Praedikate;
+FROM Muruskern IMPORT NAME_MAX, PATH_MAX;
+
+CONST maxN = NAME_MAX;
+      maxP = PATH_MAX;
+      Trennzeichen = '/';
+
+TYPE Typen = (unbekannt, Fifo, zeichenorientierteDatei, Verzeichnis,
+              blockorientierteDatei, Datei, Verweis, Socket);
+(* Typen von Einträgen im Dateibaum. Einträge vom Typ Verzeichnis, Datei
+   usw. werden auch kurz als Verzeichnisse, Dateien usw. bezeichnet. *)
+
+TYPE Namen = ARRAY [0..maxN] OF CHAR;
+(* Namen von Einträgen im Dateibaum, ohne das Trennzeichen
+   und ohne führende oder abschließende Leerzeichen *)
+
+TYPE Pfadnamen = ARRAY [0..maxP-1] OF CHAR;
+(* Namen von Pfaden (kurz als Pfade bezeichnet) im Dabeibaum als - voneinander
+   durch das Trennzeichen getrennten - Folgen von Namen von Verzeichnissen
+   in Richtung von der Wurzel des Dateibaums zu seinen Blättern, bei denen
+   jeweils das nächste Verzeichnis im vorigen enthalten ist.
+   Enthält ein Pfad ein führendes Trennzeichen, beginnt er im Wurzel-,
+   sonst im aktuellen Verzeichnis; ein Trennzeichen am Ende ist belanglos,
+   sofern der Pfad nicht nur daraus besteht. (Der Name eines Verzeichnisses
+   ist folglich auch ein Pfad.)
+   Das letzte Verzeichnis eines Pfades wird als sein Zielverzeichnis
+   bezeichnet; wenn ein Pfad nur aus dem Trennzeichen besteht,
+   ist sein Zielverzeichnis das Wurzelverzeichnis.
+   Jeder aufrufende Prozeß befindet sich zu jedem Zeitpunkt in genau einem
+   Verzeichnis, das als aktuelles Verzeichnis bezeichnet wird; die Folge
+   der Verzeichnisse vom Wurzelverzeichnis zum aktuellen Verzeichnis wird
+   als aktueller Pfad bezeichnet; d.h. das aktuelle Verzeichnis ist stets
+   das Zielverzeichnis des aktuellen Pfades.
+   Auch die leere Zeichenkette "" ist ein Pfad; deren Zielverzeichnis ist
+   das aktuelle Verzeichnis. Sie ist äquivalent zu "./".
+   Sind P und Q Pfade sind (wobei P auch leer sein darf) und V ein Verzeichnis,
+   ist "P/V/../Q" äquivalent zu "P/Q"; beide bezeichnen den gleichen Pfad. *)
+
+TYPE Dateinamen = ARRAY [0..maxP-1] OF CHAR;
+(* Zeichenketten, bestehend aus einem Pfad (der, falls nicht leer, mit einem
+   Trennzeichen abschließt), gefolgt vom Namen eines Eintrags vom Typ Datei. *)
+
+PROCEDURE aktualisieren (VAR P: Pfadnamen);
+(* Vor.: Keine.
+   Eff.: Das aktuelle Verzeichnis ist unverändert; P ist der aktuelle Pfad. *)
+
+PROCEDURE existiert (P: Pfadnamen): BOOLEAN;
+(* Vor.: Keine.
+         Der aufrufende Prozeß hat die entsprechenden Rechte.
+   Eff.: Liefert genau dann TRUE, wenn P im Dateibaum enthalten ist, d.h.
+         wenn alle Verzeichnisse aus P im Dateibaum vorhanden sind, so daß
+         das jeweils nächste Verzeichnis aus P im vorigen enthalten ist. *)
+
+PROCEDURE definiert (N: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn N der Name eines Eintrags (d.h. einer
+         Zeichenkette ohne führende und abschließende Leerzeichen und ohne
+         Trennzeichen) oder eines Eintrags mit vorangesetztem Pfad mit einem
+         Trennzeichen am Ende ist. *)
+
+PROCEDURE DateiEnthalten (N: Dateinamen): BOOLEAN;
+(* Vor.: Keine. 
+   Eff.: Liefert genau dann TRUE, wenn der aufrufende Prozeß Zugangsrechte
+         zu allen Verzeichnissen im Pfad von N hat, ein Eintrag vom Typ Datei
+         mit dem Namen N vorhanden und diese Datei nicht leer ist. *)
+
+PROCEDURE positionieren (P: Pfadnamen);
+(* Vor.: P ist ein Pfad oder die Zeichenkette ("..").
+         Der aufrufende Prozeß hat Zugriffsrecht auf alle Verzeichnisse in P
+         bzw. (für P = "..") das Verzeichnis, in dem das aktuelle Verzeichnis
+         enthalten ist.
+   Eff.: Wenn P = ".." und das aktuelle Verzeichnis das Wurzelverzeichnis ist,
+         ist nichts verändert. Ansonsten ist das aktuelle Verzeichnis wie folgt
+         verändert:
+         Für P = ".." ist das aktuelle Verzeichnis jetzt dasjenige,
+         in dem das vorherige aktuelle Verzeichnis enthalten ist,
+         d.h. der aktuelle Pfad ist um sein letztes Verzeichnis verkürzt.
+         Wenn P mit dem Trennzeichen beginnt, ist P der aktuelle Pfad,
+         sonst ist P an den vorherigen aktuellen Pfad angehängt. *)
+
+(* Verwaltet daneben die Programmvariable. Ihr Wert entspricht anfangs (d.h.
+   mit entsprechenden Groß- für alle Kleinbuchstaben) dem Namen des aufrufenden
+   Programms (ohne einen evtl. beim Aufruf mit angegebenen Pfadname davor). *)
+
+PROCEDURE setzen (V: ARRAY OF CHAR);
+(* Vor.: V enthält kein Leerzeichen und kein "=".
+   Eff.: V ist die Programmvariable. *)
+
+PROCEDURE positionieren0;
+(* Vor.: Keine.
+   Eff.: Wenn der Wert der Programmvariablen einen existierenden Pfad
+         bezeichnet, zu den der aufrufende Prozeß Zugangsrechte hat, ist dieser
+         Pfad jetzt der aktuelle Pfad, d.h. sein Zielverzeichnis das aktuelle
+         Verzeichnis; andernfalls ist das aktuelle Verzeichnis unverändert. *)
+
+PROCEDURE temporieren (VAR D: Dateinamen);
+(* Vor.: D enthält ggf. einen Pfad und am Ende einen zulässigen Namen für einen
+         Eintrag vom Typ Datei; die Länge dieses Eintrags ist <= maxN - 11.
+   Eff.: D ist mit einem Präfix aus elf Zeichen versehen. *)
+
+PROCEDURE einfuegen (P: Pfadnamen; V: Namen);
+(* Vor.: P ist im Dateibaum enthalten.
+         V ist ein zulässiger Name für einen Eintrag.
+         Der aufrufende Prozeß hat die entsprechenden Rechte.
+   Eff.: Gibt es schon einen Eintrag des Namens V im Zielverzeichnis von P,
+         ist nichts verändert. Ansonsten ist V jetzt im Dateibaum als
+         Verzeichnis enthalten und an P angehängt.
+         Der aktuelle Pfad des aufrufenden Prozesses ist unverändert. *)
+
+PROCEDURE entfernen (P: Pfadnamen; V: Namen);
+(* Vor.: P ist im Dateibaum vorhanden (s. definiert).
+         V ist der Name eines Verzeichnisses, das im Zielverzeichnis von P
+         enthalten ist.
+         V ist leer.
+         V ist nicht aktuelles Verzeichnis irgendeines Prozesses.
+         Der aufrufende Prozeß hat die entsprechenden Rechte.
+   Eff.: V ist aus dem Zielverzeichnis von P entfernt und damit nicht mehr im
+         Dateibaum vorhanden. Der aktuelle Pfad des aufrufenden Prozesses
+         ist unverändert. *)
+
+PROCEDURE leer (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn im aktuellen Verzeichnis
+         keine Einträge enthalten sind. *)
+
+PROCEDURE Anzahl (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Einträge,
+         die im aktuellen Verzeichnis enthalten sind. *)
+
+PROCEDURE enthalten (N: Namen; VAR T: Typen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn im aktuellen Verzeichnis ein Eintrag
+         des Namens N enthalten ist. In diesem Fall ist T der Typ dieses
+         Eintrags, sonst ist T = unbekannt. *)
+
+PROCEDURE lesen (i: CARDINAL; VAR N: Namen; VAR T: Typen; VAR n: CARDINAL);
+(* Vor.: i < Anzahl der Einträge des Typs T im aktuellen Verzeichnis.
+   Eff.: N ist der Name und T der Typ des i-ten (beginnend bei 0) Eintrags,
+         der im aktuellen Verzeichnis enthalten ist. Wenn dieser Eintrag
+         eine Datei ist, gilt n = Anzahl der Zeichen darin, sonst n = 0. *)
+
+PROCEDURE leer1 (T: Typen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn im aktuellen Verzeichnis
+         keine Einträge des Typs T enthalten sind. *)
+
+PROCEDURE Anzahl1 (T: Typen): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Einträge des Typs T,
+         die im aktuellen Verzeichnis enthalten sind. *)
+
+PROCEDURE enthalten1 (N: Namen; T: Typen): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn im aktuellen Verzeichnis ein Eintrag
+         des Namens N und des Typs T enthalten ist. *)
+
+PROCEDURE lesen1 (T: Typen; i: CARDINAL; VAR N: Namen; VAR n: CARDINAL);
+(* Vor.: i < Anzahl der Einträge des Typs T im aktuellen Verzeichnis.
+   Eff.: N ist der Name des i-ten (beginnend bei 0) Eintrags vom Typ T,
+         der im aktuellen Verzeichnis enthalten ist. Für T = Datei
+         gilt n = Anzahl der Zeichen in der Datei, sonst n = 0. *)
+
+PROCEDURE relativeAnzahlDateien (P: Praedikate): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der nichtleeren Dateien, die im aktuellen
+         Verzeichnis enthalten sind und auf deren Namen P zutrifft. *)
+
+PROCEDURE relativLesen (P: Praedikate; i: CARDINAL; VAR N: Namen);
+(* Vor.: relativeAnzahlDateien (P) wurde nach dem letzten Wechsel des aktuellen
+         Verzeichnisses aufgerufen und i < diese Zahl.
+   Eff.: N ist der Name der i-ten Datei, die im aktuellen Verzeichnis
+         enthalten ist und auf deren Name P zutrifft. *)
+
+END Dateibaum.

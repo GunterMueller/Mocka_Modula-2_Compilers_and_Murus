@@ -1,0 +1,137 @@
+DEFINITION MODULE Schuelermengen;
+
+(* (c) Christian Maurer   v. 10. März 2008 *)
+
+IMPORT Schuelerinnen;
+
+TYPE Objekte;
+(* Persistente geordnete Mengen von Schülerinnen und Schülern
+   mit Nummern zwischen 1 und 65535.
+   Zu einer Nummer gehört höchstens ein/e Schüler/in.
+
+   Die strikten Ordnungen der Mengen, von denen jeweils genau eine aktuell ist,
+   sind auf gewissen Teilen der Objekte in ihnen definiert, über die als Index
+   auf die Schüler und Schülerinnen zugegriffen wird. Die Begriffe "erster",
+   "nach", "folgender", "Reihenfolge" usw. beziehen sich auf die jeweils aktuelle Ordnung.
+
+   In jeder nichtleeren Schülermenge ist genau ein/e Schüler/in die/der aktuelle Schüler/in. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer.
+         X ist bzgl. .... geordnet. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+         N ist ein im Betriebssystem gültiger Dateiname.
+   Eff.: X ist mit dem Namem N definiert, d.h. X umfaßt genau diejenigen
+         Schülerinnen und Schüler, die bei der letzten Benutzung in der
+         Menge mit dem Namem N auf dem Rechner mit dem Namen A enthalten waren.
+         Die aktuelle Nummer von X ist 1 + Maximum aller Nummern der Schülerinnen
+         und Schüler aus X (= 1, wenn X leer ist).
+         Kein Prozeß hat Zugriffsrecht auf X. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine/n Schüler/in enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist leer. Es gibt keine/n aktuelle/n Schüler/in in X. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist definiert.
+   Eff.: Liefert die Anzahl der Schüler/innen in X. *) 
+
+PROCEDURE enthalten (X: Objekte; Sch: Schuelerinnen.Objekte): BOOLEAN;
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn in X ein/e Schüler/in enthalten ist, 
+         dessen ausgezeichneter Teilstrom mit dem entsprechenden 
+         Teil von Sch übereinstimmt.
+         In diesem Fall ist die/der erste solche Schüler/in die/der aktuelle Schüler/in von X, 
+         sonst ist aktuelle/r Schüler/in von X die/der, die/der vorher aktuell war. *)
+
+PROCEDURE einordnen (X: Objekte; Sch: Schuelerinnen.Objekte);
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Wenn Sch schon in X enthalten ist oder leer ist,
+         ist nichts verändert. Andernfalls ist Sch in X eingeordnet,
+         d.h. ist jetzt in X enthalten und X ist geordnet.
+         Aktuelle/r Schüler/in von X ist die/der eingeordnete.
+         Sch hat die Nummer von X und die Nummer von X ist jetzt um eins erhöht. *)
+
+PROCEDURE positionieren1 (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt: 
+         War die/der aktuelle Schüler/in von X vorher die/der letzte (für w = TRUE) 
+         bzw. die/der erste (für w = FALSE) Schüler/in aus X, ist nichts verändert,
+         andernfalls ist aktuelle/r Schüler/in von X jetzt die/der nach nach (für
+         w = TRUE) bzw. vor (für w = FALSE) der/dem aktuellen Schüler/in vorher. *)
+
+PROCEDURE positionieren (X: Objekte; h: BOOLEAN);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer war, ist nichts verändert.
+         Sonst ist für w = TRUE (bzw. w = FALSE) die/der letzte
+         (bzw. der erste) Schüler/in aus X aktuelle/r Schüler/in. *)
+
+PROCEDURE positioniert1 (X: Objekte; e: BOOLEAN): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer und
+         die/der aktuelle Schüler/in von X für w = TRUE die/der letzte,
+         für w = FALSE die/der erste Schüler/in in X ist. *)
+
+PROCEDURE lesen (X: Objekte; Sch: Schuelerinnen.Objekte);
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Wenn X leer war, ist nichts verändert.
+         Sonst ist Sch die/der aktuelle Schüler/in von X. *)
+
+PROCEDURE schreiben (X: Objekte; Sch: Schuelerinnen.Objekte);
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Wenn X bzgl. der aktuellen Ordnung nicht veränderbar ist 
+         und Sch bzgl. dieser Ordnung nicht gleich 
+         der/dem aktuellen Schüler/in ist, ist nichts verändert. 
+         (* Wenn X bzgl. der aktuellen Ordnung einfach ist und eine/n
+         Schüler/in enthält, die/der bzgl. dieser Ordnung gleich Sch ist,
+         ist nichts verändert. *)
+         Sonst ist die/der aktuelle Schüler/in aus X entfernt und Sch
+         ist in X eingeordnet und ist jetzt aktuelle/r Schüler/in. *)
+
+PROCEDURE entfernen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt:
+         Die/der vorher aktuelle Schüler/in von X ist aus X entfernt. War dies die/der
+         einzige Schüler/in in X, ist kein/e Schüler/in aktuell; andernfalls ist aktuelle/r
+         Schüler/in von X jetzt die/der nach der/dem vorherigen aktuellen Schüler/in, falls es
+         eine/n solche/n gibt, sonst die/der letzte Schüler/in von X. *)
+
+PROCEDURE existiert (X: Objekte; Sch: Schuelerinnen.Objekte): BOOLEAN;
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn es eine Schülerin oder einen Schüler
+         in X gibt, die bzw. der bzgl. der aktuellen Ordnung von X größer
+         oder gleich Sch ist.
+         In diesem Fall ist die/der erste solche Schüler/in in X aktuelle/r Schüler/in,
+         sonst ist die/der aktuelle Schüler/in von X die/der, die/der vorher aktuell war. *)
+
+PROCEDURE ordnen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist bezüglich der aktuellen Ordnung umgeordnet. *)
+
+PROCEDURE numerischOrdnen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist bezüglich der Schülernummern umgeordnet. *)
+
+PROCEDURE finden (X: Objekte; Sch: Schuelerinnen.Objekte; N: Schuelerinnen.Nummern);
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Wenn es in X eine Schülerin oder einen Schüler mit der Nummer N gibt,
+         ist Sch diese/r Schüler/in, sonst ist Sch leer. *)
+
+PROCEDURE ausgewaehlt (X: Objekte; Sch: Schuelerinnen.Objekte; Z, S: CARDINAL): BOOLEAN;
+(* Vor.: X ist definiert, Sch ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn am Bildschirm ab Zeile Z, Spalte S
+         Sch aus X ausgewählt ist. Andernfalls ist Sch leer. *)
+
+END Schuelermengen.

@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# Christian Maurer   5. August 2012
+
+export MOCKAM2=
+export MOCKALINK=
+
+for m in SysLib Exceptions LREAL libc miscc; do
+  m2 -s $m
+done
+
+m2 -c SysLib
+
+# OUT=$MOCKA/lib/m2bin
+OUT=$M2OUT/${PWD##*/}
+mkdir -p $OUT
+
+/usr/bin/as -o $OUT/Exceptions.o Exceptions.s
+
+for m in LREAL libc miscc; do
+  gcc -c -m32 -o $OUT/$m.o $m.c
+done
+
+echo p testmockalib | m2
+
+testmockalib

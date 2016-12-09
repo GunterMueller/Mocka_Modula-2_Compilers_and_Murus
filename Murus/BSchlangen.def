@@ -1,0 +1,39 @@
+DEFINITION MODULE BSchlangen; 
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST M = 1024;
+TYPE Objekte; (* Warteschlangen der Maximalkapazität M
+                 von Strömen beliebiger aber fester Länge. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; k, n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 0 < k <= M und n > 0.
+   Eff.: X ist initialisiert und leer,
+         hat die Kapazität k und die Stromlänge n. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Ströme enthält. *)
+
+PROCEDURE voll (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE,
+         wenn Anzahl der Ströme in X = Kapazität von X. *)
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert und nicht voll.
+   Eff.: Der Strom ab A der Stromlänge von X
+         ist als letzter Strom in X eingefügt. *)
+
+PROCEDURE entfernen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert und nicht leer.
+   Eff.: Ab A steht der erste Strom von X der Stromlänge von X
+         und dieser Strom ist jetzt aus X entfernt. *)
+
+END BSchlangen.

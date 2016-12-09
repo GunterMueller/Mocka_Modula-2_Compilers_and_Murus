@@ -1,0 +1,96 @@
+DEFINITION MODULE CD;
+
+(* (c) Christian Maurer   v. 8. August 2007 *)
+
+IMPORT Uhrzeiten;
+
+CONST maxSpuren = 100;
+      maxLS = 255; (* max. Lautstärke der Regler *)
+      maxMT = 12; (* max. Länge der Modustexte *)
+TYPE Spuren = [0..maxSpuren];
+     Richtungen = (zurueck, zumAnfang, weiter);
+     Regler = (links, rechts, gesamt, balance);
+     Lautstaerken = [0..maxLS];
+     Modustexte = ARRAY [0..maxMT] OF CHAR;
+
+PROCEDURE initialisieren (D: ARRAY OF CHAR);
+(* Vor.: Keine.
+   Eff.: CD ist genau dann initialisiert, wenn /dev/D zugreifbar und
+         im entsprechenden Laufwerk eine Audio-CD eingelegt ist. *)
+
+PROCEDURE initialisiert (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn CD initialisiert ist. *)
+
+PROCEDURE StatusLesen (VAR S: Spuren; A, R: Uhrzeiten.Objekte);
+(* Vor.: CD ist initialisiert.
+   Eff.: S ist die aktuelle Spur, A die absolute Zeit der CD und
+         R die relative Zeit der aktuellen Spur ab ihrem Anfang. *)
+
+PROCEDURE ModusLesen (VAR T: Modustexte);
+(* Vor.: CD ist initialisiert.
+   Eff.: T ist die Angabe des aktuellen Modus der CD. *)
+
+PROCEDURE Lautstaerke (R: Regler): Lautstaerken; 
+(* Vor.: CD ist initialisiert.
+   Eff.: Liefert die aktuelle Lautstärke des Reglers R. *)
+
+PROCEDURE Anzahl (): Spuren;
+(* Vor.: CD ist initialisiert.
+   Eff.: Liefert die Anzahl der Spuren auf der CD. *)
+
+PROCEDURE SpurPositionieren (n: Spuren);
+(* Vor.: CD ist initialisiert. n > 0.
+   Eff.: CD gibt für n <= Anzahl ab Beginn der n-ten,
+         sonst ab Beginn der letzten Spur wieder. *)
+
+PROCEDURE SpurPositionieren1 (w: BOOLEAN);
+
+PROCEDURE SpurPositionieren0;
+(* Vor.: CD ist initialisiert.
+   Eff.: CD gibt ab Anfang der aktuellen Spur wieder. *)
+
+PROCEDURE positionieren1 (w: BOOLEAN; s: CARDINAL);
+(* Vor.: CD ist initialisiert.
+   Eff.: CD gibt für w = TRUE bzw. FALSE für s = 0 ab Anfang der nächsten bzw.
+         vorigen Spur wieder, andernfalls ab s Sekunden weiter bzw. zurück. *)
+
+PROCEDURE positionieren (b: BOOLEAN; s: CARDINAL);
+(* Vor.: CD ist initialisiert.
+   Eff.: CD gibt für b = TRUE bzw. FALSE für s <= Gesamtdauer bzw. Dauer der
+         aktuellen Spur (in sek) relativ zum Beginn der CD bzw. zum Beginn
+         der aktuellen Spur ab s wieder, sonst ab zwei Sekunden vor Ende. *)
+
+PROCEDURE aktuelleSpur (): Spuren;
+(* Vor.: CD ist initialisiert.
+   Eff.: Liefert die Nummer der aktuellen Spur auf der CD. *)
+
+PROCEDURE bestimmen (U: Uhrzeiten.Objekte; i: Spuren; D: BOOLEAN);
+(* Vor.: CD ist initialisiert.
+   Eff.: U ist für S < Anzahl () für D = TRUE bzw. FALSE die Dauer
+         bzw. die Anfangszeit der i-ten Spur der CD,
+         für i = Anzahl () und A = TRUE die Gesamtdauer aller Spuren. *)
+
+PROCEDURE umschalten;
+(* Vor.: CD ist initialisiert.
+   Eff.: Wenn CD vorher wiedergegeben hat, ist sie jetzt angehalten,
+         andernfalls gibt sie jetzt wieder. *)
+
+PROCEDURE regeln1 (R: Regler; l: BOOLEAN);
+(* Vor.: CD ist initialisiert.
+   Eff.: Für l = TRUE ist die Lautstärke von R eine Einheit lauter
+         als vorher, sonst leiser, sofern das geht.*)
+
+PROCEDURE regeln (R: Regler; l: Lautstaerken);
+(* Vor.: CD-ROM ist initialisiert.
+   Eff.: Der Regler R hat die Lautstärke l. *)
+
+PROCEDURE terminieren;
+(* Vor.: CD ist initialisiert.
+   Eff.: CD gibt nicht mehr wieder. *)
+
+PROCEDURE terminieren1;
+(* Vor.: CD ist initialisiert.
+   Eff.: CD gibt nicht mehr wieder; das CD-ROM-Laufwerk ist geöffnet. *)
+
+END CD.

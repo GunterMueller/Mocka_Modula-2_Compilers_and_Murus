@@ -1,0 +1,159 @@
+DEFINITION MODULE Farben;
+
+(* (c) Christian Maurer   v. 11. Februar 2007 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Helligkeiten = CHAR;
+     Objekte = RECORD rot, gruen, blau: Helligkeiten END;
+     Faerbungen = PROCEDURE (Objekte);
+(* >>>>> experimentell *)
+     Kurzcodes = ['a'..'z'];
+
+PROCEDURE definieren (VAR X: Objekte; r, g, b: CARDINAL);
+(* Vor.: r, g, b < 256.
+   Eff.: F hat die Helligkeiten r, g und b 
+         der Anteile für rot, grün und blau. *)
+
+PROCEDURE ANSICode (X: Objekte): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert den ANSI-Code von X. Er ist <= 15. *)
+
+PROCEDURE zufaelligDefinieren (VAR X: Objekte);
+(* Vor.: Keine.
+   Eff.: X ist eine zufällig erzeugte Farbe. *)
+
+PROCEDURE kopieren (X: Objekte; VAR X1: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X und X1 sind gleich, X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind definiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 in allen
+         drei Anteilen in den Helligkeiten übereinstimmen. *)
+
+PROCEDURE istSchwarz (X: Objekte): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn X schwarz ist. *)
+
+PROCEDURE istHellweiss (X: Objekte): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn X hellweiss ist. *)
+
+PROCEDURE invertieren (VAR X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist die Komplementärfarbe von X vorher: für alle drei Komponenten h
+         (h = rot, gruen, blau) gilt jetzt h = CHR (255 - ORD (h vorher)). *)
+
+PROCEDURE SWinvertieren (VAR X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X vorher hellweiss war, ist X jetzt schwarz und umgekehrt,
+         andernfalls ist nichts verändert. *)
+
+PROCEDURE kontrastieren (VAR X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X vorher eher dunkel war,
+         ist X jetzt hellweiss, sonst schwarz. *)
+
+PROCEDURE definiert (VAR X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn T eine Folge aus 6 Zeichen 
+         ist, die 3 Sedezimalzahlen zwischen 00 und FF darstellt. 
+         In diesem Fall hat X die entsprechenden Helligkeiten der 
+         Anteile für rot, grün und blau; sonst ist X schwarz. *)
+
+PROCEDURE aendern (VAR X: Objekte; rgb, d: CARDINAL; heller: BOOLEAN);
+(* Vor.: rgb < 3, d < 128.
+   Eff.: Noch nicht dokumentiert. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist definiert. T umfaßt 6 Zeichen.
+   Eff.: T ist die Folge der 6 Zeichen, die die Helligkeiten 
+         der Anteile für rot, grün und blau von X in Form 
+         von Sedezimalzahlen zwischen 00 und FF darstellt. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen, die zur Codierung einer Farbe als
+         Zeichenfolge notwendig ist. Diese Zahl ist für alle Farben gleich groß. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: Der Strom ab A der Länge Codelaenge ist reserviert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (VAR X: Objekte; A: ADDRESS);
+(* Vor.: Ab A ist eine Farbe als Zeichenfolge codiert.
+   Eff.: X ist diese Farbe. *)
+
+VAR
+(* >>>>> experimentell *)
+  festeFarbe: ARRAY Kurzcodes OF Objekte;
+
+PROCEDURE kurzCodieren (C: Kurzcodes; A: ADDRESS);
+(* >>>>> experimentelle Version *)
+(* Vor.: Keine.
+   Eff.: Farbe [C] ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE Kurzcode (F: Objekte): Kurzcodes;
+(* >>>>> experimentelle Version *)
+(* Vor.: Keine.
+   Eff.: Liefert MIN (Kurzcode), wenn F keine der festen Farben ist,
+         andernfalls den Kurzcode C mit F = festeFarbe [C]. *)
+
+VAR
+(* Eff.: Die Farben schwarz, braun, rot, hellrot, gelb, hellgruen, gruen,
+         tuerkis, helltuerkis, hellblau, blau, lila, hellila, grau, weiss
+         und hellweiss sind standardisiert (und im Text-Modus verfügbar).
+   >>>   Alle anderen Farben sind rein experimentell. *)
+
+  schwarz, anthrazit, grau, hellgrau, weiss, silber, hellweiss,
+
+  schwarzbraun, schokoladenbraun, kastanienbraun, rotbraun, dunkelbraun, orangebraun,
+  siena, mittelbraun, dunkelocker, braun, hellsiena, hellbraun, sandbraun,
+  ocker, hellocker, olivbraun, umbrabraun, f440, hellolivbraun, ganzhellbraun,
+  rosabraun, weissbraun, beige, hellbeige, creme, hellcreme,
+
+  f402, f422, schwarzrot, dunkelrot, karminrot, purpurrot,
+  rot, pompejirot, signalrot, grellrot, zinnoberrot, hellrot, blutorange, ziegelrot, weissrot,
+  dunkelorange, orange, hellorange,
+  dunkelgelb, grellgelb, sandgelb, gelb, hellgelb, zitronengelb,
+
+  rosabraun0, rosabraun1, rosabraun2, rosabraun3, rosabraun4, salmondunkel,
+
+  schwarzgruen, tiefdunkelgruen, dunkelgruen, grasgruen, birkengruen, gruen,
+  f042, hellchromgruen, f242, wiesengruen, grellgruen, hellgruen, gelbgruen,
+  hellolivgruen, f264, f064, weissgruen, (* olivgruen, *)
+
+  tiefdunkeltuerkis, dunkeltuerkis, tuerkis, f244, grelltuerkis, helltuerkis, weisstuerkis, 
+
+  tiefdunkelblau, dunkelblau, ultramarinblau, f204, f224, blau, f024,
+  preussischblau, enzianblau, grellblau, f206, f026, hellblau, himmelblau, weissblau,
+
+  tiefdunkellila, dunkellila, lila, f424, grellila, hellila, weisslila, f406, f426,
+  dunkelrosa, pink, f624, rosa, hellrosa,
+
+  HinweisS, HinweisH, FehlerS, FehlerH, murusH: Objekte;
+
+(* >>> Die folgenden Prozeduren dienen nur der Implementierung von XKern und
+       Bildschirm. Sie sollen auf keinen Fall weiter oben verwendet werden. *)
+
+PROCEDURE FarbtiefeSetzen (T: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Für T = 4, 8, 15, 16, 24 oder 32 gilt jetzt Farbtiefe = T,
+         sonst Farbtiefe = 0. *)
+
+PROCEDURE Anzahl (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der verfügbaren Farben. *)
+
+PROCEDURE Code (F: Objekte): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Undokumentiert. *)
+
+CONST P6 = 3;
+
+PROCEDURE P6codieren (C: CARDINAL; VAR F: Objekte);
+(* Vor.: Keine.
+   Eff.: Undokumentiert. *)
+
+END Farben.

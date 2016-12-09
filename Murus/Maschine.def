@@ -1,0 +1,28 @@
+FOREIGN MODULE Maschine;
+
+(* (c) Christian Maurer   v. 5. Dezember 2007 *)
+
+(* Unteilbare Maschinenbefehle zur Verwendung bei der
+   Konstruktion von Schloßalgorithmen für N Prozesse
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 18-21, 38).
+
+   Die Prozeduren sind unteilbar, d.h. ihr Ablauf
+   kann von anderen Prozessen nicht unterbrochen werden. *)
+
+CONST falsch = 0; wahr = 1;
+TYPE Boolean = [falsch..wahr];
+
+PROCEDURE TAS (VAR b: Boolean): Boolean;
+(* Vor.: Keine.
+   Eff.: Liefert den Wert von b vorher und jetzt gilt b = wahr. *)
+
+PROCEDURE CMPXCHG (VAR x: CARDINAL; y, z: CARDINAL): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Wenn x vorher den Wert von y hatte, hat x jetzt den Wert von z, sonst
+         ist x unverändert. Liefert in jedem Fall den vorherigen Wert von x. *)
+
+PROCEDURE FA (VAR x: CARDINAL; y: CARDINAL): CARDINAL;
+(* Vor.: x + y < MAX (CARDINAL).
+   Eff.: Liefert den vorherigen Wert von x und x ist jetzt um y erhöht. *)
+
+END Maschine.

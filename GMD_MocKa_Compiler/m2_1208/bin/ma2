@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 5. August 2012
+
+rm -rf $M2OUT/${PWD##*/}
+echo p $1 | m2

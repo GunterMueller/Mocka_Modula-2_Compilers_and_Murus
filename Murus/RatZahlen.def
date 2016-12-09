@@ -1,0 +1,116 @@
+DEFINITION MODULE RatZahlen;       
+
+(* (c) Christian Maurer   v. 27. August 2006
+   >>>                    Experimentelle Version *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Rationale Zahlen mit Zähler und Nenner
+                 der Stellenzahl < NatZahlen.max *)
+     Operationen = (plus, minus, mal, durch);
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keinen Wert hat. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat keinen Wert. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X ist unverändert und X1 hat den gleichen Wert wie X
+         (ist insbesondere genau dann leer, wenn X leer ist). *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 leer
+         oder die Werte von X und X1 gleich sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht
+         leer ist oder wenn beide nicht leer sind und
+         der Wert von X kleiner als der von X1 ist. *)
+
+PROCEDURE definieren (X: Objekte; N: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat den Wert N. *)
+
+PROCEDURE Wert (X: Objekte): LONGREAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert den Wert von X als Dezimalzahl, wenn er
+         im Bereich von LONGREAL liegt, andernfalls 0.0. *)
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn T einen Wert im Rahmen 
+         der implementierten Zahlen hat.
+         In diesem Fall hat X diesen Wert, sonst ist X leer. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert. T umfaßt eine der Stelligkeit von X
+         entsprechende Anzahl von Teichen.
+   Eff.: Ist X leer, besteht T nur aus Leerzeichen; 
+         andernfalls ist T die Ziffernfolge des Wertes von X. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.  
+   Eff.: X ist ab der Position (Z, S) auf dem Bildschirm
+         in seinen Farben ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist der am Bildschirm an der Position (Z, S) eingegebene Bruch. *)
+
+PROCEDURE operieren (X, X1: Objekte; o: Operationen; Y: Objekte);
+(* Vor.: X, X1 und Y sind initialisiert.
+   Eff.: Wenn X oder X1 leer ist, ist S leer. Andernfalls gilt: 
+         Wenn der Wert von X o X1 im Rahmen der implementierten Zahlen liegt,
+         hat Y diesen Wert, sonst ist Y leer. *)
+
+PROCEDURE addieren (X, X1, S: Objekte);
+(* Vor.: X, X1 und S sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist S leer. Andernfalls gilt: 
+         Wenn der Wert von X + X1 im Rahmen der implementierten Zahlen liegt,
+         hat S diesen Wert, sonst ist S leer. *)
+
+PROCEDURE subtrahieren (X, X1, D: Objekte);
+(* Vor.: X, X1 und D sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist D leer. Andernfalls gilt: 
+         Wenn der Wert von X - X1 im Rahmen der implementierten Zahlen liegt,
+         hat D diesen Wert, sonst ist D leer. *)
+
+PROCEDURE multiplizieren (X, X1, P: Objekte);
+(* Vor.: X, X1 und P sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist P leer. Andernfalls gilt: 
+         Wenn der Wert von X * X1 im Rahmen der implementierten Zahlen liegt,
+         hat P diesen Wert, sonst ist Q leer. *)
+
+PROCEDURE invertieren (X: Objekte);
+(* Vor.: X ist initialisiert und hat nicht den Wert 0.
+   Eff.: Wenn X leer ist, ist nichts verändert.
+         Wenn X vorher den Wert 0 hatte, ist X jetzt leer,
+         andernfalls hat X jetzt den Kehrwert seines vorherigen Wertes. *)
+
+PROCEDURE dividieren (X, X1, Q: Objekte);
+(* Vor.: X, X1 und Q sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist oder X1 den Wert 0 hat, ist Q leer. 
+         Andernfalls gilt: 
+         Wenn der Wert von X / X1 im Rahmen der implementierten Objekte liegt,
+         hat Q diesen Wert, sonst ist Q leer. *)
+
+END RatZahlen.

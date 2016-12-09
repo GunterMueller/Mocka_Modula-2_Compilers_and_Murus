@@ -1,0 +1,41 @@
+DEFINITION MODULE LinksRechts;
+
+(* (c) Christian Maurer   v. 5. Dezember 2007 *)
+
+TYPE Objekte;
+(* Verwaltung von kritischen Abschnitten, in denen mehrere Prozesse 
+   von links und rechts auf gemeinsame Daten zugreifen:
+   zu jedem Zeitpunkt im gleichen kritischen Abschnitt aber
+   entweder nur Prozesse von links oder nur Prozesse von rechts
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 72). *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert.
+         Kein Prozeß ist aktiv in X. *)
+
+PROCEDURE terminieren (VAR A: Objekte);
+(* Vor.: X ist initialisiert. 
+         Kein Prozeß ist aktiv in X.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE linksEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist nicht aktiv in X.
+   Eff.: Der aufrufende Prozeß ist aktiv von links in X, d.h. er war ggf.
+         solange blockiert, bis es keinen aktiven Prozeß von rechts in X gab.
+         Jetzt gibt es keinen aktiven Prozeß von rechts in X. *)
+
+PROCEDURE rechtsEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist nicht aktiv in X.
+   Eff.: Der aufrufende Prozeß ist aktiv von rechts in X, d.h. er war ggf.
+         solange blockiert, bis es keinen aktiven Prozeß von links in X gab.
+         Jetzt gibt es keinen aktiven Prozeß von links in X. *)
+
+PROCEDURE aus (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist aktiv in X.
+   Eff.: Der aufrufende Prozeß ist nicht mehr aktiv in X. *)
+
+END LinksRechts.

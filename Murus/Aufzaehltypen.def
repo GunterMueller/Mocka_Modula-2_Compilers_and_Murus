@@ -1,0 +1,94 @@
+DEFINITION MODULE Aufzaehltypen;
+
+(* (c) Christian Maurer   v. 21. Januar 2006 *)
+
+  FROM SYSTEM IMPORT TSIZE, ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Texte der Länge < 256 aus Mengen mit maximal 255 Elementen,
+                 angereichert um einen leeren Text.
+                 Die Menge aller möglichen Texte der Objekte mit dem Namen N
+                 (wobei N ein Groß- oder Kleinbuchstabe oder eine Ziffer ist)
+                 sind durch die Zeilen von Textdateien mit dem Namen "N.Typ"
+                 definiert. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N: CHAR; L: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         N ist ein Groß- oder Kleinbuchstabe oder eine Ziffer.
+         L < 256.
+   Eff.: X ist initialisiert und leer, hat den Namen N und die Länge L. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+(*
+PROCEDURE Spaltenzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die maximale Länge der Texte aller Objekte mit dem Namen von X. *)
+*)
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Text von X nur Leerzeichen enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht den gleichen Namen haben, ist nichts verändert.
+         Andernfalls stimmt X1 mit X überein; X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 den gleichen Namen haben
+         und gleich sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 den gleichen Namen haben
+         und X lexikographisch vor X1 steht. *)
+
+PROCEDURE Ordnungszahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Ordnungszahl von X. *)
+
+PROCEDURE definiert (X: Objekte; n: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn es ein Objekt mit der Ordnungszahl n gibt.
+         In diesem Fall ist X dieses Objekt, andernfalls ist X leer. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Text von X ist ab Zeile Z, Spalte S auf dem Bildschirm
+         in seinen Farben ausgegeben. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Text von X steht ab Zeile Z, Spalte S im Druckerpuffer. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das von Benutzer/in ab Zeile Z, Spalte S auf dem Bildschirm
+         edierte Objekt, dessen Text einer derjenigen aus der Menge der Objekte
+         mit dem Namen von X ist. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen, die zur eindeutig umkehrbaren
+         Codierung der Objekte als Ströme notwendig ist.
+         Diese Zahl ist für alle Objekte gleich groß. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS); 
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom der Codelaenge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS); 
+(* Vor.: X ist initialisiert. Ab A ist ein Objekt als Strom codiert.
+   Eff.: X ist dieses Objekt. *)
+
+END Aufzaehltypen.

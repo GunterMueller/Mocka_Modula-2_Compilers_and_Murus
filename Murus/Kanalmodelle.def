@@ -1,0 +1,36 @@
+DEFINITION MODULE Kanalmodelle;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Bearbeitungsspektren;
+
+TYPE Objekte;
+(* Kanäle zum synchronen Austausch von Strömen beliebiger, aber fester Länge
+   zwischen je zwei Leichtgewichtsprozessen bei exklusiver Nutzung,
+   d.h. auf eine Weise, in der jeder Kanal nur von zwei Prozessen genutzt wird.
+   Vorausgesetzt wird der Zugriff auf gemeinsamen Speicher, d.h. der Modul
+   ist nicht zur Nutzung zwischen Unix-Prozessen, sondern lediglich zur 
+   Simulation echter Kanäle zum synchronen Botschaftenaustausch konzipiert
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 140 ff., 154). *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 
+   Eff.: X ist initialisiert und hat die Stromlänge n. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE senden (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Stromlänge von X ist auf X gesendet, nachdem der
+         aufrufende Prozeß ggf. bis zum Empfang des Stroms blockiert war. *)
+
+PROCEDURE empfangen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der auf X gesendete Strom ist empfangen, d.h. ab A steht der
+         auf X gesendete Strom der Stromlänge von X, nachdem der aufrufende
+         Prozeß ggf. bis zur Sendung eines Stroms blockiert war. *)
+
+END Kanalmodelle.

@@ -1,0 +1,73 @@
+DEFINITION MODULE PFolgenkern;
+
+(* (c) Christian Maurer   v. 14. August 2008
+
+   >>> Nur zur Implementierung von PFolgen;
+       soll weiter oben nicht verwendet werden ! *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Objekte;
+
+PROCEDURE direkteLaenge (N: ARRAY OF CHAR): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen in der Datei namens N,
+         falls eine solche existiert. *)
+
+PROCEDURE initialisieren (VAR K: Objekte);
+(* Vor.: K ist nicht initialisiert. 
+   Eff.: K ist initialisiert, aber nicht definiert. *)
+
+PROCEDURE terminieren (VAR K: Objekte);
+(* Vor.: K ist initialisiert. 
+   Eff.: K ist nicht initialisiert. *)
+
+PROCEDURE definieren (K: Objekte; N: ARRAY OF CHAR);
+(* Vor.: K ist initialisiert. 
+   Eff.: Wenn N kein gültiger Dateiname ist, ist das System mit einer
+         Fehlermeldung angehalten.
+         Ansonsten ist K definiert, d.h. K enthält genau die Zeichen
+         der externen Datei mit dem Namen N. K hat die Position 0. *)
+
+PROCEDURE redefinieren (K: Objekte; N: ARRAY OF CHAR);
+(* Vor.: K ist definiert. 
+         N ist ein im Betriebssystem gültiger Dateiname.
+   Eff.: Wenn es eine nichtleere externe Datei mit dem Namen N gibt, 
+         ist nichts verändert; sonst hat K den Namen N. *)
+
+PROCEDURE leer (K: Objekte): BOOLEAN;
+(* Vor.: K ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn K keine Zeichen enthält. *)
+
+PROCEDURE leeren (K: Objekte);
+(* Vor.: K ist definiert.
+   Eff.: K ist leer. *)
+
+PROCEDURE Laenge (K: Objekte): CARDINAL;
+(* Vor.: K ist definiert.
+   Eff.: Liefert die Anzahl der Zeichen in K. *)
+
+PROCEDURE positionieren (K: Objekte; P: CARDINAL);
+(* Vor.: K ist definiert.
+   Eff.: Wenn P größer als die Länge von K ist, stimmt die Position 
+         von K mit der Länge von K überein, sonst hat K die Position P. *)
+
+PROCEDURE Position (K: Objekte): CARDINAL;
+(* Vor.: K ist definiert.
+   Eff.: Liefert die Position von K. *)
+
+PROCEDURE lesen (K: Objekte; A: ADDRESS; n: CARDINAL; VAR g: CARDINAL);
+(* Vor.: K ist definiert.
+   Eff.: Ab A steht der Strom der g <= n Zeichen aus K ab dessen Position. 
+         (g < n: Lesefehler!) Die Position von K ist um g inkrementiert. *)
+
+PROCEDURE schreiben (K: Objekte; A: ADDRESS; n: CARDINAL; VAR s: CARDINAL);
+(* Vor.: K ist definiert.
+   Eff.: K enthält ab seiner Position den Strom ab A der Länge s <= n. 
+         (s < n: Schreibfehler!) Die Position von K ist um s inkrementiert. *)
+
+PROCEDURE sichern (K: Objekte);
+(* Vor.: K ist definiert.
+   Eff.: Die letzten Schreiboperationen auf K sind gesichert. *)
+
+END PFolgenkern.

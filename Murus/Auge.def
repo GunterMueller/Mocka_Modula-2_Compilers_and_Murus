@@ -1,0 +1,143 @@
+DEFINITION MODULE Auge;
+
+(* (c) LWB Informatik Kurs 14 & Christian Maurer   v. 19. August 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+  FROM Raum IMPORT Richtungen;
+IMPORT Farben, Vektoren;
+
+(* Verwaltet ein orthonormiertes rechtsorientiertes Koordinatensystem
+   mit Einheitsvektoren in den Richtungen (vorne, links, oben) und
+   dem Ursprung Auge, das bewegt und gedreht werden kann.
+   Anfangs gilt vorne = (1, 0, 0), links = (0, 1, 0), oben = (0, 0, 1).
+   Verwaltet daneben die Vektoren AugeAlt und Fokus.
+   Fokus liegt immer auf der vorne-Achse des lokalen Koordinatensystems.
+   Anfangs gilt AugeAlt = Auge = Fokus = (0, 0, 0). *)
+
+PROCEDURE polarDefinieren (phi, theta: LONGREAL);
+(* Vor.: phi, theta im Gradmaß mit -180° < phi, theta <= 180°.
+   Eff.: vorne hat die Polarkoordinaten (1, phi, theta), links hat
+         die Polarkoordinaten (1, phi + 90°, 0°), oben = [vorne, links].
+         Beispiele: für (phi, theta)
+         = (90,   -90): Blick aus z-Richtung, x-Achse rechts, y-Achse oben;
+         = (-135, -30): Blick aus dem 1. Oktanten, 30° von oben. *)
+
+PROCEDURE ganzDefinieren3 (v0, v1, v2: INTEGER);
+(* Vor.: v0 # 0 oder v1 # 0.
+   Eff.: Geheim. *)
+
+PROCEDURE Distanz (V: Vektoren.Objekte): LONGREAL;
+(* Vor.: Keine.
+   Eff.: Liefert | Auge - V |. *)
+
+PROCEDURE Abstand (): LONGREAL;
+(* Vor.: Keine.
+   Eff.: Liefert | Auge - Fokus |. *)
+
+PROCEDURE lesen (A0, A: Vektoren.Objekte);
+(* Vor.: A0 und A sind initialisiert.
+   Eff.: A0 stimmt mit AugeAlt, A mit Auge überein;
+         AugeAlt und Auge sind unverändert. *)
+
+PROCEDURE bewegen (R: Richtungen; d: LONGREAL);
+(* Vor.: Keine.
+   Eff.: (vorne, links, oben) ist unverändert.
+         Auge ist für d > 0 um d nach D, für d < 0 um |d| in die Gegenrichtung
+         von R (für R = vorne / links / oben: hinten / rechts / unten) bewegt;
+         AugeAlt stimmt mit Auge vorher überein.
+         Fokus ist an Auge im gleichen Abstand angepaßt, d.h.
+         Fokus = Auge + d * vorne mit d = vorheriger Abstand (Fokus, Auge). *)
+
+PROCEDURE drehen (R: Richtungen; a: LONGREAL);
+(* Vor.: -180 < a <= 180.
+   Eff.: (vorne, links, oben) ist um a° um die Achse in Richtung R
+         als Drehachse gedreht, und zwar für a > 0 von R aus gesehen
+         im mathematisch positiven Sinn (entgegen dem Uhrzeigersinn),
+         für a < 0 anders herum.
+         Auge und AugeAlt sind unverändert.
+         Fokus ist an Auge im gleichen Abstand angepaßt. *)
+
+PROCEDURE invertieren;
+(* Vor.: Keine.
+   Eff.: Effekt von drehen (oben, 180). *)
+
+PROCEDURE fokussieren (d: LONGREAL);
+(* Vor.: d >= 0.
+   Eff.: (vorne, links, oben) ist unverändert.
+         Auge ist an Fokus im Abstand d angepaßt,
+         d.h. Auge = Fokus - d * vorne.
+         Fokus ist unverändert. *)
+
+PROCEDURE umFokusDrehen (R: Richtungen; a: LONGREAL);
+(* Vor.: -180 < a <= 180.
+   Eff.: Für Auge = Fokus ist nichts verändert. Andernfalls ist
+         (vorne, links, oben) um a° um die Achse in Richtung R als Drehachse
+         gedreht, für a > 0 von R aus gesehen im mathematisch positiven Sinn
+         (entgegen dem Uhrzeigersinn), für a < 0 anders herum.
+         Wenn R = vorne,
+           sind Auge und AugeAlt unverändert
+           und Fokus ist an Auge im gleichen Abstand angepaßt,
+         andernfalls (R = links oder R = oben)
+           ist Auge an Fokus im gleichen Abstand wie vorher angepaßt, d.h.
+           Auge = Fokus - d * vorne  mit  d = vorheriger Abstand (Auge, Fokus),
+           und Fokus ist unverändert. *)
+
+CONST D = 2.0; (* Betrachtungsabstand = D-faches der Bildschirmhöhe *)
+
+PROCEDURE ausgebbar (V: Vektoren.Objekte; VAR x, y: CARDINAL): BOOLEAN;
+(* Vor.: V ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn das Bild des Endpunktes von V auf der
+         Bildschirmebene bei einem Betrachtungsabstand in Größe der D-fachen
+         Bildschirmhöhe (vertikaler Betrachtungswinkel = 2 * arc tan 0.25 = 28°)
+         auf dem Bildschirm liegt.
+         In diesem Fall sind (x, y) die Koordinaten dieses Punktes mit
+         x < Bildschirm.Graphikspaltenzahl und y < Bildschirm.Graphikzeilenzahl;
+         andernfalls gilt x = y = MAX (CARDINAL).
+         Liefert insbesondere FALSE, wenn der Endpunkt von V "hinter dem Auge"
+         liegt, d.h. wenn  <V - Auge, vorne> <= 0  gilt. *)
+
+(*******  Umschreibender Quader einer Menge von Vektoren  *********************)
+
+(* Verwaltet daneben eine zu messende Menge von Vektoren.
+   Anfangs ist diese Menge leer. *)
+
+PROCEDURE einmessen (V: Vektoren.Objekte);
+(* Vor.: Keine.
+   Eff.: V ist in der zu messenden Menge enthalten. *)
+
+PROCEDURE einmessenA (A: ADDRESS);
+(* Vor.: Ab A ist ein initialisierter Vektor codiert.
+   Eff.: Dieser Vektor ist in der zu messenden Menge enthalten. *)
+
+PROCEDURE ausmessen (VAR d: LONGREAL);
+(* Vor.: Keine.
+   Eff.: Wenn die zu messende Menge leer ist, ist d = 0 und Fokus = Auge = (0, 0, 0).
+         Andernfalls gilt:
+         d ist das D-fache des Durchmessers des umschreibenden Quaders der
+         zu messenden Menge (d.h. des kleinsten achsenparallelen Quaders,
+         in dem alle Vektoren aus der Menge enthalten sind) vorher und
+         der Mittelpunkt dieses Quaders ist der Fokus.
+         Das lokale Koordinatensystem Auge hat die Koordinaten (0, 0, -1)
+         (das Auge "schaut" also "von oben" auf die 2-dimensionale x-y-Ebene),
+         wenn die zu messende Menge vollständig in der x-y-Ebene liegt,
+         andernfalls einen anderen Wert (das Auge schaut "schräg von oben"
+         und "sieht" den ersten Quadranten der x-y-Ebene auf der rechten Seite).
+         Das Auge hat den Abstand d vom Fokus.
+         Die zu messende Menge ist jetzt leer. *)
+
+(*******  Stapel von Vektoren  ************************************************)
+
+(* Verwaltet außerdem einen Stapel, auf dem Paare, bestehend aus dem Auge
+   und einer Farbe, abgelegt werden können. Anfangs ist der Stapel leer. *)
+
+PROCEDURE ablegen (F: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: Das Paar (Auge, F) ist oben auf dem Stapel abgelegt. *)
+
+PROCEDURE aufnehmen (VAR F: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: (Auge, F) ist das oberste Objekt vom Stapel.
+         Dieses Objekt ist vom Stapel entnommen.
+         AugeAlt und Fokus sind unverändert. *)
+
+END Auge.

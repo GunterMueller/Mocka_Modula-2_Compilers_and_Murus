@@ -1,0 +1,382 @@
+DEFINITION MODULE Kalenderdaten;
+
+(* (c) Christian Maurer   v. 8. Oktober 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+  FROM Tastatur IMPORT Kommandos;
+IMPORT Farben;
+
+
+TYPE Perioden = (taeglich, woechentlich, monatlich, jaehrlich, dekadisch);
+     Wochentage = (Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Sonnabend,
+                   Sonntag);
+     Objekte; (* Kalenderdaten in gewissen Grenzen *)
+
+     Formate = (tt,           (* z.B. " 8"             *)
+                ttommo,       (* z.B. " 8.10."         *)
+                ttommojj,     (* z.B. " 8.10.07"       *)
+                ttommojjjj,   (* z.B. " 8.10.2007"     *)
+                ttoMojjjj,    (* z.B. "8.Oktober 2007" *)
+                jj,           (* z.B. "08"             *)
+                jjjj,         (* z.B. "2007"           *)
+                ww,           (* z.B. "Mo"             *)
+                W,            (* z.B. "Montag"         *)
+                mmm,          (* z.B. "Mon"            *)
+                M,            (* z.B. "Oktober"        *)
+                Mjjjj,        (* z.B. "Oktober 2007"   *)
+                wn,           (* z.B. "1" (.Woche)     *)
+                WN,           (* z.B. "1.Woche"        *)
+                WNjjjj,       (* z.B. "1.Woche 2007"   *)
+                Q);           (* z.B. "  I/06"         *)
+
+     Bearbeitungen     = PROCEDURE (Objekte);
+     Bearbeitungspaare = PROCEDURE (Objekte, BOOLEAN);
+
+VAR WochentagS, WochentagH, FeiertagS, FeiertagH, JahreszahlS, JahreszahlH,
+    WochentagstextS, WochentagstextH, MonatstextS, MonatstextH: Farben.Objekte;
+(* Eff.: Jedes Datum hat (in Abhängigkeit davon, ob es ein Feiertag ist
+         oder nicht und von seinem Format) die entsprechenden Farben,
+         wobei das Suffix S für die Schrift und H für den Hintergrund steht. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer, hat die Farben des Bildschirms
+         und das Format ttommojj. *)
+
+PROCEDURE initialisiert (X: Objekte): BOOLEAN;
+(* Vor.: X ist nicht initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X initialisiert ist. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE MinimumLiefern (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das erste definierte Datum. *)
+
+PROCEDURE MaximumLiefern (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das letzte definierte Datum. *)
+
+PROCEDURE aktualisieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist das Datum der Systemuhr. *)
+
+PROCEDURE definieren (X: Objekte; Tag, Monat, Jahr: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn Tag, Monat, Jahr ein Datum definieren, ist X dieses Datum,
+         andernfalls ist X leer. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist unverändert, X1 stimmt mit X überein. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 gleich 
+         (auch, wenn beide leer) sind. *)
+
+PROCEDURE Agleich (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A und A1 sind Objekte als Zeichenfolgen codiert.
+   Eff.: Liefert genau dann TRUE, wenn die ab A und A1 codierten
+         Kalenderdaten gleich sind. *)
+
+PROCEDURE kleinergleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert TRUE, wenn X leer ist, oder wenn X und X1 
+         nicht leer sind und X zeitlich vor X1 liegt. *)
+
+PROCEDURE Akleinergleich (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A und A1 sind Objekte als Zeichenfolgen codiert.
+   Eff.: Liefert genau dann TRUE, wenn das ab A codierte Datum 
+         kleinergleich ist als das ab A1 codierte. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist,
+         oder wenn X und X1 nicht leer sind und X zeitlich vor X1 liegt,
+         d.h. das leere Datum ist kleiner als jedes nichtleere. *)
+
+PROCEDURE Akleiner (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A und A1 sind Objekte als Zeichenfolgen codiert.
+   Eff.: Liefert genau dann TRUE, wenn das ab A codierte Datum kleiner ist
+         als das ab A1 codierte. *)
+
+PROCEDURE kleinerImJahr (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist,
+         oder wenn X und X1 nicht leer sind und X innerhalb eines Jahres
+         zeitlich vor X1 liegt, bei gleichem Tag und Monat von X und X1,
+         wenn das Jahr von X vor dem von X1 liegt. *)
+
+PROCEDURE AkleinerImJahr (A, A1: ADDRESS): BOOLEAN;
+(* Vor.: Ab A und A1 sind Objekte als Zeichenfolgen codiert.
+   Eff.: Liefert genau dann TRUE, wenn das ab A codierte Datum
+         kleinerModJahr ist als das ab A1 codierte. *)
+
+PROCEDURE aequivalent (X, X1: Objekte; P: Perioden): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 innerhalb 
+         des gleichen durch P definierten Zeitraums liegen 
+         (für P = taeglich: das gleiche Ergebnis wie "gleich", 
+                = woechentlich: innerhalb der gleichen Woche 
+                                von Montag bis Sonnabend, 
+                = monatlich: innerhalb des gleichen Monats, 
+                = jaehrlich: innerhalb des gleichen Jahres. *)
+
+PROCEDURE istAnfang (X: Objekte; P: Perioden): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X am Anfang von P liegt 
+         (für P = taeglich: immer, 
+                = woechentlich: wenn X ein Montag ist, 
+                = monatlich: wenn X ein Monatserster ist, 
+                = jaehrlich: wenn X ein Neujahrstag ist. *)
+
+PROCEDURE AnfangDefinieren (X: Objekte; P: Perioden);
+(* Vor.: X ist initialisiert.
+   Eff.: Ist X leer oder P taeglich, ist nichts verändert; sonst ist 
+         X der Anfang von X vorher des durch P definierten Zeitraums 
+         (für P = woechentlich: Montag der Woche, 
+                = monatlich: der Anfang des Monats, 
+                = jaehrlich: der Neujahrstag des Jahres)
+         von X vorher. *)
+
+PROCEDURE EndeDefinieren (X: Objekte; P: Perioden);
+(* Vor.: X ist initialisiert.
+   Eff.: Ist X leer oder P taeglich, ist nichts verändert; sonst ist 
+         X das Ende von X vorher des durch P definierten Zeitraums 
+         (für P = woechentlich: Sonntag der Woche, 
+                = monatlich: der Letzte des Monats, 
+                = jaehrlich: der Sylvestertag) von X vorher. *)
+
+PROCEDURE aktuell (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X mit dem Datum der Systemuhr 
+         übereinstimmt. *)
+
+PROCEDURE vergangen (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer ist und zeitlich 
+         vor dem Datum der Systemuhr liegt. *)
+
+PROCEDURE Abstand (X, X1: Objekte): CARDINAL;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert MAX (CARDINAL), wenn X oder X1 leer ist, sonst 
+         den Absolutbetrag der Anzahl der Tage zwischen X und X1. *)
+
+PROCEDURE inkrementieren (X: Objekte; P: Perioden);
+(* Vor.: X ist initialisiert.
+   Eff.: Ist X leer, ist nichts verändert. Andernfalls ist X um so viele Tage
+         erhöht, wie durch P gegeben ist, wenn das im Bereich der definierten
+         Objekte möglich ist; sonst ist nichts verändert. *)
+
+PROCEDURE dekrementieren (X: Objekte; P: Perioden);
+(* Vor.: X ist initialisiert. 
+   Eff.: Ist X leer, ist nichts verändert. Andernfalls ist X um P erniedrigt,
+         wenn das im Bereich der definierten Objekte möglich ist;
+         sonst ist nichts verändert. *)
+
+PROCEDURE aendern (X: Objekte; K: Kommandos; E: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Ist X leer, ist nichts verändert. 
+         Mit P = VAL (Perioden, E), höchstens MAX (Perioden) gilt:
+         für K = abwaerts und rechts ist X um P inkrementiert, 
+         für K = aufwaerts und links ist X um P dekrementiert, 
+         für K = zumAnfang bzw. zumEnde ist X Anfang bzw. Ende 
+                 von X vorher des durch P definierten Zeitraums,
+         für K = hier ist X der Anfang des durch P definierten 
+                 Zeitraums, in dem das Datum der Systemuhr liegt. 
+         Für andere Kommandos ist X unverändert. *)
+
+PROCEDURE Wochentag (X: Objekte; P: Perioden): Wochentage;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert Mittwoch, wenn X leer ist; liefert sonst für P = 
+         = taeglich:     den Wochentag von X, 
+         = woechentlich: Montag,
+         = monatlich:    den Wochentag des 1. des Monats von X, 
+         = jaehrlich:    den Wochentag des 1.1. des Jahres von X. *)
+
+PROCEDURE istFeiertag (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X ein Sonntag oder ein gesetzlicher
+         Feiertag im Land Berlin ist. In diesem Fall hat X die Feiertagsfarben. *)
+
+PROCEDURE istWerktag (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X weder Feiertag (im obigen Sinn) noch
+         ein Sonnabend ist. *)
+
+PROCEDURE AnzahlWerktage (X, X1: Objekte): CARDINAL;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert MAX (CARDINAL), wenn X oder X1 leer ist, sonst
+         den Absolutbetrag der Anzahl der Werktage zwischen X und X1. *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Format F. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: T ist der Text von X im Format von X. 
+         Wenn X leer ist, besteht T nur aus Leerzeichen. *)
+
+PROCEDURE Tag (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann 0, wenn X leer ist, andernfalls den Tag von X. *)
+
+PROCEDURE Monat (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann 0, wenn X leer ist, andernfalls den Monat von X. *)
+
+PROCEDURE Jahr (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann 0, wenn X leer ist, andernfalls das Jahr von X. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab der Bildschirmposition (Z, S) in seinem Format und seinen
+         Farben ausgegeben. Ist X leer, sind nur Leerzeichen ausgegeben. *)
+
+PROCEDURE attributieren (A: Bearbeitungen);
+(* Vor.: Keine.
+   Eff.: A ist das aktuelle Attribut für die Ausgabe und den Ausdruck von
+         Wochen, Monaten oder Jahren. *)
+
+PROCEDURE PositionInWocheLiefern (X: Objekte; v: BOOLEAN; a: CARDINAL;
+                                              VAR Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. a > 0. 
+         Für v = TRUE ist a > 0, sonst a > Länge des Formats von X. 
+   Eff.: Liefert (0, 0), wenn X leer ist; sonst die relative Bildschirmposition
+         (Z, S) für das Datum X innerhalb der Woche, in der X liegt,
+         entsprechend der folgenden Ausgabe: *)
+
+PROCEDURE WocheAusgeben (X: Objekte; v: BOOLEAN; a, Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind (in Abhängigkeit vom Format von X)
+         genügend klein für die Ausgabe.
+         Für v = TRUE ist a > 0, sonst a > Länge des Formats von X. 
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst sind alle Objekte
+         der Woche, in der X liegt, sind (beginnend beim Montag)
+         ab Position (Z, S) im Format von X und in der aktuellen Färbung
+         ausgegeben: für v (= vertikal) 
+         = TRUE in einer Spalte mit dem Zeilenabstand a, 
+         = FALSE in einer Zeile mit dem Spaltenabstand a. *)
+
+PROCEDURE mitMausInWocheAendern (X: Objekte; v: BOOLEAN; a, Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE PositionImMonatLiefern (X: Objekte; v: BOOLEAN; n, z, s: CARDINAL;
+                                              VAR Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. n > 0. 
+         Für v = TRUE ist z > 0, für v = FALSE ist s > 0. 
+   Eff.: Liefert (0, 0), wenn X leer ist, sonst die relative Bildschirmposition
+         (Z, S) für das Datum X innerhalb des Monats, in dem X liegt,
+         entsprechend der folgenden Ausgabe: *)
+
+PROCEDURE MonatAusgeben (X: Objekte; v: BOOLEAN; 
+                         n, z, s, Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind (in Abhängigkeit vom Format von X)
+         genügend klein für die Ausgabe.
+         n > 0. Für v = TRUE ist z > 0, für v = FALSE ist s > 0. 
+   Eff.: Wenn X leer ist, ist nichts verändert. Ansonsten sind alle Objekte
+         des Monats, in dem X liegt, sind (beginnend beim Monatsersten)
+         ab Position (Z, S) im aktuellen Format in der aktuellen Färbung
+         ausgegeben, jeweils n Wochen für v = TRUE pro Spalte, für v = FALSE
+         pro Zeile, mit dem Zeilenabstand z und dem Spaltenabstand s. *)
+
+PROCEDURE mitMausImMonatAendern (X: Objekte; v: BOOLEAN; n, z, s, Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE MonatDrucken (X: Objekte; v: BOOLEAN; 
+                        n, z, s, Z, S: CARDINAL);
+
+PROCEDURE PositionImJahrLiefern (X: Objekte; VAR Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert (0, 0), wenn X leer ist; sonst die relative Bild-
+         schirmposition von X entsprechend der folgenden Ausgabe: *)
+
+PROCEDURE mitMausImJahrAendern (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE JahrAusgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z <= Bildschirm.Zeilenzahl - 24; 
+                              S <= Bildschirm.Spaltenzahl - 79.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst ist ein Kalender des
+         Jahres, in dem X liegt, in der aktuellen Färbung ausgegeben.
+         Das Format von X ist nicht verändert. *)
+
+PROCEDURE imJahrEditieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z <= Bildschirm.Zeilenzahl - 24; 
+                              S <= Bildschirm.Spaltenzahl - 79.
+         Jahr von X ist ab (Z, S) ausgegeben.
+   Eff.: X ist das mit der linken Maustaste im Jahr von X angeklickte Datum. *)
+
+PROCEDURE JahrDrucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert FALSE, wenn das Format von X = ww, W, M, Mjjjj, WNjjjj
+         oder Q ist. Sonst gilt:
+         Liefert TRUE, wenn T nur aus Leerzeichen besteht oder
+         ein Datum innerhalb des definierten Bereichs darstellt;
+         in diesem Fall ist X leer bzw. dieses Datum.
+         Andernfalls wird FALSE geliefert und X ist leer. *)
+
+PROCEDURE definiert3 (X: Objekte; Tag, Monat, Jahr: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn Tag, Monat, Jahr ein Datum innerhalb des definierten Bereichs
+         darstellen, wird TRUE geliefert und X ist dieses Datum.
+         Andernfalls wird FALSE geliefert und X ist leer. *)
+
+PROCEDURE ausgewaehlt (X: Objekte; B: Bearbeitungspaare): BOOLEAN;
+(* Vor.: X ist initialisiert. Das aktuelle Format ist <= jjjj.
+   Eff.: Undefiniert. Nicht zur Benutzung freigegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Das aktuelle Format ist keins, 
+         für die die Prozedur "definiert" a priori FALSE liefert. 
+   Eff.: X ist das an der Bildschirmposition (Z, S) im Format von X
+         (Echo in der Farbe von X) editierte Datum. 
+         Sind nur Leerzeichen eingegeben, ist X leer. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor.: X ist initialisiert.
+         F ist ein definierter Font.
+   Eff.: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht in seinem Format und Font an der Seitenposition (Z, S)
+         im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         eines Datums als Zeichenfolge notwendig ist. 
+         Diese Zahl ist für alle Objekte gleich. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A sind Codelaenge Bytes alloziert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert. Ab A ist ein Datum als Zeichenfolge codiert. 
+   Eff.: X ist das Datum, das ab A als Zeichenfolge codiert ist. *)
+
+END Kalenderdaten.

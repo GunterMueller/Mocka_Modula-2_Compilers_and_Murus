@@ -1,0 +1,40 @@
+DEFINITION MODULE Anreden;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+
+PROCEDURE terminieren (VAR X: Objekte);
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+
+PROCEDURE leeren (X: Objekte);
+
+PROCEDURE kopieren (X, X1: Objekte);
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE setzen (F: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE codieren (X: Objekte; D: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; D: ADDRESS);
+
+END Anreden.

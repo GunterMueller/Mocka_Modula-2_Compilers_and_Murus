@@ -1,0 +1,91 @@
+DEFINITION MODULE Ecken;
+
+(* (c) Christian Maurer   v. 12. März 2006
+
+   >>> Nur zur Implementierung von GraphEditor,
+       soll weiter oben nicht verwendet werden ! *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Ecken mit Namen, ....,  und Positionen auf dem Bildschirm *)
+     Bearbeitungen = PROCEDURE (Objekte);
+VAR transparent: BOOLEAN; (* anfangs FALSE *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         n < 22.
+   Eff.: X ist initialisiert und leer und hat die Namenslänge n. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat keinen Namen. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR; C: CHAR; x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Länge (N) <= Namenslänge von X.
+         C in { '<', '>', '^', '_' }.
+         x < Bildschirm.Graphikspaltenzahl, y < Bildschirm.Graphikzeilenzahl.
+   Eff.: X ... . *)
+
+PROCEDURE positionieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Position der Maus. *)
+
+PROCEDURE NamenLiefern (X: Objekte; VAR N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+         HIGH (N) >= Namenslänge von X.
+   Eff.: N ist der Name von X. *)
+
+PROCEDURE PositionLiefern (X: Objekte; VAR x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: . *)
+
+PROCEDURE Radius (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert 4, wenn die Namenslänge von X > 2 ist, sonst ... . *)
+
+PROCEDURE unterMaus (A: ADDRESS): BOOLEAN;
+(* Vor.: Ab A ist ein Objekt codiert.
+   Eff.: Liefert genau dann TRUE, wenn die Maus die Position dieses Objekts hat. *)
+
+PROCEDURE faerben (F, A: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: F ist die normale und A die aktuelle Farbe der Objekte. *)
+
+PROCEDURE ausgeben (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist an seiner Position (ggf. transparent) ausgegeben. *)
+
+PROCEDURE bedingtAusgeben (X: Objekte; u: BOOLEAN);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist an seiner Position ausgegeben;
+         für u = TRUE in der aktuellen, sonst in der normalen Farbe. *)
+
+PROCEDURE invertieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Die von X zur Ausgabe benötigten Pixel sind in ihrer Farbe komplementiert. *)
+
+PROCEDURE loeschen (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist mit der Hintergrundfarbe an seiner Position ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat den Namen, den Benutzer/in editiert hat. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Zahl der Zeichen, die zur eindeutig umkehrbaren Codierung
+         von X als Zeichenfolge notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Objekt als Zeichenfolge codiert.
+   Eff.: X ist dieses Objekt. *)
+
+END Ecken.

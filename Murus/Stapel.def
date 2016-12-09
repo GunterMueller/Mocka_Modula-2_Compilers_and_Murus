@@ -1,0 +1,36 @@
+DEFINITION MODULE Stapel;
+
+(* (c) Christian Maurer   v. 10. März 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Objekte; (* Stapel (= Kellerspeicher) von Strömen
+                 beliebiger aber fester Länge. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. n > 0.
+   Eff.: X ist initialisiert und leer und hat die Stromlänge n. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn auf X keine Ströme abgelegt sind. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Ströme, die auf X abgelegt sind. *)
+
+PROCEDURE einfuegen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Strom ab A der Stromlänge von X
+         ist als oberster Strom auf X abgelegt. *)
+
+PROCEDURE entfernen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert und nicht leer. 
+   Eff.: Ab A steht der oberste Strom von der Stromlänge von X
+         und dieser Strom ist jetzt aus X entfernt. *)
+
+END Stapel.

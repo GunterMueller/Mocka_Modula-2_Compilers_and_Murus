@@ -1,0 +1,95 @@
+DEFINITION MODULE Kursnummern;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben, Kurshalbjahre;
+
+TYPE Objekte; (* Kursnummern gemäß Abiturheft für die gymnasiale Oberstufe *)
+
+PROCEDURE initialisieren (VAR K: Objekte);
+(* Vor.: K ist nicht initialisiert.
+   Eff.: K ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR K: Objekte);
+(* Vor.: K ist initialisiert.
+   Eff.: K ist nicht initialisiert. *)
+
+PROCEDURE leer (K: Objekte): BOOLEAN;
+(* Vor.: K ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn K keine Bezeichnung hat. *)
+
+PROCEDURE leeren (K: Objekte);
+(* Vor.: K ist initialisiert.
+   Eff.: K ist leer. *)
+
+PROCEDURE kopieren (K, K1: Objekte);
+(* Vor.: K und K1 sind initialisiert.
+   Eff.: K1 stimmt mit K überein (K ist unverändert). *)
+
+PROCEDURE gleich (K, K1: Objekte): BOOLEAN;
+(* Vor.: K und K1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn K und K1 gleich sind. *)
+
+PROCEDURE kleiner (K, K1: Objekte): BOOLEAN;
+(* Vor.: K und K1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn die Ziffer zur Kursfolge von K kleiner
+         als die von K1 ist; bei gleichen Ziffern zur Kursfolge, wenn die
+         weiteren Ziffern zur Bezeichnung des alternativen Kursthemas von K
+         kleiner als die von K1 sind.
+         Leere Kursnummern sind größer als nichtleere. *)
+(*
+PROCEDURE kleinergleich (K, K1: Objekte): BOOLEAN;
+(* Vor.: K und K1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn .... *)
+*)
+PROCEDURE Halbjahr (K: Objekte): Kurshalbjahre.Objekte;
+(* Vor.: K ist initialisiert.
+   Eff.: Liefert das Kurshalbjahr von K. *)
+
+PROCEDURE definieren (K: Objekte; H: Kurshalbjahre.Objekte);
+(* Vor.: K ist initialisiert.
+   Eff.: K hat das Fach F. Falls das eine Fremdsprache ist, 
+         hat K keine Sprachnummer. *)
+
+PROCEDURE vertexten (K: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: K ist initialisiert.
+   Eff.: T ist der Text von K. *)
+
+PROCEDURE definiert (K: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: K ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn T eine Kursnummer definiert. 
+         In diesem Fall ist K diese Kursnummer, sonst ist K leer. *)
+
+PROCEDURE faerben (K: Objekte; S, H: Farben.Objekte);
+(* Vor.: K ist initialisiert.
+   Eff.: K hat die Farben S, H. *)
+
+PROCEDURE ausgeben (K: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind hinreichend klein (s. Bildschirm).
+   Eff.: K ist an der Position (Z, S) auf dem Bildschirm 
+         in seinen Farben ausgegeben. *)
+
+PROCEDURE editieren (K: Objekte; Z, S: CARDINAL);
+(* Vor.: Z und S sind hinreichend klein (s. Bildschirm).
+   Eff.: K ist die an der Position (Z, S) editierte Kursnummer. *)
+
+PROCEDURE drucken (K: Objekte; Z, S: CARDINAL);
+(* Vor.: K ist initialisiert.
+   Eff.: K steht an der Seitenposition (Z, S) im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Zahl der Zeichen, die zur Codierung 
+         einer Kursnummer als Zeichenfolge notwendig ist. *)
+
+PROCEDURE codieren (K: Objekte; A: ADDRESS);
+(* Vor.: K ist initialisiert.
+   Eff.: K ist ab A als Zeichenfolge codiert. *)
+
+PROCEDURE decodieren (K: Objekte; A: ADDRESS);
+(* Vor.: K ist initialisiert.
+         Ab A ist eine Kursnummer als Zeichenfolge codiert.
+   Eff.: K ist diese Kursnummer. *)
+
+END Kursnummern.

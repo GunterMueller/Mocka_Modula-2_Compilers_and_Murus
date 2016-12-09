@@ -1,0 +1,34 @@
+DEFINITION MODULE Druckfelder;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+TYPE Objekte;
+(*
+PROCEDURE Zeilenzahl (): CARDINAL;
+
+PROCEDURE Spaltenzahl (): CARDINAL;
+*)
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und hat den normalen Font. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor.: X ist initialisiert. F ist ein Font.
+   Eff.: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; T: ARRAY OF CHAR; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Z < maxZ; S + Länge (T) < maxS.
+   Eff.: T steht im Font von X an der Seitenposition (Z, S)
+         im Druckerpuffer. *)
+(*
+PROCEDURE SeiteFertig;
+(* Vor.: TeX ist installiert; Druckerzugriff ist möglich.
+   Eff.: Alle Texte im Druckerpuffer sind ausgedruckt;
+         der Druckerpuffer ist leer. *)
+*)
+END Druckfelder.

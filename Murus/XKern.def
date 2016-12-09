@@ -1,0 +1,62 @@
+DEFINITION MODULE XKern;
+
+(* (c) Christian Maurer   v. 6. September 2008 *)
+
+(* >>> Nur zur Implementierung von Maus, Tastatur und Bildschirm;
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Farben IMPORT Objekte;
+
+TYPE Ereignisarten = (anderes, TasteGedrueckt, TasteLosgelassen,
+                      MausknopfGedrueckt, MausknopfLosgelassen, MausBewegt,
+                      Maus3DBewegt);
+
+PROCEDURE aktiv (): BOOLEAN;
+PROCEDURE initialisieren (B, H: CARDINAL; SF, HF: Objekte);
+PROCEDURE MaxZeilenzahl (): CARDINAL;
+PROCEDURE MaxSpaltenzahl (): CARDINAL;
+PROCEDURE schalten (X, Y: CARDINAL);
+
+PROCEDURE P;
+PROCEDURE V;
+
+PROCEDURE FarbenSetzen (S, H: Objekte);
+PROCEDURE loeschen (x, y, b, h: CARDINAL);
+PROCEDURE schreiben (T: ARRAY OF CHAR; x, y: CARDINAL; t: BOOLEAN);
+PROCEDURE SchriftInvertieren (T: ARRAY OF CHAR; x, y: CARDINAL; t: BOOLEAN);
+
+PROCEDURE SchriftartSchalten (a: CARDINAL);
+(* 0 = normal, 1 = zierlich, 2 = groesser *)
+
+PROCEDURE archivieren (x, y, b, h: CARDINAL);
+PROCEDURE restaurieren (x, y, b, h: CARDINAL);
+PROCEDURE invertieren (x, y, x1, y1: CARDINAL);
+PROCEDURE Punkt (x, y: CARDINAL; i: BOOLEAN);
+PROCEDURE Punkte (VAR x, y: ARRAY OF CARDINAL; n: CARDINAL; i: BOOLEAN);
+PROCEDURE Strecke (x, y, x1, y1: CARDINAL; i: BOOLEAN);
+PROCEDURE Streckenzug (A: ADDRESS; n: CARDINAL; i: BOOLEAN);
+PROCEDURE Strecken (A: ADDRESS; n: CARDINAL; i: BOOLEAN);
+PROCEDURE PolygonFuellen (A: ADDRESS; n: CARDINAL; i: BOOLEAN);
+PROCEDURE Rechteck (x, y, x1, y1: CARDINAL; i, f: BOOLEAN);
+PROCEDURE Ellipse (x, y, a, b: CARDINAL; i, f: BOOLEAN);
+
+PROCEDURE Ereignisart (VAR B: BITSET): Ereignisarten;
+PROCEDURE TasteGelesen (VAR Z: CHAR; VAR k: CARDINAL): BOOLEAN;
+PROCEDURE MausknopfGelesen (VAR Z: CHAR; VAR k: CARDINAL): BOOLEAN;
+PROCEDURE MausPositionLesen (VAR x, y: CARDINAL);
+PROCEDURE MausDefinieren (x, y, x1, y1: CARDINAL);
+PROCEDURE MausPositionieren (x, y: CARDINAL);
+
+PROCEDURE sperren;
+PROCEDURE entsperren;
+
+PROCEDURE codieren (x, y, b, h: CARDINAL; A: ADDRESS);
+(* Vor.: b, h nicht auf den Gesamtbildschirm bezogen, sonst bricht XGetImage
+         mit einem BadMatch zusammen, weil der Scheiß-Rahmen des Fensters in
+         der GUI einen Teil seines Inhalts unsichtbar macht (man XGetImage). *)
+PROCEDURE decodieren (x, y, b, h: CARDINAL; A: ADDRESS);
+PROCEDURE P6codieren (b, h: CARDINAL; A, P: ADDRESS);
+PROCEDURE P6decodieren (b, h: CARDINAL; P, A: ADDRESS);
+
+END XKern.

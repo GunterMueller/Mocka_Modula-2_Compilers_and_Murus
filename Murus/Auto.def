@@ -1,0 +1,15 @@
+DEFINITION MODULE Auto;
+
+(* (c) Christian Maurer   v. 3. Dezember 2005 *)
+
+FROM Farben IMPORT Objekte;
+
+PROCEDURE zeichnen (r: BOOLEAN; F: Objekte; x, y: CARDINAL);
+(* Vor.: x < Bildschirm.Graphikspaltenzahl - 32,
+         y < Bildschirm.Graphikzeilenzahl - 16.
+   Eff.: Im Rechteck zwischen (x, y) und (x + 31, y + 16) ist ein
+         stilisiertes Auto in Fahrtrichtung rechts (für r = TRUE)
+         bzw. links (für r = FALSE) in der Farbe F gezeichnet.
+         Die Hintergrundfarbe ist die des Bildschirms. *)
+
+END Auto.

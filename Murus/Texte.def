@@ -1,0 +1,109 @@
+DEFINITION MODULE Texte;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* kurze Texte der Länge <= 256 *)
+     Attribute = (ohne, nurZiffern, keineSonderzeichen); (* usw. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert, hat die Länge n und ist leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X nur aus Leerzeichen besteht. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X besteht nur aus Länge (X) vielen Leerzeichen. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht verändert, X1 stimmt mit X überein. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 in allen Zeichen
+         übereinstimmen. *)
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 in allen Zeichen
+         bis auf Groß- und Kleinschreibung übereinstimmen. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X lexikographisch vor X1 liegt 
+         (ein leerer Text ist folglich kleiner als ein nichtleerer). 
+         Ordnungskriterium ist dabei die Reihenfolge der Zeichen 
+         im von der Maschine verwendeten Zeichensatz. Das Problem 
+         der nationalen Sonderzeichen ist daher nicht gelöst! *)
+
+PROCEDURE istTeil (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer oder 
+         ein Teilstück von X1 ist. *)
+
+PROCEDURE istAequivalenterTeil (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer oder bis auf 
+         Groß-/Kleinschreibung ein Teilstück von X1 ist. *)
+
+PROCEDURE definieren (X: Objekte; S: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Zeichenkette S, normiert auf die Länge von. *)
+
+PROCEDURE vertexten (X: Objekte; VAR S: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: S ist eine Zeichenkette, die X eindeutig wiedergibt. 
+         Ist X leer, hat S die Länge 0. *)
+
+PROCEDURE verweben (X: Objekte; VAR S: ARRAY OF CHAR);
+(* >>>>> experimentelle Version. *)
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat die Farben S und H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab der Position (Z, S) in seinen Farben 
+         auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist der ab der Position (Z, S) editierte Text. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor.: X ist initialisiert. F ist ein Font. 
+         X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist in seinem Font an der Position (Z, S) 
+         im Druckerspooler der laufenden Seite. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Zeichen, die zur Codierung von X als Strom
+         notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom der Länge von X codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Text der Länge von X codiert.
+   Eff.: X ist dieser Text. *)
+
+END Texte.

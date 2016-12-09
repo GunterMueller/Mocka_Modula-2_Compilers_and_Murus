@@ -1,0 +1,77 @@
+DEFINITION MODULE FLSAbschnitte;
+
+(* (c) Christian Maurer   v. 9. Juni 2008 *)
+
+FROM IP IMPORT Namen;
+
+TYPE Objekte;
+(* Ferne Leser-Schreiber-Abschnitte, d.h. Zugangsprotokolle zu kritischen
+   Abschnitten, in denen mehrere Unix-Prozesse oder Prozesse auf verschiedenen
+   Rechnern auf gemeinsame Daten zugreifen; zu jedem Zeitpunkt im gleichen
+   kritischen Abschnitt entweder nur lesende Prozesse oder höchstens ein
+   schreibender Prozeß (s. Grundzüge der Nichtsequentiellen Programmierung,
+   S. 69 ff. und 158-159).
+
+   Anbieter und Kunde verwenden bei FLSAbschnitten den gleichen Quelltext.
+   Ob ein gestarteter Prozeß der Anbieter oder ein Kunde ist, hängt vom Aufruf
+   der Prozedur initialisieren ab.
+
+   Die Prozeduren Leser/Schreiber-Ein/Aus sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; A: Namen; N: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         A ist der Name des lokalen oder eines fernen im Netz erreichbaren
+         Rechners; im zweiten Fall hat ein Prozeß auf dem Rechner mit dem
+         Namen A einen fernen LSAbschnitt mit gleicher Nummer initialisiert.
+         N + 4 <= Kanaele.maxNr; die Ports Muruskern.MinPort + N + i (i < 4)
+         sind nicht von Netzwerkdiensten belegt.
+   Eff.: X ist initialisiert.
+         Kein Prozeß ist lesend oder schreibend in X.
+         X hat die Nummer N, d.h. die Kommunikation zwischen dem Anbieter
+         und den Kunden läuft unter TCP/IP über die o.g. Ports.
+
+         Der aufrufende Prozeß ist genau dann Anbieter von X, wenn der
+         lokale Rechner den Namen A und der aufrufende Prozeß die Prozedur
+         als erster aufgerufen hat; andernfalls ist er Kunde von X.
+
+         Wenn er Anbieter von X ist, hat er Kunden von X bei ihren Aufrufen der
+         Prozeduren Leser/Schreiber-Ein/Aus bedient, bis er abgebrochen wurde.
+         Anweisungen nach dem Aufruf von initialisieren sind nicht mehr
+         ausgeführt. Danach ist er nicht mehr initialisiert; insbesondere
+         sind die o.g. Ports auf ihm nicht mehr von Netzwerkdiensten belegt.
+
+         Andernfalls, d.h. wenn er Kunde von X ist, steht ihm der Anbieter von X
+         bei seinen Aufrufen von Leser/Schreiber-Ein/Aus zur Verfügung. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß ist lesend oder schreibend in X.
+   Eff.: X ist nicht initialisiert. Die o.g. Ports von X sind auf dem
+         lokalen Rechner nicht mehr von Netzwerkdiensten belegt. *) 
+
+PROCEDURE LeserEin (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X,
+         der weder lesend noch schreibend in X ist.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß schreibend in X war.
+         Jetzt ist er lesend in X. *)
+
+PROCEDURE LeserAus (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X und lesend in X.
+   Eff.: Er ist nicht lesend in X. *)
+
+PROCEDURE SchreiberEin (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X,
+         der weder lesend noch schreibend in X ist.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß lesend oder schreibend
+         in X war. Jetzt ist er (als einziger) schreibend in X. *)
+
+PROCEDURE SchreiberAus (X: Objekte);
+(* Vor.: X und der Anbieter von X sind initialisiert.
+         Der aufrufende Prozeß ist Kunde von X und schreibend in X.
+   Eff.: Er ist nicht schreibend in X. *)
+
+END FLSAbschnitte.

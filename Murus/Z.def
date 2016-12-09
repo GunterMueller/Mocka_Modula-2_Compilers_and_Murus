@@ -1,0 +1,17 @@
+DEFINITION MODULE Z;
+
+(* (c) Christian Maurer   v. 5. August 2008 *)
+
+CONST
+  AE = CHR (196); OE = CHR (214); UE = CHR (220);
+  ae = CHR (228); oe = CHR (246); ue = CHR (252); sz = CHR (223);
+  Euro  = CHR (164); Para  = CHR (167); Grad  = CHR (176);
+  hoch2 = CHR (178); hoch3 = CHR (179); mue   = CHR (181);
+
+PROCEDURE Laenge (Text: ARRAY OF CHAR): CARDINAL;
+
+PROCEDURE echteLaenge (Text: ARRAY OF CHAR): CARDINAL;
+
+PROCEDURE zumTeufelmitUTF8 (VAR T: ARRAY OF CHAR);
+
+END Z.

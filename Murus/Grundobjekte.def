@@ -1,0 +1,133 @@
+DEFINITION MODULE Grundobjekte;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Typcodes = RECORD
+                  Code,
+                  Breite,
+                  Hoehe,
+                  Zusatz: CHAR
+                END;
+     Objekte; (* diverser Standardtypen, die in Murus verfügbar sind;
+                 angereichert um einen undefinierten Typ. *)
+
+PROCEDURE undefiniert (T: Typcodes): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn ein Aufruf von definieren (X, T)
+         den Effekt hat, daß der Typ von X undefiniert ist. *)
+
+PROCEDURE undefinieren (VAR T: Typcodes);
+(* Vor.: Keine.
+   Eff.: T ist undefiniert. *)
+
+PROCEDURE typgleich (T, T1: Typcodes): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn Aufrufe von definieren (X, T)
+         und definieren (X1, T1) den Effekt haben, daß X und X1 den
+         gleichen Typ haben. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert; der Typ von X ist undefiniert. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE auswaehlen (X: Objekte; VAR T: Typcodes);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat einen interaktiv von dem/der Benutzer/in ausgewählten Typ.
+         T.Breite ist die Anzahl der Spalten und T.Hoehe die Anzahl der
+         Zeilen, die X zur Ein-/Ausgabe auf dem Bildschirm benötigt. *)
+
+PROCEDURE TypLiefern (X: Objekte; VAR T: Typcodes);
+(* Vor.: X ist initialisiert.
+   Eff.: T enthält die Typinformationen von X. *)
+
+PROCEDURE definieren (X: Objekte; T: Typcodes);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat den durch T definierten Typ. *)
+
+PROCEDURE numerifiziert (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X den Typ SHORTCARD (TSIZE 2) hat. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Typ von X undefiniert ist oder
+         wenn X leer ist. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer (was leer ist, ist durch den Typ von X bestimmt). *)
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 den gleichen Typ haben. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Wenn X und X1 nicht den gleichen Typ haben, ist nichts verändert.
+         Andernfalls stimmt X1 mit X überein (X ist unverändert). *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert FALSE, wenn X und X1 nicht den gleichen Typ haben;
+         liefert ansonsten genau dann TRUE, wenn X und X1 gleich sind, wobei
+         die Semantik dieser Äquivalenzrelation vom Typ von X, X1 abhängt. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert FALSE, wenn der Typ von X oder X1 undefiniert ist
+         oder wenn X und X1 nicht den gleichen Typ haben.
+         Liefert ansonsten genau dann TRUE, wenn X kleiner als X1 ist, wobei
+         die Semantik dieser Ordnungsrelation vom Typ von X, X1 abhängt. *)
+
+PROCEDURE faerben (X: Objekte; V, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn der Typ von X undefiniert ist, ist nichts verändert,
+         andernfalls hat X die Schriftfarbe V und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Z + Hoehe von X <= Bildschirm.Zeilenzahl,
+         S + Breite von X <= Bildschirm.Spaltenzahl.
+   Eff.: Wenn der Typ von X undefiniert ist, ist nichts verändert.
+         Andernfalls ist X auf dem Bildschirm ab Zeile Z, Spalte S
+         in seinen Farben ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert und hat einen definierten Typ.
+         Z + Hoehe von X <= Bildschirm.Zeilenzahl,
+         S + Breite von X <= Bildschirm.Spaltenzahl.
+   Eff.: Wenn der Typ von X undefiniert ist, ist nichts verändert.
+         Andernfalls ist X ist das Objekt, das ab Zeile Z, Spalte S
+         auf dem Bildschirm editiert wurde. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+         Z und S sind klein genug, so daß X "auf das Papier paßt"
+         (hängt vom in Drucker geschalteten Modus ab).
+   Eff.: Wenn der Typ von X undefiniert ist, ist nichts verändert.
+         Andernfalls steht X ab Zeile Z, Spalte S im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann 0, wenn X keinen definierten Typ hat,
+         sonst die Anzahl der Zeichen, die zur umkehrbar
+         eindeutigen Codierung von X notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist eindeutig umkehrbar ab A als Strom der Codelänge
+         von X codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A steht ein Strom, der ein Objekt codiert.
+   Eff.: X ist dieses Objekt. *)
+
+END Grundobjekte.

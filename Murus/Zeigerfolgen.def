@@ -1,0 +1,65 @@
+DEFINITION MODULE Zeigerfolgen;
+
+(* (c) Christian Maurer   v. 14. September 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Bearbeitungen, Praedikate;
+
+TYPE Objekte; (* Folgen von Zeigern auf irgendwelche Objekte) *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Zeiger enthält. *)
+
+PROCEDURE leeren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X enthält keine Zeiger. *)
+
+PROCEDURE vorsetzen (VAR X: Objekte; Z: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Z ist als erster Zeiger in X eingefügt. *)
+
+PROCEDURE anhaengen (VAR X: Objekte; Z: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Z ist als letzter Zeiger in X eingefügt. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert und enthält nicht mehr als 
+         MAX (CARDINAL) Zeiger. 
+   Eff.: Liefert die Anzahl der Zeiger in X. *)
+
+PROCEDURE lesen (X: Objekte; i: CARDINAL; VAR Z: ADDRESS);
+(* Vor.: X ist initialisiert.
+         i < Anzahl der Zeiger in X.
+   Eff.: Z ist der i-te Zeiger aus X. *)
+
+PROCEDURE enthalten (X: Objekte; Z: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn Z in X enthalten ist. *)
+
+PROCEDURE existiert (X: Objekte; P: Praedikate;
+                                 VAR Z: ADDRESS): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn es einen Zeiger in X 
+         gibt, der auf ein Objekt zeigt, auf das P zutrifft. 
+         In diesem Fall ist Z der erste solche Zeiger aus X, 
+         andernfalls gilt Z = NIL. *)
+
+PROCEDURE entfernen (VAR X: Objekte; Z: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: Z ist nicht in X enthalten. *) 
+
+PROCEDURE traversieren (X: Objekte; B: Bearbeitungen);
+(* Vor.: X ist initialisiert.
+   Eff.: Auf alle Objekte, auf die die Zeiger in X zeigen, 
+         ist B angewandt. *)
+
+END Zeigerfolgen.

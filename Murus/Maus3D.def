@@ -1,0 +1,34 @@
+DEFINITION MODULE Maus3D;
+
+(* (c) Christian Maurer   v. 6. September 2007 *)
+
+(* >>> Nur zur Implementierung von XKern und Tastatur;
+       soll auf keinen Fall weiter oben verwendet werden ! *)
+
+FROM Raum IMPORT Gitterkoordinaten;
+
+(* Vor.: Welt hat Leserecht auf die Gerätedateien /dev/input/mouse3D.
+   Eff.: Wenn in /etc/udev/rules.d eine Regel mit der Zeile:
+         SYSFS{idVendor}=="046d", SYSFS{idProduct}=="c626", MODE="644", SYMLINK+="input/mouse3D"
+         enthalten ist, ist die 3D-Maus initialisiert
+         (sofern eine physikalisch vorhanden ist,
+         aber die Geräte sind bezahlbar und wirklich affengeil). *)
+
+PROCEDURE initialisiert (VAR d: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn eine 3D-Maus vorhanden ist.
+         In diesem Fall ist d sein Dateideskriptor. *)
+
+PROCEDURE gegeben (): BOOLEAN;
+(* Vor.: Die 3D-Maus ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn eine 3D-Mausbewegung erfolgt war. *)
+
+PROCEDURE lesen (VAR B, D: Gitterkoordinaten);
+(* Vor.: Die 3D-Maus ist initialisiert.
+   Eff.: B und D sind die Koordinaten der letzten 3D-Mausbewegung und -drehung,
+         sofern eine erfolgt war, in der Reihenfolge des Dreibeins der
+         Richtungen: B sind die Werte der Bewegungen in Richtung der
+         entsprechenden Achsen, D die Werte der Drehungen um diese Achsen
+         (aus positiver Richtung gesehen in mathematisch positivem Sinn). *)
+
+END Maus3D.

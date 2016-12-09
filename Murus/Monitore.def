@@ -1,0 +1,133 @@
+DEFINITION MODULE Monitore;
+
+(* (c) Christian Maurer   v. 8. April 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Bearbeitungsspektren, Bedingungsspektren;
+
+TYPE Objekte;
+(* Universelle Synchronisationsobjekte zur Sicherstellung des gegenseitigen
+   Ausschlusses von - evtl. bedingungsabhängigen - Operationen auf gemeinsamen
+   Ressourcen und zur Bedingungssynchronisation mehrerer nebenläufiger Prozesse
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 111 ff.).
+
+   Die Operationen, die ein Monitor zur Verfügung stellt, werden durch fort-
+   laufende natürliche Zahlen (ab 0) identifiziert; sie sind in einem durch
+   diese Operationsnummern parametrisierten Spektrum von Bearbeitungsprozeduren
+   gebündelt, das von den Klienten konstruiert und bei der Initialisierung des
+   Monitors übergeben wird.
+
+   Mit jeder Operation ist implizit eine Bedingungsvariable mit der gleichen
+   Nummer verbunden, auf die ein aufrufender Prozeß bei ihrer Ausführung ggf.
+   bis zur Erfüllung einer Bedingung blockiert bzw. bei deren Erfüllung wieder
+   deblockiert werden kann.
+
+   In komplexeren Fällen synchronisieren die Klienten die Bearbeitungen durch
+   Aufrufe von blockieren und deblockieren in den Operationen, wobei sie für die
+   passende Verknüpfung der impliziten Bedingungsvariablen mit den Bedingungen
+   in Form Boolescher Ausdrücke für die Ausführung der Bearbeitungen sorgen.
+   
+   Standardfälle, bei denen jede Bearbeitung von höchstens einer Bedingung
+   abhängt, lassen sich mit konditionierten Monitoren erledigen:
+   Die Nutzung der Monitore kann vereinfacht werden, indem die Klienten die
+   Bedingungen als (durch die Operationsnummern parametrisiertes) Spektrum
+   Boolescher Funktionsprozeduren konstruieren und dem Monitor nach seiner
+   Initialisierung per Konditionierung übergeben. Dabei darf blockieren oder
+   deblockieren in den Operationen natürlich nicht mehr verwendet werden, da
+   das vom Monitor in der Operation mit der Nummer i, bei der die Bearbeitung
+   von einer Bedingung phi(i) abhängt, nach folgendem Muster erledigt wird:
+
+   WHILE NOT phi(i) DO blockieren(i) END;
+   bearbeiten(i);
+   FOR i:= 0 TO Operationszahl - 1 DO
+     IF phi(i) THEN deblockieren(i) END
+   END;
+
+   Die Monitore können zu übergeordneten Subjekten assoziiert sein,
+   von denen sie zur Synchronisation benutzt werden. Das ist erforderlich,
+   falls mehrere Exemplare eines Monitors mit den gleichen Bearbeitungen,
+   ggf. den gleichen Bedingungen, in einem Programm verwendet werden. *)
+
+TYPE Semantiken = (Aufgeben, Fortfahren, Warten, VorrangigWarten);
+                  (* s. Buch, S. 123 ff.: SX, SC, SW, SU *)
+
+PROCEDURE initialisieren (VAR X: Objekte; S: ADDRESS; n: CARDINAL;
+                                          B: Bearbeitungsspektren);
+(* Vor.: X ist nicht initialisiert.
+         S = NIL oder S ist ein Verweis auf ein übergeordnetes Subjekt,
+         von dem X zur Synchronisation benutzt wird.
+         n > 0. B ist für alle i < n definiert (wobei Bearbeitungen mit
+         NIL als drittem Parameter nichts anderes als Anweisungen sind).
+   Eff.: X ist initialisiert und hat die Operationszahl n.
+         Im Fall S # NIL hat X das synchronisierende Subjekt S.
+         X hat für alle i < n die Bearbeitung B (S, i, -).
+         X hat die Semantik VorrangigWarten.
+         X hat keine Bedingungen. *)
+
+PROCEDURE definieren (X: Objekte; S: Semantiken);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß hat blockieren oder deblockieren aufgerufen.
+   Eff.: X hat die Semantik S. *)
+
+PROCEDURE konditionieren (X: Objekte; C: Bedingungsspektren);
+(* Vor.: X ist initialisiert.
+         C ist für alle i < Operationszahl von X definiert.
+         X hat die Semantik Fortfahren oder VorrangigWarten.
+         Kein Prozeß hat blockieren oder deblockieren aufgerufen.
+   Eff.: X hat für alle i < Operationszahl von X die Bedingung C (S, i)
+         (wobei S das synchronisierende Subjekt von X ist). *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß befindet sich in der Ausführung einer Monitoroperation.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE blockieren (X: Objekte; i: CARDINAL);
+(* Vor.: X ist initialisiert.
+         i < Operationszahl von X.
+         X hat keine Bedingung.
+         Die Prozedur ist in einer Bearbeitung von X aufgerufen.
+   Eff.: Der aufrufende Prozeß war ggf. solange auf i blockiert, bis genügend
+         viele andere Prozesse deblockieren (X, i) aufgerufen haben. *)
+
+PROCEDURE blockiert (X: Objekte; i: CARDINAL): BOOLEAN;
+(* Vor.: X ist initialisiert. i < Operationszahl von X.
+         X hat keine Bedingung.
+         Die Prozedur ist in einer Bearbeitung von X aufgerufen.
+   Eff.: Liefert genau dann TRUE, wenn es zum Zeitpunkt des Aufrufs
+         Prozesse gibt, die in X auf i blockiert sind. *)
+
+PROCEDURE deblockieren (X: Objekte; i: CARDINAL);
+(* Vor.: X ist initialisiert. i < Operationszahl von X.
+         X hat keine Bedingung.
+         Die Prozedur ist in einer Bearbeitung von X aufgerufen.
+         Wenn X die Semantik Aufgeben hat, ist dieser Aufruf
+         eine letzte Anweisung in der Bearbeitungsprozedur.
+   Eff.: Wenn es Prozesse gibt, die zum Zeitpunkt des Aufrufs in X
+         auf i blockiert sind, ist genau einer von ihnen deblockiert. *)
+
+PROCEDURE alleDeblockieren (X: Objekte; i: CARDINAL);
+(* Vor.: X ist initialisiert. i < Operationszahl von X.
+         X hat keine Bedingung.
+         Die Prozedur ist in einer Bearbeitung von X aufgerufen.
+         X hat die Semantik Fortfahren.
+   Eff.: Alle Prozesse, die in X auf i blockiert sind, sind deblockiert. *)
+
+PROCEDURE operieren (X: Objekte; i: CARDINAL; A: ADDRESS);
+(* Vor.: X ist initialisiert. i < Operationszahl von X.
+         A = NIL oder ab A steht der zu bearbeitende Strom.
+   Eff.: Auf den Strom ab A ist die i-te Bearbeitung von X (wenn X eine
+         Bedingung hat, unter der i-ten Bedingung vom X) angewandt, d.h.
+         B (S, A, i) ist ausgeführt, nachdem der aufrufende Prozeß ggf.
+         - wenn X Bedingungen hat:
+           bis zur Sicherstellung von C (S, i)
+         - wenn X keine Bedingungen hat:
+           entsprechend den Aufrufen von blockieren (X, i)
+           und deblockieren (X, i) in den Bearbeitungen von X
+         blockiert war (wobei S das synchronisierende Subjekt,
+         C die Bedingungs- und B die Bearbeitungsprozedur von X sind
+         und A der Parameter für einen Zeiger auf Daten ist, ggf. NIL).
+         Die Prozedur ist eine Monitoroperation, d.h.
+         sie läuft unter gegenseitigem Ausschluß. *)
+
+END Monitore.

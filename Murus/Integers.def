@@ -1,0 +1,41 @@
+DEFINITION MODULE Integers;
+
+(* (c) Christian Maurer   v. 1. Februar 2008 *)
+
+IMPORT Farben;
+
+PROCEDURE istZahl (S: ARRAY OF CHAR; VAR K: INTEGER): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE, wenn S leer ist. In diesem Fall ist K = 0.
+         Liefert ansonsten genau dann TRUE, wenn S eine Zahl im Bereich 
+         von INTEGER mit nicht mehr als 9 Ziffern darstellt.
+         In diesem Fall ist K diese Zahl. *)
+
+PROCEDURE Stellenzahl (K: INTEGER): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert 0 für K = 0, sonst die Anzahl der Ziffern von K 
+         (ohne führende Nullen und ohne Vorzeichen). *)
+
+PROCEDURE vertexten (K: INTEGER; VAR T: ARRAY OF CHAR; L: CARDINAL
+                                                  (* ; b: BOOLEAN; *));
+(* Vor.: 1 + Stellenzahl von K <= L <= 10.
+   Eff.: S ist die rechtsbündige Darstellung von K als Zeichenkette 
+         der Länge L.
+         S ist genau dann ... , wenn b = TRUE ist. *)
+
+PROCEDURE faerben (V, H: Farben.Objekte);
+(* Vor.: Keine.
+   Eff.: Alle folgenden Ein-/Ausgaben erfolgen in der
+         Schriftfarbe V und der Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (K: INTEGER; Z, S, B: CARDINAL);
+(* Vor.: Z und S klein genug;
+         1 + Stellenzahl (K) <= B <= 10.
+   Eff.: K ist auf dem Bildschirm an der Position (Z, S) ausgegeben. *)
+
+PROCEDURE editieren (VAR K: INTEGER; Z, S, B: CARDINAL);
+(* Vor.: K hat einen Wert.
+         Z und S klein genug; 2 <= B <= 10.
+   Eff.: K ist die Zahl, die am Bildschirm editiert wurde. *)
+
+END Integers.

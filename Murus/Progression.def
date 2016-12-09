@@ -1,0 +1,13 @@
+DEFINITION MODULE Progression;
+
+(* (c) Christian Maurer   v. 2. Mai 2007 *)
+
+PROCEDURE initialisieren (n: CARDINAL);
+
+PROCEDURE initialisieren1 (n, Z, S, B: CARDINAL);
+
+PROCEDURE ausgeben;
+
+PROCEDURE terminieren;
+
+END Progression.

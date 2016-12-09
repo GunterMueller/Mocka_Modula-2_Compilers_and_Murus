@@ -1,0 +1,57 @@
+DEFINITION MODULE Auswahlen;
+
+(* (c) Christian Maurer   v. 2. Januar 2007 *)
+
+IMPORT Farben;
+  FROM Meldungen IMPORT Textzeilen;
+
+TYPE Ausgaben = PROCEDURE (CARDINAL, CARDINAL, CARDINAL,
+                           Farben.Objekte, Farben.Objekte);
+
+PROCEDURE auswaehlen (A: Ausgaben; N, M, B: CARDINAL; VAR n: CARDINAL;
+                      Z, S: CARDINAL; SF, HF: Farben.Objekte);
+(* Vor.: 1 < N => M > 0; Z < Bildschirm.Zeilenzahl - 2;
+         B >= 1, S + B <= Bildschirm.Spaltenzahl; n < N.
+   Eff.: >>>>>>>> Es fehlt noch die Beschreibung der Semantik von A ! <<<<<<<<
+         Der aufrufende Prozeß war solange blockiert, bis Benutzer/in
+         mit Tastatur oder Maus einen Wert n <= N ausgewählt hat.
+         Solange war ab Zeile Z, Spalte S auf dem Bildschirm ein Balkenmenü
+         der Höhe min (M, Zeilenhoehe () - Z - 1) und Breite B ausgegeben,
+         bestehend aus maximal M Texten >>>>>>>> .... <<<<<<<< , von denen
+         immer genau einer die Schriftfarbe SF und Hintergrundfarbe HF hat;
+         die anderen haben Schriftfarbe HF und Hintergrundfarbe SF.
+         Benutzer/in hat mit Pfeiltasten oder Maus entweder einen der Texte
+         ausgewählt (dann ist n < N jetzt die Zahl, die dem ausgewählten Text
+         entspricht) oder hat die Auswahl abgebrochen (dann ist jetzt n = N).
+         Das Balkenmenü ist jetzt wieder vom Bildschirm entfernt
+         und der ursprüngliche Bildschirminhalt wiederhergestellt. *)
+
+PROCEDURE auswaehlen1 (VAR T: ARRAY OF Textzeilen; N, B: CARDINAL; VAR n: CARDINAL;
+                       Z, S: CARDINAL; SF, HF: Farben.Objekte);
+(* Vor.: 1 < N <= HIGH (T) + 1; Z < Bildschirm.Zeilenzahl - 2;
+         B >= 1, S + B <= Bildschirm.Spaltenzahl; n < N.
+   Eff.: Der aufrufende Prozeß war solange blockiert, bis Benutzer/in
+         mit Tastatur oder Maus einen Wert n <= N ausgewählt hat.
+         Solange war ab Zeile Z, Spalte S auf dem Bildschirm ein Balkenmenü
+         der Höhe min (N, Zeilenhoehe () - Z - 1) und Breite B ausgegeben,
+         bestehend aus H von den Texten T[i], von denen immer genau einer die
+         Schriftfarbe SF und Hintergrundfarbe HF hat (anfangs ist das T[n]);
+         die anderen haben Schriftfarbe HF und Hintergrundfarbe SF.
+         Benutzer/in hat mit Pfeiltasten oder Maus entweder einen der Texte
+         ausgewählt (dann ist n < N jetzt die Zahl, die dem ausgewählten Text
+         entspricht) oder hat die Auswahl abgebrochen (dann ist jetzt n = N).
+         Das Balkenmenü ist jetzt wieder vom Bildschirm entfernt
+         und der ursprüngliche Bildschirminhalt wiederhergestellt. *)
+
+PROCEDURE DateinameEditiert (M, A: ARRAY OF CHAR; B: CARDINAL;
+                             VAR N, D: ARRAY OF CHAR; b: BOOLEAN;
+                             Z, S: CARDINAL; SF, HF: Farben.Objekte): BOOLEAN;
+(* >>>>> experimentelle Version. *)
+(* Vor.: M ist ein Maskenbestandteil.
+         A ist ein nicht leeres Datei-Suffix.
+         B > 0. (* Breite *)
+         Z < Bildschirm.Zeilenzahl, S + n < Bildschirm.Spaltenzahl.
+   Eff.: D = N + "." + A.
+         Für b = FALSE ist Menü verschwunden. *)
+
+END Auswahlen.

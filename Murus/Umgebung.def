@@ -1,0 +1,30 @@
+DEFINITION MODULE Umgebung;
+
+(* (c) Christian Maurer   v. 10. Mai 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+CONST M = 999;
+TYPE Indizes = [0..M];
+     Variablen = ARRAY Indizes OF CHAR;
+
+PROCEDURE holen (V: Variablen; VAR W: ARRAY OF CHAR);
+(* Vor.: HIGH (W) ist groß genug, um ggf. den Wert von V aufzunehmen.
+   Eff.: W ist der Wert der Umgebungsvariablen V.
+         Wenn V leer ist, ist nichts verändert. *)
+
+PROCEDURE setzen (V: Variablen; W: ARRAY OF CHAR);
+(* Vor.: W enthält kein Leerzeichen und kein "=".
+   Eff.: Die Umgebungsvariable V hat den Wert W. *)
+
+PROCEDURE Adresse (V: Variablen): ADDRESS;
+(* Vor.: Keine.
+   Eff.: Liefert NIL, wenn V nicht als Umgebungsvariable definiert ist,
+         sonst die Adresse von V im Arbeitsspeicher. *)
+
+PROCEDURE ParameterHolen (n: CARDINAL; VAR T: ARRAY OF CHAR);
+(* Vor.: HIGH (T) ist groß genug, um den Parameter aufzunehmen.
+   Eff.: T ist der n-te Parameter des Programmsaufrufs
+         (für n = 0 ist das der Name des Programmaufrufs selber). *)
+
+END Umgebung.

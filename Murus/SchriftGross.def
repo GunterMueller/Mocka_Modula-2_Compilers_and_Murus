@@ -1,0 +1,7 @@
+DEFINITION MODULE SchriftGross;
+
+(* (c) Christian Maurer   v. 5. September 2006 *)
+
+(* Eff.: Schriftart = Bildschirm.nochgroesser. *)
+
+END SchriftGross.

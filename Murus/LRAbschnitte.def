@@ -1,0 +1,47 @@
+DEFINITION MODULE LRAbschnitte;
+
+(* (c) Christian Maurer   v. 23. Februar 2008 *)
+
+TYPE Objekte;
+(* Zugangsprotokolle zu kritischen Abschnitten, in denen mehrere
+   Prozesse "von links" oder "von rechts" die gleiche Ressource
+   benutzen; zu jedem Zeitpunkt im gleichen kritischen Abschnitt
+   entweder nur Prozesse "von links" oder Prozesse "von rechts"
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 72).
+
+   Die Prozeduren links/rechts-Ein/Aus sind unteilbar, d.h. ihr
+   Ablauf kann von anderen Prozessen nicht unterbrochen werden. *)   
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert.
+         Kein Prozeß ist "von links" oder "von rechts" in X. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+         Kein Prozeß ist "von links" oder "von rechts" in X.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE linksEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist weder "von links" noch "von rechts" in X.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß "von rechts" in X war.
+         Jetzt ist er "von links" in X. *)
+
+PROCEDURE linksAus (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist "von links" in X.
+   Eff.: Er ist nicht "von links" in X. *)
+
+PROCEDURE rechtsEin (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist weder "von links" noch "von rechts" in X.
+   Eff.: Er war ggf. solange blockiert, bis kein Prozeß "von links" in X war.
+         Jetzt ist er "von rechts" in X. *)
+
+PROCEDURE rechtsAus (X: Objekte);
+(* Vor.: X ist initialisiert.
+         Der aufrufende Prozeß ist "von rechts" in X.
+   Eff.: Er ist nicht "von rechts" in X. *)
+
+END LRAbschnitte.

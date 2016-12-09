@@ -1,0 +1,139 @@
+DEFINITION MODULE Tastatur;
+
+(* (c) Christian Maurer   v. 6. September 2008 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Raum;
+
+(* Zur Bedienung und Steuerung eines Systems mit Tastatur und Maus
+   werden drei Gruppen von Tasten unterschieden:
+
+   - Zeichentasten (mit Echo in Form eines alphanumerischen Zeichens
+     auf dem Bildschirm) zur Eingabe von Zeichenketten,
+   - Kommandotasten zur Auslösung definierter Systemreaktionen,
+   - Mausaktionen zur Ansteuerung bestimmter Bildschirmpositionen.
+
+   Zur Abstraktion von konkreten Tastaturen oder Mäusen sind für
+   die beiden letztgenannten Gruppen folgende Kommandos vorgesehen: *)
+
+TYPE Kommandos = (keins,             (* zur Unterscheidung von Zeichentasten  *)
+                                     (* (siehe Prozedur "lesen")              *)
+                  weiter, schluss,   (* zum Abschluß einfacher Eingaben, ganz *)
+                  zurueck,           (* allg. zur Bestätigung oder Ablehnung  *)
+                  links, rechts,       (* zur Positionierung des Kursors und  *)
+                  aufwaerts, abwaerts, (* ganz allgemein zur Bewegung im      *)
+                  zumAnfang, zumEnde,  (* System in verschiedene Richtungen   *)
+                  schalte,
+                  entferne, fuegeEin,  (* zum Entfernen/Einfügen von Objekten *)
+                  hilf, suche,          (* zur Auslösung von Systemreaktionen *)
+                  ordne, konfiguriere,  (* mit anwendungsabhängiger Semantik  *)
+                  markiere, demarkiere, (* zum (Ent-)Markieren von Objekten   *)
+                  nimmAuf, legeAb,      (* "Papierkorb"-Operationen           *)
+                  schwaerzer, roeter, gruener, blauer,     (* zur Farbauswahl *)
+                  drucke, rolle, pausiere,       (* zu speziellen Zwecken     *)
+                  gehe, hier, ziehe, hierhin,    (* zur gezielten Ansteuerung *)
+                  dort, schiebe, dorthin,        (* von Bildschirmpositionen  *)
+                  da, bewege, dahin,             (* mit einem Zeigeinstrument *)
+                  navigiere);                    (* zur Navigation im Raum    *)
+
+(* Kommandos können in der "Tiefe" ihrer "Wirkung" verstärkt sein;
+   Zu jedem Kommando gehört eine natürliche Zahl als Tiefe (0 als Basisversion,
+   zunehmende Zahlen für größere Tiefen). Damit werden konzeptionell wirkungs-
+   gleiche Kommandos unterschiedlicher Tiefe ermöglicht, wie z.B. die Bewegung
+   in einem Text zum/zur nächsten Zeichen, Wort, Satz, Absatz, Seite, oder
+   in einem Kalender zum/zur nächsten Tag, Woche, Monat, Jahr, Jahrzehnt.
+
+   Kommandos der Tiefe 0 sind durch Tasten (ohne Vorwahltasten) oder
+   Mausaktionen mit systemunabhängiger Semantik implementiert:
+
+   - weiter:                  Eingabetaste "Enter"
+   - schluss:                 Schlußtaste "Esc"
+   - zurueck:                 Rückschrittaste "<-"
+   - links, rechts,
+     aufwaerts, abwaerts:     entsprechende Pfeiltasten
+   - zumAnfang, zumEnde:      "Pos1"-, "Ende"-Taste
+   - schalte:                 Tabulatortaste "<- ->"
+   - entferne, fuegeEin:      "Entf"-, "Einfg"-Taste
+   - hilf, ..., legeAb:       F1-Taste, ..., F8-Taste
+   - schwaerzer, ..., blauer: F9-Taste, ..., F12-Taste
+   - drucke, rolle, pausiere: entsprechend benannte Taste
+   - gehe:                    Maus ohne gedrückten Knopf bewegt
+   - hier, dort, da:          linker, rechter, mittlerer Mausknopf gedrückt
+   - hierhin, dorthin, dahin: Maus mit entsprechend gedrücktem Mausknopf bewegt
+   - ziehe, schiebe, bewege:  entsprechender Mausknopf losgelassen
+   - navigiere:               3D-Maus bedient
+
+   Kommandos der Tiefe > 0 durch Kombination mit Vorwahltasten:
+   - Tiefe 1:                 Umschalt- oder "Strg"-Taste,
+   - Tiefe 2:                 "Alt"-Taste,
+   - Tiefe 3:                 "Strg"- und "Alt"-Taste.
+
+   Die derzeitige Implementierung liefert bei den Mauskommandos nur Tiefe 0. *)
+
+PROCEDURE lesen (VAR Z: CHAR; VAR K: Kommandos; VAR T: CARDINAL);
+(* Vor.: Keine. 
+   Eff.: Entweder gilt K = keins und das erste Objekt aus dem Tastaturpuffer
+         ist das Zeichen Z oder es gilt Z = 0C und das erste Objekt aus dem
+         Tastaturpuffer ist das Kommando K der Tiefe T (der aufrufende Prozeß
+         war ggf. solange blockiert, bis der Tastaturpuffer ein Objekt
+         enthielt). Dieses erste Objekt ist jetzt aus dem Tastaturpuffer
+         entfernt. Wenn keine Maus vorhanden ist, gilt K < hier. *)
+
+PROCEDURE MausVorhanden (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann TRUE, wenn eine Maus angeschlossen ist. *)
+
+PROCEDURE Zeichen (): CHAR;
+(* Vor.: Keine. 
+   Eff.: Der aufrufende Prozeß ist ggf. solange blockiert, bis der
+         Tastaturpuffer ein Zeichen enthält. Liefert das erste Zeichen
+         aus dem Tastaturpuffer und dieses Zeichen ist aus ihm entfernt. *)
+
+PROCEDURE Kommando (VAR T: CARDINAL): Kommandos;
+(* Vor.: Keine.
+   Eff.: Der aufrufende Prozeß ist ggf. solange blockiert, bis der
+         Tastaturpuffer ein Kommando enthält. Liefert das erste Kommando
+         und seine Tiefe T aus dem Tastaturpuffer und dieses Kommando
+         ist aus ihm entfernt. *)
+
+PROCEDURE Maus3DLesen (VAR B, D: Raum.Gitterkoordinaten); 
+(* Vor.: Keine.
+   Eff.: Liefert die Bewegungs- und Drehungswerte des letzten Kommandos
+         navigiere; ggf. = 0, falls keine 3D-Maus initialisiert ist oder
+         dieses Kommando nicht geliefert worden war. *)
+
+PROCEDURE letztesZeichen (): CHAR;
+(* Vor.: Ein Zeichen oder Kommando ist gelesen.
+   Eff.: Liefert das letzte gelesene Zeichen, falls eins gelesen wurde,
+         sonst 0C. *)
+
+PROCEDURE letztesKommando (VAR T: CARDINAL): Kommandos;
+(* Vor.: Ein Zeichen oder Kommando ist gelesen.
+   Eff.: Liefert das letzte gelesene Kommando, falls eins gelesen wurde,
+         sonst keins. Im ersten Fall ist T seine Tiefe, sonst ist T = 0. *)
+
+PROCEDURE KommandoDeponieren (K: Kommandos);
+(* Vor.: Keine.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE ZeichenDeponieren (C: CHAR);
+(* Vor.: Keine.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE warten (b: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Der aufrufende Prozeß war solange blockiert, bis der Tastaturpuffer
+         eins der Kommandos weiter oder hier (für b = TRUE) bzw. zurueck oder
+         dort (für b = FALSE) enthielt. Dieses Kommando ist jetzt aus dem
+         Tastaturpuffer entfernt. *)
+
+PROCEDURE bestaetigt (b: BOOLEAN): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE, wenn der Tastaturpuffer eins der Kommandos weiter oder
+         hier enthielt, und FALSE, wenn der Tastaturpuffer eins der Kommandos
+         zurueck oder dort enthielt, und zwar für b = FALSE, beliebiger Tiefe
+         und für b = TRUE einer Tiefe > 0. Der aufrufende Prozeß war solange
+         blockiert, bis der Tastaturpuffer eins dieser Kommandos enthielt;
+         dieses Kommando ist jetzt aus dem Tastaturpuffer entfernt. *)
+
+END Tastatur.

@@ -1,0 +1,117 @@
+DEFINITION MODULE Prozedurtypen;
+
+(* (c) Christian Maurer   v. 7. Juli 2008 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+
+TYPE Anweisungen = PROCEDURE;
+
+PROCEDURE nixtun;
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE Anweisungsspektren = PROCEDURE (ADDRESS, CARDINAL);
+
+PROCEDURE niewastun (S: ADDRESS; C: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE Bearbeitungen = PROCEDURE (ADDRESS);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+PROCEDURE nixbearbeiten (A: ADDRESS);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE Bearbeitungsspektren = PROCEDURE (ADDRESS, ADDRESS, CARDINAL);
+
+PROCEDURE niewasbearbeiten (S, A: ADDRESS; C: CARDINAL);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE bedingteBearbeitungen = PROCEDURE (ADDRESS, BOOLEAN);
+
+PROCEDURE garnixbearbeiten (A: ADDRESS; B: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE Abbildungen = PROCEDURE (ADDRESS, ADDRESS);
+
+TYPE Abbildungsspektren = PROCEDURE (ADDRESS, ADDRESS, ADDRESS, CARDINAL);
+(*
+TYPE PaarBearbeitungen = PROCEDURE (ADDRESS, ADDRESS);
+
+PROCEDURE nix2bearbeiten (A, A1: ADDRESS);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+*)
+TYPE TripelBearbeitungen = PROCEDURE (ADDRESS, ADDRESS, ADDRESS);
+
+PROCEDURE nix3bearbeiten (A, A1, A2: ADDRESS);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+(*
+TYPE bedingtePaarBearbeitungen = PROCEDURE (ADDRESS, ADDRESS, BOOLEAN);
+
+PROCEDURE garnix2bearbeiten (A, A1: ADDRESS; B: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+*)
+TYPE bedingteTripelBearbeitungen = PROCEDURE (ADDRESS, ADDRESS, ADDRESS, BOOLEAN);
+
+PROCEDURE garnix3bearbeiten (A, A1, A2: ADDRESS; B: BOOLEAN);
+(* Vor.: Keine.
+   Eff.: Nichts ist verändert. *)
+
+TYPE Bewertungen = PROCEDURE (ADDRESS): CARDINAL;
+
+PROCEDURE Eins (A: ADDRESS): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert 1. *)
+
+TYPE Bedingungen = PROCEDURE (): BOOLEAN;
+
+TYPE Bedingungsspektren = PROCEDURE (ADDRESS, CARDINAL): BOOLEAN;
+
+PROCEDURE stetswahr (S: ADDRESS; C: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE. *)
+
+PROCEDURE stetsfalsch (S: ADDRESS; C: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert FALSE. *)
+
+TYPE Praedikate = PROCEDURE (ADDRESS): BOOLEAN;
+
+PROCEDURE zutreffend (A: ADDRESS): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE. *)
+
+PROCEDURE unzutreffend (A: ADDRESS): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert FALSE. *)
+
+TYPE Praedikatsspektren = PROCEDURE (ADDRESS, ADDRESS, CARDINAL): BOOLEAN;
+
+PROCEDURE stetszutreffend (S, A: ADDRESS; C: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert TRUE. *)
+
+PROCEDURE stetsunzutreffend (S, A: ADDRESS; C: CARDINAL): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert FALSE. *)
+
+TYPE Relationen = PROCEDURE (ADDRESS, ADDRESS): BOOLEAN;
+
+TYPE Relationenfolgen = PROCEDURE (CARDINAL): Relationen;
+
+TYPE Ausgaben = PROCEDURE (ADDRESS, CARDINAL, CARDINAL);
+(*
+TYPE gefaerbteAusgaben = PROCEDURE (ADDRESS, CARDINAL, CARDINAL, Farben.Objekte, Farben.Objekte);
+*)
+TYPE Ausgaben2 = PROCEDURE (ADDRESS, CARDINAL, CARDINAL, CARDINAL, CARDINAL);
+
+TYPE PaarAusgaben2 = PROCEDURE (ADDRESS, ADDRESS, CARDINAL, CARDINAL, CARDINAL, CARDINAL);
+
+END Prozedurtypen.

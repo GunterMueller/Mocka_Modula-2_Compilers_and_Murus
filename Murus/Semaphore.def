@@ -1,0 +1,38 @@
+DEFINITION MODULE Semaphore;
+
+(* (c) Christian Maurer   v. 12. Dezember 2007 *)
+
+TYPE Objekte;
+(* Ganzzahlige Werte als Zugangsprotokolle zu kritischen Abschnitten
+   zum nebenläufigen Zugriff mehrerer Prozesse auf gemeinsame Daten
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 52 ff., 87).
+
+   Die Prozeduren P und V sind unteilbar, d.h. sie können
+   von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE I (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 
+   Eff.: X ist initialisiert und hat den Wert n. 
+         Kein Prozeß ist auf X blockiert. *)
+
+PROCEDURE T (VAR X: Objekte);
+(* Vor.: X ist initialisiert und hat einen Wert >= 0.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE P (X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: Der aufrufende Prozeß war ggf. solange auf X blockiert, bis der
+         Wert von X > 0 war. Jetzt ist der Wert von X dekrementiert. *)
+
+PROCEDURE V (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Der Wert von X ist inkrementiert. *)
+
+PROCEDURE A (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn der Wert von X im Moment des Aufrufs
+         > 0 ist.
+         Achtung: Der Wert von X kann sich unmittelbar danach bereits wieder
+         verändert haben, weil andere Prozesse P oder V aufgerufen haben ! *)
+
+END Semaphore.

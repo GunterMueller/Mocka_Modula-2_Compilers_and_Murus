@@ -1,0 +1,25 @@
+DEFINITION MODULE Raum;
+
+(* (c) Christian Maurer    v. 19. August 2007 *)
+
+TYPE Richtungen = (vorne, links, oben);
+  (* der Einheitsvektoren eines orthonormierten
+     rechtsorientierten Koordinatensystems im Raum *)
+
+     Koordinaten = ARRAY Richtungen OF LONGREAL;
+     Gitterkoordinaten = ARRAY Richtungen OF INTEGER;
+
+VAR null, e1, e2, e3: Gitterkoordinaten;
+(* Vor.: Die Werte von nn, e1, e2, e3 werden nicht geändert.
+   Eff.: null = (0, 0, 0), e1 = (1, 0, 0), e2 = (0, 1, 0), e3 = (0, 0, 1). *)
+
+PROCEDURE naechsteRichtung (Richtung: Richtungen): Richtungen;
+(* Vor.: Keine.
+   Eff.: Liefert links/oben/vorne für vorne/links/oben. *)
+
+PROCEDURE vorigeRichtung (Richtung: Richtungen): Richtungen;
+(* Vor.: Keine.
+   Eff.: Liefert oben/vorne/links für vorne/links/oben
+         (Vektorprodukt aus Richtung und naechster Richtung). *)
+
+END Raum.

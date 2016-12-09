@@ -1,0 +1,116 @@
+DEFINITION MODULE Wortsammlungen;
+
+(* (c) Christian Maurer   v. 21. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+CONST maxK = 32;
+      maxL = 64;
+TYPE Objekte; (* Alphabetisch geordnete Sammlungen von bis zu maxK Wörtern
+                 der Höchstlänge maxL, wobei keine Wörter mehrfach vorkommen,
+                 sowie auch keine Wörter, die Teile anderer Wörter sind. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N, L: CARDINAL);
+(* Vor.: X ist nicht initialisiert.
+         0 < N <= maxW, 0 < L <= maxL.
+   Eff.: X ist initialisiert und leer.
+         X hat die Kapazität N und die Wörter von X haben die Länge L. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn alle Wörter von X leer sind. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X ist unverändert, X1 umfaßt genau die gleichen Wörter wie X. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 die gleichen Wörter umfassen. *)
+
+PROCEDURE enthalten (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn alle Wörter von X auch
+         als Wörter in X1 oder als Teile von ihnen vorkommen. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* >>>>> experimentelle Version *)
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Noch nicht dokumentiert. *)
+(*
+PROCEDURE Anzahl (X, X1: Objekte): CARDINAL;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert die Anzahl der nichtleeren Wörter,
+         die sowohl in X wie in X1 vorkommen. *)
+*)
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Die Wörter in X haben die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE Hoehe (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Bildschirmzeilen, die zur Aus-/Eingabe
+         der Wörter von X auf dem Bildschirm notwendig sind. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab Zeile Z, Spalte S auf dem Bildschirm
+         in seinen Farben ausgegeben. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht ab Zeile Z, Spalte S im Druckerpuffer. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die von Benutzer/in editierte Sammlung von Wörtern. *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Zeichen, die zur eindeutig
+         umkehrbaren Codierung als Strom notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A als Strom codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Objekt als Strom codiert.
+   Eff.: X ist dieses Objekt. *)
+
+TYPE Multimengen; (* von Wörtern *)
+
+PROCEDURE Initialisieren (VAR M: Multimengen; L: CARDINAL);
+(* Vor.: M ist nicht initialisiert.
+   Eff.: M ist initialisiert und leer.
+         Die Wörter von M haben die Länge L. *)
+
+PROCEDURE Faerben (M: Multimengen; S, H: Farben.Objekte);
+(* Vor.: M ist initialisiert.
+   Eff.: Die Wörter von M haben die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE Einfuegen (M: Multimengen; X: Objekte);
+(* Vor.: M ist initialisiert.
+         Die Wöerter von M und X haben die gleiche Länge.
+   Eff.: Alle Wörter von X sind in M eingefügt. *)
+
+PROCEDURE Entfernen (M: Multimengen; X: Objekte);
+(* Vor.: M ist initialisiert.
+         Die Wörter von M und X haben die gleiche Länge.
+   Eff.: Alle Wörter von X sind aus M entfernt. *)
+
+PROCEDURE alleAusgeben (M: Multimengen; Z: CARDINAL);
+(* Vor.: M ist initialisiert.
+   Eff.: Alle Wörter von M sind auf dem Bildschirm ab Zeile Z ausgegeben. *)
+
+END Wortsammlungen.

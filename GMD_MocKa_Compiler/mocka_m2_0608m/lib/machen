@@ -1,0 +1,26 @@
+# $MOCKA/lib/machen
+#
+# Christian Maurer   v. 11. August 2006
+#
+#!/bin/sh
+
+mkdir -p mockabin
+
+export MOCKAM2=
+export MOCKALINK=
+
+for m in SysLib Exceptions LREAL libc miscc; do
+  $MOCKA/sys/m2 -s $m
+done
+
+$MOCKA/sys/m2 -c SysLib
+
+/usr/bin/as --32 -o mockabin/Exceptions.o Exceptions.s
+
+for m in LREAL libc miscc; do
+  gcc -m32 -c -o mockabin/$m.o $m.c
+done
+
+echo p tst | $MOCKA/sys/m2
+
+mockabin/tst

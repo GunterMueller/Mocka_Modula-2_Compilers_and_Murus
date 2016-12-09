@@ -1,0 +1,91 @@
+DEFINITION MODULE Felder;
+
+(* (c) Christian Maurer   v. 4. Dezember 2006 *)
+
+IMPORT Farben;
+  FROM Tastatur IMPORT Kommandos;
+
+TYPE Objekte; (* Felder zur Ein- und Ausgabe von Zeichenketten. *)
+     Attribute = (numerisch, TRnumerisch, transparent);
+     Attributmengen = SET OF Attribute;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert. 
+   Eff.: X ist initialisiert, hat die Breite 0, die Farben des 
+         Bildschirms und das Standardverhalten beim Editieren. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; B: CARDINAL);
+(* Vor.: X ist initialisiert. B > 0. 
+   Eff.: X hat die Breite B.
+   Bem.: Die Verwendung der Prozedur ist in vielen Fällen wegen der Erweiterung
+         der Prozeduren "ausgeben" und "editieren" überflüssig geworden. *)
+
+PROCEDURE attributieren (X: Objekte; A: Attributmengen);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat alle Atttribute aus A. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; T: ARRAY OF CHAR; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z < Zeilenzahl.
+         S + Breite von X <= Bildschirm.Spaltenzahl,
+         S + Länge von T <= Bildschirm.Spaltenzahl.
+         Breite von X = 0 oder es gilt Länge von T <= Breite von X.
+   Eff.: Wenn Breite von X = 0 war, gilt jetzt Breite von X = Länge von T.
+         T ist ab Position (Zeile, Spalte) = (Z, S) auf dem Bildschirm
+         in den Farben von X ausgegeben. *)
+
+PROCEDURE GraphikAusgeben (X: Objekte; T: ARRAY OF CHAR; x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+         y <= Bildschirm.Graphikzeilenzahl - Bildschirm.Zeilenhoehe.
+         x + Bildschirm.Spaltenbreite * Breite von X < Bildschirm.Spaltenzahl,
+         x + Bildschirm.Spaltenbreite * Länge von T < Bildschirm.Spaltenzahl.
+   Eff.: Wie ausgeben, ab Grapikspalte x, Graphikzeile y statt Zeile Z, Spalte S. *)
+
+PROCEDURE starten (X: Objekte; S: CARDINAL);
+(* >>>>> experimentelle Version *)
+(* Vor.: X ist initialisiert.
+   Eff.: Undokumentiert. *)
+
+PROCEDURE editieren (X: Objekte; VAR T: ARRAY OF CHAR; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z < Bildschirm.Zeilenzahl.
+         S + Breite von X < Bildschirm.Spaltenzahl,
+         S + Länge von T < Bildschirm.Spaltenzahl
+         (weil die Spalte hinter der letzten Position von X zwar aus
+         ergonomischen Gründen mit dem Kursor erreicht werden können muß,
+         eine Eingabe von Zeichen dort aber nicht mehr möglich ist).
+         Breite von X = 0 oder es gilt Länge von T <= Breite von X.
+   Eff.: Wenn Breite von X = 0 war, gilt jetzt Breite von X = Länge von T.
+         T ist die in X ab Position (Zeile, Spalte) = (Z, S) auf dem Bildschirm
+         (in den Farben von X) editierte Zeichenkette.
+         Der Eingabekorrektur dienen die üblichen Tasten:
+         - Rückschritt- und Entfernungstaste zum Löschen von Zeichen,
+           zusammen mit Umschalt- oder Steuerungstaste des ganzen Feldes,
+         - Pfeiltasten links/rechts und Anfangs-/Endetaste zum Bewegen,
+         - Einfügetaste zum Wechsel zwischen Einfügemodus (erkennbar
+           am Unterstrich-Kursor) und Überschreibemodus (Blockkursor).
+           Der Kursor befindet sich zu Beginn am Anfang von X, wenn
+           T leer ist, im Einfüge-, sonst im Überschreibemodus.
+         Der aufrufende Prozeß war solange blockiert, bis die Eingabe
+         mit einem anderen Kommando (siehe Tastatur.def) oder einem
+         der o.a. Kommandos mit Tiefe > 0 abgeschlossen wurde. *)
+
+PROCEDURE GraphikEditieren (X: Objekte; VAR T: ARRAY OF CHAR; x, y: CARDINAL);
+(* Vor.: X ist initialisiert.
+         y <= Bildschirm.Graphikzeilenzahl - Bildschirm.Zeilenhoehe.
+         x + Bildschirm.Spaltenbreite * Breite von X < Bildschirm.Spaltenzahl,
+         x + Bildschirm.Spaltenbreite * Länge von T < Bildschirm.Spaltenzahl.
+   Eff.: Wie editieren, ab Grapikspalte x, Graphikzeile y statt Zeile Z, Spalte S. *)
+
+PROCEDURE editiert (): BOOLEAN;
+(* Vor.: Keine.
+   Eff.: Liefert genau dann FALSE, wenn die Eingabe beim letzten Editieren sofort,
+         d.h. ohne den Text zu verändern, mit einem Kommando verlassen wurde. *)
+
+END Felder.

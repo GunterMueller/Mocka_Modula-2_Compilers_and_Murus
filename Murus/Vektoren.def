@@ -1,0 +1,130 @@
+DEFINITION MODULE Vektoren;
+
+(* (c) Christian Maurer  v. 19. August 2007 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+  FROM Raum IMPORT Richtungen, Koordinaten, Gitterkoordinaten;
+IMPORT Farben;
+
+TYPE Objekte; (* Vektoren im R^3 mit den Koordinaten (vorne, links, oben).
+                 Verwaltet daneben gewisse Datenobjekte (siehe unten). *)
+
+PROCEDURE initialisieren (VAR V: Objekte);
+(* Vor.: V ist nicht initialisiert.
+   Eff.: V ist initialisiert. *)
+
+PROCEDURE terminieren (VAR V: Objekte);
+(* Vor.: V ist initialisiert.
+   Eff.: V ist nicht initialisiert. *)
+
+PROCEDURE definieren (V: Objekte; a: Koordinaten);
+PROCEDURE ganzDefinieren (V: Objekte; a: Gitterkoordinaten);
+(* Vor.: V ist initialisiert.
+   Eff.: V = a. *)
+
+PROCEDURE definieren3 (V: Objekte; a0, a1, a2: LONGREAL);
+PROCEDURE ganzDefinieren3 (V: Objekte; a0, a1, a2: INTEGER);
+(* Vor.: V ist initialisiert.
+   Eff.: V = (a0, a1, a2). *)
+
+PROCEDURE Koordinate (V: Objekte; r: Richtungen): LONGREAL;
+(* Vor.: V ist initialisiert.
+   Eff.: Liefert für die Koordinate von V in Richtung r. *)
+
+PROCEDURE polarDefinieren (V: Objekte; r, a, b: LONGREAL);
+(* Vor.: V ist initialisiert.
+         -180 < a <= 180, -180 < b <= 180.
+   Eff.: V = (r cos a cos b, r sin a cos b, r sin b). *)
+
+PROCEDURE projizieren (V, X, Y, Z: Objekte);
+(* Vor.: V, X, Y und Z sind initialisiert.
+   Eff.: X = (x, 0, 0), Y = (0, y, 0) und Z = (0, 0, z) mit V = (x, y, z),
+         insbesondere V = X + Y + Z. V ist unverändert. *)
+
+PROCEDURE kopieren (V, W: Objekte);
+(* Vor.: V und W sind initialisiert.
+   Eff.: W = V, V ist unverändert. *)
+
+PROCEDURE strecken (V: Objekte; a: LONGREAL);
+(* Vor.: V ist initialisiert.
+   Eff.: V' = a * V. *)
+
+PROCEDURE skalieren (V: Objekte; a: LONGREAL; W: Objekte);
+(* Vor.: V und W sind initialisiert.
+   Eff.: V = a * W. *)
+
+PROCEDURE addieren (S, V, W: Objekte);
+(* Vor.: s, V und W sind initialisiert.
+   Eff.: S = V + W. *)
+
+PROCEDURE inkrementieren (V, W: Objekte);
+(* Vor.: V und W sind initialisiert.
+   Eff.: V' = V + W. *)
+
+PROCEDURE subtrahieren (D, V, W: Objekte);
+(* Vor.: D, V und y sind initialisiert.
+   Eff.: D = V - W. *)
+
+PROCEDURE dekrementieren (V, W: Objekte);
+(* Vor.: V und W sind initialisiert.
+   Eff.: V' = V - W. *)
+
+PROCEDURE parametrisieren (V, W, W1: Objekte; t: LONGREAL);
+(* Vor.: V, W und W1 sind initialisiert.
+   Eff.: V = W + t * (W1 - W). *)
+
+PROCEDURE innen (V, W: Objekte): LONGREAL;
+(* Vor.: V und W sind initialisiert.
+   Eff.: Liefert <V, W>. *)
+
+PROCEDURE kreuzen (V, W, W1: Objekte);
+(* Vor.: V, W und W1 sind initialisiert.
+   Eff.: V = [W, W1]. *)
+
+PROCEDURE Laenge (V: Objekte): LONGREAL;
+(* Vor.: V ist initialisiert.
+   Eff.: Liefert die Länge von V. *)
+
+PROCEDURE Distanz (V, V1: Objekte): LONGREAL;
+(* Vor.: V und V1 sind initialisiert.
+   Eff.: Liefert | V - V1 |. *)
+
+PROCEDURE normieren (V: Objekte);
+(* Vor.: V ist initialisiert.
+         V # (0, 0, 0).
+   Eff.: V'|| V, |V'| = 1. *)
+
+PROCEDURE normiert (V: Objekte): BOOLEAN;
+(* Vor.: V ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn |V| = 1. *)
+
+PROCEDURE rotieren (V, A: Objekte; a: LONGREAL);
+(* Vor.: V und A sind initialisiert. V und A sind nicht kollinear.
+         A ist normiert, d.h. |A| = 1. -180 < a <= 180.
+   Eff.: V ist um die durch A definierte Drehachse um a° gedreht (entgegen
+         der Richtung von A gesehen im mathematisch positiven Sinn). *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen, die zur
+         Codierung eines Vektors als Strom notwendig sind. *)
+
+PROCEDURE codieren (V: Objekte; A: ADDRESS);
+(* Vor.: V ist initialisiert.
+         Ab A ist ein Vektor als Strom codiert.
+   Eff.: V ist dieser Vektor. *)
+
+PROCEDURE decodieren (V: Objekte; A: ADDRESS);
+(* Vor.: V ist initialisiert.
+   Eff.: V ist ab A als Strom codiert. *)
+
+PROCEDURE minimaxen (V, V1, V2: Objekte);
+(* Vor.: V, V1 und V2 sind initialisiert.
+   Eff.: Die Koordinaten von V1 sind das Minimum derjenigen von V und V1 vorher,
+         die Koordinaten von V2 sind das Maximum derjenigen von V und V2 vorher. *)
+
+PROCEDURE ausgeben (V: Objekte; Z, S: CARDINAL);
+(* Vor.: V ist initialisiert.
+   Eff.: Undokumentiert. Nur zu Testzwecken. *)
+
+END Vektoren.

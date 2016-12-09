@@ -1,0 +1,123 @@
+DEFINITION MODULE Verbundobjekte;
+
+(* (c) Christian Maurer   v. 8. Januar 2006
+
+   >>> Die Spezifikation wird im Laufe der nächsten Zeit vervollständigt. *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Relationen, Abbildungen;
+
+TYPE Nummern = SHORTCARD; (* TSIZE (Nummern) = 2 *)
+     Objekte; (* Verbunde aus Grundobjekten.
+                 Zu den Objekten existiert mindestens eine strikte Ordnung,
+                 von denen genau eine immer aktuell ist. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und hat keine Grundobjekte. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist definiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Grundobjekte hat
+         oder wenn alle Grundobjekte von X leer sind. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Alle Grundobjekte von X sind leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind definiert.
+   Eff.: Wenn X und X1 nicht strukturgleich sind, ist nichts verändert.
+         Andernfalls enthält X1 die gleichen Grundobjekte wie X;
+         X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind definiert und strukturgleich.
+   Eff.: Liefert genau dann TRUE,
+         wenn X und X1 keine Grundobjekte haben oder wenn beide definiert und
+         strukturgleich sind und alle Grundobjekte von X und X1 gleich sind. *)
+
+PROCEDURE strukturgleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind definiert und strukturgleich.
+   Eff.: Liefert genau dann TRUE, wenn ... *)
+
+PROCEDURE numerifiziert (X: Objekte): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE,
+         wenn das erste Grundobjekt von X vom Typ Nummern ist. *)
+
+PROCEDURE numerieren (X: Objekte; N: Nummern);
+(* Vor.: X ist definiert und numerifiziert. N < 65536.
+   Eff.: Wenn X numerifiziert ist, hat X die Nummer N,
+         andernfalls ist nichts verändert. *)
+
+PROCEDURE Nummer (X: Objekte): Nummern;
+(* Vor.: X ist definiert.
+   Eff.: Liefert die Nummer von X, wenn X numerifiziert ist,
+         andernfalls 65536. *)
+
+PROCEDURE kleiner (X0, X, X1: Objekte): BOOLEAN;
+(* Vor.: X0, X und X1 sind definiert und strukturgleich.
+   Eff.: Liefert genau dann TRUE, wenn X
+         bzgl. der aktuellen Ordnung auf X0 kleiner als X1 ist. *)
+
+PROCEDURE Akleiner (X0: Objekte): Relationen;
+(* Vor.: X0 ist definiert.
+   Eff.: Liefert die Kleiner-Relation auf Paaren von als Strömen codierte Objekte,
+         deren Struktur und aktuelle Ordnung durch X0 definiert ist. *) 
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind definiert und strukturgleich.
+   Eff.: Liefert genau dann TRUE, wenn ... *)
+
+PROCEDURE umordnen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: ... *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind klein genug.
+   Eff.: X ist ab der Position (Z, S) auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X steht ab der Seitenposition (Z, S) im Druckerpuffer. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind klein genug.
+   Eff.: X ist das an der Bildschirmposition (Z, S) editierte Objekt. *)
+
+PROCEDURE StrukturEditieren (X: Objekte; e: BOOLEAN; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: ... *)
+
+PROCEDURE Codelaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Anzahl der Zeichen, die zur eindeutig
+         umkehrbaren Codierung von X als Strom notwendig sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist umkehrbar eindeutig als Strom ab A codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+         Ab A ist ein Objekt als Strom codiert.
+   Eff.: X ist dieses Objekt. *)
+
+PROCEDURE Indexlaenge (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert die Länge des Indexstroms von X. *)
+
+PROCEDURE IndexCodieren (X0: Objekte): Abbildungen;
+(* Vor.: X0 ist definiert.
+   Eff.: ... *)
+
+END Verbundobjekte.

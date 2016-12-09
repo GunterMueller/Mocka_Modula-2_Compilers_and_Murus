@@ -1,0 +1,38 @@
+DEFINITION MODULE Bilder;
+
+(* (c) Christian Maurer   v. 15. April 2006 *)
+(* >>> experimentelle Version *)
+
+TYPE Formate = (P6); (* Suffix = "ppm" *)
+
+(* Eff.: Das aktuelle Format ist P6, siehe
+         /usr/share/doc/packages/netpbm/doc/*.html *)
+
+PROCEDURE schreiben (N: ARRAY OF CHAR; x, y, b, h: CARDINAL);
+(* Vor.: Der Bildschirm ist graphikfähig.
+   Eff.: Die Pixel des Rechtecks zwischen (x, y) und (x + b, y + h) sind
+         als Bild im aktuellen Format in der Datei N.<Suffix> gespeichert. *)
+
+PROCEDURE GroesseLesen (N: ARRAY OF CHAR; VAR B, H: CARDINAL);
+(* Vor.: Der Bildschirm ist graphikfähig.
+         In der Datei namens N.ppm ist ein Bild im PPM-Format P6 gespeichert.
+   Eff.: B bzw. H ist die Pixelbreite bzw. -höhe des in der Datei N.<Suffix>
+         abgelegten Bildes. *)
+
+PROCEDURE lesen (N: ARRAY OF CHAR; x, y: CARDINAL);
+(* Vor.: Der Bildschirm ist graphikfähig.
+         In der Datei namens N.ppm ist ein Bild im PPM-Format P6 gespeichert.
+   Eff.: Das im aktuellen Format in der Datei namens N.<Suffix> abgelegte Bild
+         ist im Rechteck zwischen (x, y) und (x + b - 1, y + h - 1) ausgegeben,
+         wobei b bzw. h die Pixelbreite bzw. -höhe des Bildes sind. *)
+
+PROCEDURE drucken;
+(* Vor.: Der Bildschirm ist graphikfähig.
+   Eff.: Der Bildschirminhalt ist als Bild im aktuellen Format ausgedruckt. *)
+
+PROCEDURE TeilDrucken (x, y, b, h: CARDINAL);
+(* Vor.: Der Bildschirm ist graphikfähig.
+   Eff.: Die Pixel des Rechtecks zwischen (x, y) und (x + b, y + h) sind
+         als Bild im aktuellen Format ausgedruckt. *)
+
+END Bilder.

@@ -1,0 +1,27 @@
+DEFINITION MODULE Religionen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte);
+PROCEDURE terminieren (VAR X: Objekte);
+PROCEDURE leer (X: Objekte): BOOLEAN;
+PROCEDURE leeren (X: Objekte);
+PROCEDURE kopieren (X, R1: Objekte);
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+PROCEDURE faerben ( (* X: Objekte; *) S, H: Farben.Objekte);
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+PROCEDURE Codelaenge (): CARDINAL;
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Religionen.

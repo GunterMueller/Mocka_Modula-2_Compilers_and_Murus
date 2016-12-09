@@ -1,0 +1,25 @@
+DEFINITION MODULE Lehrermenge;
+
+(* (c) Christian Maurer   v. 24. Mai 2005 *)
+
+IMPORT Lehrerinnen;
+
+(* Verwaltet eine Menge von Lehrer(inne)n mit Nummern zwischen 1 und 65535.
+   Zu einer Nummer gehört höchstens ein/e Lehrer/in. *)
+
+PROCEDURE auswaehlen (X: Lehrerinnen.Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist leer oder aus der Menge der Lehrerinnen
+         am Bildschirm ab Zeile Z ausgewählt. *)
+
+PROCEDURE finden (X: Lehrerinnen.Objekte; N: Lehrerinnen.Nummern);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn es in der Menge eine/n Lehrer/in mit der Nummer N gibt,
+         ist X diese/r Lehrer/in, sonst ist X leer. *)
+
+PROCEDURE verwalten;
+(* Vor.: Keine.
+   Eff.: Die Menge umfaßt diejenigen Lehrerinnen und Lehrer,
+         die von der/dem Benutzer/in erfaßt und verwaltet sind. *)
+
+END Lehrermenge.

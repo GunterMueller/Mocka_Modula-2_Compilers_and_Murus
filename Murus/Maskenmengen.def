@@ -1,0 +1,47 @@
+DEFINITION MODULE Maskenmengen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+TYPE Objekte; (* Persistente Mengen von konstanten Texten
+                 mit bestimmten Positionen auf dem Bildschirm,
+                 nach diesen Positionen geordnet. *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist die durch N definierte Maskenmenge. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn X keine Texte enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist leer. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist definiert.
+   Eff.: X ist auf dem Bildschirm ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist definiert.
+   Eff.: X ist das editierte Objekt. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist definiert.
+   Eff.: X steht im Druckerpuffer. *)
+
+PROCEDURE Spalte (X: Objekte; Z: CARDINAL): CARDINAL;
+(* Vor.: X ist definiert. Z < Bildschirm.Zeilenzahl.
+   Eff.: Liefert die kleinste nicht durch einen Text aus X belegte Spalte
+         in Zeile Z (liefert daher genau dann Bildschirm.Zeilenzahl,
+         wenn alle Spalten in Zeile Z durch Texte aus X belegt sind). *)
+
+END Maskenmengen.

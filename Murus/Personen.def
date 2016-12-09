@@ -1,0 +1,126 @@
+DEFINITION MODULE Personen;
+
+(* (c) Christian Maurer   v. 8. Januar 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE
+  Objekte;
+  Formate = (          (* ohne Maske:            1 Zeile,             *)
+             ganzKurz, (* Name, Vorname            maximal 35 Spalten *)
+             kurz,     (* Name, Vorname                    42 Spalten *)
+             kurzG,    (* Name, Vorname (GebDat)           53 Spalten *)
+          (* kurzA,    (* Anrede, Name, Vorname                       *) *)
+          (* kurzGA,   (* Anrede, Name, Vorname (GebDat)              *) *)
+                       (* mit Maske:                                  *)
+             lang,     (* Name, Vorname, m/w     1 Zeile,  64 Spalten *)
+             langG,    (* lang, GebDat           1 Zeile,  80 Spalten *)
+             langA,    (* lang, Anrede           2 Zeilen, 64 Spalten *)
+             langGA);  (* lang, GebDat, Anrede   2 Zeilen, 80 Spalten *)
+
+PROCEDURE initialisieren (VAR X: Objekte);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert und leer, hat die Farben des Bildschirms 
+         und das Format langG. *)
+   
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn Name und Vorname von X 
+         leer sind. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Sämtliche Komponenten von X sind leer. *)
+
+PROCEDURE identifizierbar (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn weder Name, noch 
+         Vorname, noch Geburtsdatum von X leer sind. *)
+
+PROCEDURE volljaehrig (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn das Geburtsdatum von X  
+         nicht leer ist und mindestens 18 Jahre vor dem Zeitpunkt 
+         des Aufrufs liegt. *) 
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: X1 stimmt mit X überein; X ist unverändert. *)
+
+PROCEDURE IdVertexten (X: Objekte; VAR I: ARRAY OF CHAR);
+
+PROCEDURE NachnameKopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Der Nachname von X1 stimmt mit dem von X überein; 
+         X ist unverändert. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 in sämtlichen 
+         Komponenten übereinstimmen. *)
+
+PROCEDURE aequivalent (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 den gleichen Namen 
+         und Vornamen und das gleiche Geburtsdatum haben. *)
+
+PROCEDURE gleichalt (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X und X1 leer sind oder wenn
+         X und X1 nicht leer sind und das gleiche Geburtsdatum haben. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist 
+         oder wenn X und X1 nicht leer sind und X alphabetisch vor 
+         X1 kommt; bei Namensgleichheit, wenn X jünger ist als X1. *)
+
+PROCEDURE juenger (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist 
+         oder wenn X und X1 nicht leer sind und das Geburtsdatum von X
+         vor dem von X1 liegt. *)
+
+PROCEDURE istTeil (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn alle Angaben zu X 
+         Teile der entsprechenden Angaben von X1 sind. *)
+
+PROCEDURE formatieren (X: Objekte; F: Formate);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat das Format F. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X hat die Schriftfarbe S und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab (Z, S) auf dem Bildschirm in ihrem Format 
+         und ihren Farben ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert und hat nicht das Format ganzKurz. 
+   Eff.: X ist die Person, die ab (Z, S) auf dem Bildschirm 
+         editiert worden ist. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+
+PROCEDURE Codelaenge (): CARDINAL;
+
+PROCEDURE Schluessellaenge (): CARDINAL;
+(* Eff.: Liefert die Länge des Anfangsstücks einer codierten Person,
+         in der Name, Vorname und Geb.-Dat. enthalten sind. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+
+END Personen.

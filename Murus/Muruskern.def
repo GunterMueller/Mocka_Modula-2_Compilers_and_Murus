@@ -1,0 +1,290 @@
+FOREIGN MODULE Muruskern;
+
+(* (c) Christian Maurer   v. 5. Mai 2008 *)
+
+(* >>> Nur zur Implementierung systemabhängiger Teile von Murus;
+       soll weiter oben nicht verwendet werden ! *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Anweisungen, Bearbeitungen;
+
+PROCEDURE stop (M: ARRAY OF CHAR; n: CARDINAL);
+(* Eff.: Das Programm ist mit der Meldung "Wegen Fehler n im Modul M" abgebrochen. *)
+
+PROCEDURE stop2 (F, M: ARRAY OF CHAR);
+(* Eff.: Das Programm ist mit der Meldung "Weil F im Modul M" abgebrochen. *)
+
+PROCEDURE stopE (M: ARRAY OF CHAR; n: CARDINAL);
+(* Eff.: Das Programm ist mit der Meldung "Wegen Fehler n im Modul M mit error E"
+         abgebrochen, wobei E der C-Bezeichner von errno ist. *)
+
+PROCEDURE melden (T: ARRAY OF CHAR; i: INTEGER);
+(* Eff.: T und n sind auf dem Bildschirm ausgegeben. *)
+
+(* asm-generic/errno-base.h, asm-generic/errno.h *)
+CONST EPERM = 1; ENOENT = 2; ESRCH = 3; EINTR = 4;
+      EIO = 5; ENXIO = 6; E2BIG = 7; ENOEXEC = 8; EBADF = 9;
+      ECHILD = 10; EAGAIN = 11; ENOMEM = 12; EACCES = 13; EFAULT = 14;
+      ENOTBLK = 15; EBUSY = 16; EEXIST = 17; EXDEV = 18; ENODEV = 19;
+      ENOTDIR = 20; EISDIR = 21; EINVAL = 22; ENFILE = 23; EMFILE = 24;
+      ENOTTY = 25; ETXTBSY = 26; EFBIG = 27; ENOSPC = 28; ESPIPE = 29;
+      EROFS = 30; EMLINK = 31; EPIPE = 32; EDOM = 33; ERANGE = 34;
+      EDEADLK = 35; ENAMETOOLONG = 36; ENOLCK = 37; ENOSYS = 38; ENOTEMPTY = 39;
+      EADDRINUSE = 98; EADDRNOTAVAIL = 99;
+      ENETDOWN = 100; ENETUNREACH = 101; ENETRESET = 102; ECONNABORTED = 103; ECONNRESET = 104;
+      ENOBUFS = 105; EISCONN = 106; ENOTCONN = 107; ESHUTDOWN = 108; ETOOMANYREFS = 109;
+      ETIMEDOUT = 110; ECONNREFUSED = 111; EHOSTDOWN = 112; EHOSTUNREACH = 113; EALREADY = 114;
+      EINPROGRESS = 115;
+      EREMOTEIO = 121; ECANCELED = 125;
+ 
+PROCEDURE Fehlernummer (): CARDINAL;
+
+(* linux/vt.h *)
+PROCEDURE aktuelleKonsole (): CARDINAL;
+PROCEDURE Konsole1 (w: BOOLEAN);
+PROCEDURE Konsole (n: CARDINAL);
+PROCEDURE KonsolenschaltungInitialisieren;
+PROCEDURE KonsoleAktivieren;
+PROCEDURE KonsoleDeaktivieren;
+
+(* linux/fb.h *)
+PROCEDURE Framebuffer (VAR x, y, b, vt: CARDINAL): ADDRESS;
+
+(* linux/limits.h *)
+CONST PATH_MAX = 4096; (* einschließlich 0C *)
+      NAME_MAX =  255;
+
+(* strings.h *)
+PROCEDURE memcpy (dest, src: ADDRESS; n: CARDINAL);
+PROCEDURE memmove (dest, src: ADDRESS; n: CARDINAL) (* : ADDRESS) *);
+PROCEDURE memcmp (a, a1: ADDRESS; n: CARDINAL): CARDINAL;
+PROCEDURE memset (a: ADDRESS; c: CARDINAL; n: CARDINAL) (* : ADDRESS) *);
+
+(* bits/termios.h *)
+CONST ISIG = 1; ECHO = 2; ICANON = 8; VTIME = 5; VMIN = 6;
+      TCSANOW = 0; TCSADRAIN = 1; TCSAFLUSH = 2;
+TYPE termios = RECORD i, o, c, l: INTEGER; line: CHAR;
+                      cc: ARRAY [0..31] OF CHAR; is, os: INTEGER END;
+(* termios.h *)
+PROCEDURE tcgetattr (f: INTEGER; t: ADDRESS);
+PROCEDURE tcsetattr (f, o: INTEGER; t: ADDRESS);
+
+(* linux/kd.h *)
+CONST KDGKBTYPE = 4B33H;
+      KD_TEXT = 0; KD_GRAPHICS = 1;
+      KDSETMODE = 4B3AH; KDGETMODE = 4B3BH;
+      K_RAW = 0; K_XLATE = 1; K_MEDIUMRAW = 2;
+      KDGKBMODE = 4B44H; KDSKBMODE = 4B45H;
+
+(* ioctl.h *)
+PROCEDURE ioctl (fd: INTEGER; n: CARDINAL; A: ADDRESS): INTEGER;
+PROCEDURE ioctl2 (fd: INTEGER; n: CARDINAL): INTEGER;
+
+(* stdio.h *)
+PROCEDURE getchar (): INTEGER;
+PROCEDURE fopen (name, mode: ADDRESS): ADDRESS;
+PROCEDURE fdopen (name: ADDRESS; fd: CARDINAL; mode: ADDRESS): ADDRESS;
+PROCEDURE fclose (name: ADDRESS): INTEGER;
+PROCEDURE rename (name, name1: ADDRESS): INTEGER;
+PROCEDURE remove (name: ADDRESS): INTEGER;
+PROCEDURE fseek (file: ADDRESS; offset, from: INTEGER): INTEGER;
+PROCEDURE ftell (file: ADDRESS): CARDINAL;
+PROCEDURE fread (buf: ADDRESS; size, n: CARDINAL; file: ADDRESS): CARDINAL;
+PROCEDURE fwrite (buf: ADDRESS; size, n: CARDINAL; file: ADDRESS): CARDINAL;
+PROCEDURE fflush (file: ADDRESS): INTEGER;
+
+(* sys/select.h *)
+PROCEDURE select (n: INTEGER; R, W, X, T: ADDRESS): INTEGER;
+PROCEDURE zero (M: ADDRESS);
+PROCEDURE set (M: ADDRESS; i: INTEGER);
+PROCEDURE clr (M: ADDRESS; i: INTEGER);
+PROCEDURE isset (M: ADDRESS; i: INTEGER): INTEGER;
+
+(* stdlib.h *)
+PROCEDURE malloc (n: CARDINAL): ADDRESS;
+PROCEDURE free (A: ADDRESS);
+PROCEDURE exit (s: CARDINAL);
+PROCEDURE abort;
+PROCEDURE TerminierungInstallieren (p: Anweisungen);
+PROCEDURE system (K: ARRAY OF CHAR): INTEGER;
+PROCEDURE getenv (V: ADDRESS): ADDRESS;
+PROCEDURE setenv (V, W: ADDRESS; O: INTEGER): INTEGER;
+
+(* bits/stat.h *)
+TYPE Zustaende = RECORD (* TSIZE = sizeof = 88 *)
+                   device: ARRAY [0..1] OF CARDINAL;
+                   pad1: CARDINAL; (* eigentl. SHORTCARD, aber aligned *)
+                   inode,
+                   Modus, nlink,
+                   Besitzer, Gruppe: CARDINAL;
+                   rdev: ARRAY [0..1] OF CARDINAL;
+                   pad2: CARDINAL; (* eigentl. SHORTCARD, aber aligned *)
+                   Byteanzahl, 
+                   Blockgroesse, Anzahl512Bloecke,
+                   atime, atimensec,
+                   mtime, mtimensec,
+                   ctime, ctimensec,
+                   u4, u5: CARDINAL
+                 END;
+
+(* sys/stat.h *)
+(*
+PROCEDURE stat (file, status: ADDRESS): INTEGER;
+*)
+PROCEDURE stat (file: ADDRESS; VAR Status: Zustaende): INTEGER;
+PROCEDURE chmod (file: ADDRESS; Modus: CARDINAL): INTEGER;
+PROCEDURE mkfifo (name: ADDRESS; Modus: CARDINAL): INTEGER;
+PROCEDURE mkdir (pfad: ADDRESS; Modus: CARDINAL): INTEGER;
+
+(* bits/fnctl.h *)
+CONST O_RDONLY = 0; O_WRONLY = 1; O_RDWR = 2;
+      O_CREAT = 8 * 8; O_EXCL = 2 * O_CREAT;
+      O_TRUNC = 8 * 8 * 8; O_APPEND = 2 * O_TRUNC; O_NONBLOCK = 4 * O_TRUNC;
+
+(* unistd.h *)
+PROCEDURE getlogin (): ADDRESS;
+PROCEDURE gethostname (VAR N: ARRAY OF CHAR; l: CARDINAL): INTEGER;
+PROCEDURE sleep (s: CARDINAL);
+PROCEDURE mleep (s: CARDINAL); (* Millisekunden *)
+PROCEDURE usleep (s: CARDINAL);
+PROCEDURE getpid (): CARDINAL;
+PROCEDURE getuid (): CARDINAL;
+PROCEDURE setuid (i: CARDINAL): INTEGER;
+PROCEDURE access (N: ADDRESS; mode: CARDINAL): INTEGER;
+PROCEDURE open (N: ADDRESS; mode: CARDINAL): INTEGER;
+PROCEDURE write (fd: INTEGER; buf: ADDRESS; n: CARDINAL): INTEGER;
+PROCEDURE read (fd: INTEGER; buf: ADDRESS; n: CARDINAL): INTEGER;
+PROCEDURE close (fd: INTEGER): INTEGER;
+PROCEDURE unlink (N: ADDRESS): INTEGER;
+PROCEDURE getcwd (p: ADDRESS; n: CARDINAL): ADDRESS;
+PROCEDURE chdir (p: ADDRESS): INTEGER;
+PROCEDURE rmdir (p: ADDRESS): INTEGER;
+TYPE Pipes = ARRAY [0..1] OF INTEGER;
+PROCEDURE pipe (VAR P: Pipes): INTEGER;
+
+(* dirent.h *)
+PROCEDURE opendir (N: ADDRESS): ADDRESS;
+PROCEDURE readdir (D: ADDRESS): ADDRESS;
+PROCEDURE seekdir (D: ADDRESS; P: INTEGER);
+PROCEDURE telldir (D: ADDRESS): INTEGER;
+PROCEDURE rewinddir (D: ADDRESS);
+PROCEDURE closedir (D: ADDRESS): INTEGER;
+
+(* pwd.h *)
+PROCEDURE getpwuid (uid: CARDINAL): ADDRESS;
+
+(* time.h, times.h *)
+PROCEDURE time (c: ADDRESS): CARDINAL;
+PROCEDURE localtime (t: ADDRESS): ADDRESS;
+PROCEDURE relativetime (VAR s, us: CARDINAL): INTEGER;
+PROCEDURE usertime (): CARDINAL;
+
+(* linux/input.h *)
+TYPE Inputs = RECORD
+                sec, usec: CARDINAL;
+                Typ, Code: SHORTCARD;
+                Wert: INTEGER
+              END;
+
+(* crypt.h *)
+PROCEDURE setkey (C: ADDRESS);
+PROCEDURE encrypt (B: ADDRESS; c: CARDINAL);
+
+(* signal.h, bits/signum.h *)
+TYPE Signale = (keinSignal, SIGHUP, SIGINT, SIGQUIT, SIGILL,
+                SIGTRAP, SIGABRT, SIGBUS, SIGFPE, SIGKILL,
+                SIGUSR1, SIGSEGV, SIGUSR2, SIGPIPE, SIGALRM,
+                SIGTERM, SIGSTKFLT, SIGCHLD, SIGCONT, SIGSTOP,
+                SIGTSTP, SIGTTIN, SIGTTOU, SIGURG, SIGXCPU,
+                SIGXFSZ, SIGVTALRM, SIGPROF, SIGWINCH, SIGIO,
+                SIGPWR, SIGSYS);
+TYPE Signalmengen = ARRAY [0..127] OF CHAR; (* sigset_t hat size 128 ! *)
+CONST Signal1 = SIGUSR1; Signal2 = SIGUSR2;
+TYPE Signalbearbeitungen = PROCEDURE (Signale);
+PROCEDURE SignalSetzen (S: Signale; B: Signalbearbeitungen);
+PROCEDURE signalisieren (S: Signale);
+PROCEDURE SignaltextAusgeben (S: Signale);
+
+PROCEDURE Signale12setzen (VAR M: Signalmengen);
+PROCEDURE sigpending (VAR M: Signalmengen): INTEGER;
+PROCEDURE SignalEnthalten (S: Signale; VAR M: Signalmengen): BOOLEAN;
+(*
+PROCEDURE Signale12setzen (A: ADDRESS);
+PROCEDURE sigpending (A: ADDRESS): INTEGER;
+PROCEDURE SignalEnthalten (S: Signale; A: ADDRESS): BOOLEAN;
+PROCEDURE pselect (n: INTEGER; R, W, X, T: ADDRESS; VAR M: Signalmengen): INTEGER;
+*)
+PROCEDURE alarm (t: CARDINAL);
+
+(* pthread.h, bits/pthreadtypes.h *)
+TYPE Threads = CARDINAL;
+     ReturnValues = POINTER TO INTEGER;
+PROCEDURE pthread_create (VAR T: Threads; n: INTEGER;
+                          b: Bearbeitungen; x: ADDRESS): INTEGER;
+PROCEDURE pthread_exit (VAR R: INTEGER);
+PROCEDURE pthread_join (T: Threads; VAR R: ReturnValues): INTEGER;
+PROCEDURE pthread_self (): Threads;
+PROCEDURE pthread_elf (): Threads;
+PROCEDURE pthread_equal (T, T1: Threads): INTEGER;
+
+CONST spinlock_size = 4;
+PROCEDURE pthread_spin_init (S: ADDRESS; n: CARDINAL): INTEGER;
+PROCEDURE pthread_spin_destroy (S: ADDRESS): INTEGER;
+PROCEDURE pthread_spin_lock (S: ADDRESS): INTEGER;
+PROCEDURE pthread_spin_unlock (S: ADDRESS): INTEGER;
+
+CONST mutex_size = 24;
+      mutex_attr_size = 4;
+      cond_size = 48;
+PROCEDURE pthread_mutex_init (m: ADDRESS; A: ADDRESS): INTEGER;
+PROCEDURE pthread_mutex_destroy (m: ADDRESS): INTEGER;
+PROCEDURE pthread_mutex_lock (m: ADDRESS): INTEGER;
+PROCEDURE pthread_mutex_unlock (m: ADDRESS): INTEGER;
+PROCEDURE pthread_cond_init (c: ADDRESS; A: ADDRESS): INTEGER;
+PROCEDURE pthread_cond_destroy (c: ADDRESS): INTEGER;
+PROCEDURE pthread_cond_wait (c, m: ADDRESS): INTEGER;
+PROCEDURE pthread_cond_signal (c: ADDRESS): INTEGER;
+PROCEDURE pthread_cond_broadcast (c: ADDRESS): INTEGER;
+
+(* semaphore.h, bits/sem.h *)
+(* PROCEDURE sem_size (): CARDINAL; *)
+CONST sem_size = 16;
+PROCEDURE sem_init (s: ADDRESS; i: INTEGER; n: CARDINAL): INTEGER;
+PROCEDURE sem_destroy (s: ADDRESS): INTEGER;
+PROCEDURE sem_wait (s: ADDRESS);
+PROCEDURE sem_post (s: ADDRESS): INTEGER;
+PROCEDURE sem_getvalue (s: ADDRESS; VAR n: INTEGER);
+
+(* netdb.h *)
+PROCEDURE gethostbyaddr (n: ADDRESS): ADDRESS;
+PROCEDURE gethostbyname (n: ADDRESS): ADDRESS;
+
+(* arpa/inet.h *)
+PROCEDURE inet_ntoa (a: CARDINAL): ADDRESS;
+
+(* netinet/in.h *)
+PROCEDURE ntohl (n: CARDINAL): CARDINAL;
+PROCEDURE ntohs (n: SHORTCARD): SHORTCARD;
+PROCEDURE htons (h: SHORTCARD): SHORTCARD;
+PROCEDURE htonl (h: CARDINAL): CARDINAL;
+
+(* /etc/services *)
+CONST MinPort = 54321; (* >= 49152 ! *)
+
+(* sys/socket *)
+PROCEDURE socket (domain, type, protocol: INTEGER): INTEGER;
+PROCEDURE setsockopt (s, l, opt: INTEGER; VAR i: INTEGER; n: CARDINAL);
+PROCEDURE bind (s: INTEGER; a: ADDRESS; len: CARDINAL): INTEGER;
+PROCEDURE listen (s, backlog: INTEGER): INTEGER;
+PROCEDURE accept (s: INTEGER; a: ADDRESS; VAR len: CARDINAL): INTEGER;
+PROCEDURE connect (s: INTEGER; a: ADDRESS; len: CARDINAL): INTEGER;
+TYPE Shuts = (SHUT_RD, SHUT_WR, SHUT_RDWR);
+PROCEDURE shutdown (s: INTEGER; S: Shuts): INTEGER;
+PROCEDURE recv (s: INTEGER; P: ADDRESS; n: INTEGER; flags: INTEGER): INTEGER;
+PROCEDURE send (s: INTEGER; Puff: ADDRESS; n: INTEGER; flags: INTEGER): INTEGER;
+PROCEDURE recvfrom (s: INTEGER; P: ADDRESS; n: INTEGER; flags: INTEGER; 
+                    a: ADDRESS; VAR l: CARDINAL): INTEGER;
+PROCEDURE sendto (s: INTEGER; P: ADDRESS; n: INTEGER; flags: INTEGER; 
+                  a: ADDRESS; l: CARDINAL): INTEGER;
+
+END Muruskern.

@@ -1,0 +1,54 @@
+DEFINITION MODULE Balkenanzeigen; 
+
+(* (c) Christian Maurer   v. 7. August 2007 *)
+
+IMPORT Farben;
+
+TYPE Objekte;
+
+PROCEDURE initialisieren (VAR X: Objekte; w: BOOLEAN);
+(* Vor.: X ist nicht initialisiert.
+   Eff.: X ist initialisiert.
+         X hat für w = TRUE horizontale Füllrichtung, sonst senkrechte.
+         X hat die Kapazität 100 und den Füllungsgrad 0. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE definieren (X: Objekte; k: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Kapazitaet k und den Füllungsgrad 0. *)
+
+PROCEDURE positionieren (X: Objekte; x, y, b, h: CARDINAL);
+(* Vor.: X ist initialisiert.
+         x + b <= Bildschirm.Spaltenzahl, y + h <= Bildschirm.Zeilenzahl.
+   Eff.: X hat die linke obere Ecke (x, y), die Breite b und die Höhe h. *)
+
+PROCEDURE fuellen (X: Objekte; i: CARDINAL);
+(* Vor.: X ist initialisiert.
+         i <= Kapazitaet von X.
+   Eff.: X hat den Füllungsgrad i, d.h. X ist zu i/k % gefüllt
+         (k = Kapazität von X). *)
+
+PROCEDURE Fuellungsgrad (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert den Füllungsgrad von i. *)
+
+PROCEDURE faerben (X: Objekte; V, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Vordergrundfarbe V und die Hintergrundfarbe H. *)
+
+PROCEDURE ausgeben (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist als Rechteck mit seiner linken oberen Ecke und seiner Breite
+         und Höhe auf dem Bildschirm ausgegeben; der dem Füllungsgrad von X
+         entsprechende Bruchteil der Kapazität von X (bei waagerechter
+         Füllrichtung der linke, sonst der untere Teil des Rechtecks)
+         in der Vordergrundfarbe, der Rest in der Hintergrundfarbe von X. *)
+
+PROCEDURE editieren (X: Objekte; VAR i: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Geheim. *)
+
+END Balkenanzeigen.

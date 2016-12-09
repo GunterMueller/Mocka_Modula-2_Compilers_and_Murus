@@ -1,0 +1,166 @@
+DEFINITION MODULE BNatZahlen;
+
+(* (c) Christian Maurer   v. 28. August 2006 *)
+
+  FROM SYSTEM IMPORT ADDRESS;
+IMPORT Farben;
+
+TYPE Objekte; (* Natürliche Zahlen mit höchstens 9 Stellen,
+                 angereichert um eine undefinierte Zahl ohne Wert. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL);
+(* Vor.: X ist nicht initialisiert. 0 < n <= 9.
+   Eff.: X ist initialisiert und leer und hat die Stelligkeit n. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X keinen Wert hat. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist initialisiert. 
+   Eff.: X ist leer. *)
+
+PROCEDURE kopieren (X, X1: Objekte);
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Wenn X leer ist, ist X1 auch leer. Andernfalls gilt: 
+         Wenn X im Rahmen der Stelligkeit von X1 liegt, 
+         hat X1 den Wert von X, sonst ist X1 leer. *)
+
+PROCEDURE gleich (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert. 
+   Eff.: Liefert genau dann TRUE, wenn X und X1 leer sind 
+         oder wenn die Werte von X und X1 gleich sind. *)
+
+PROCEDURE kleiner (X, X1: Objekte): BOOLEAN;
+(* Vor.: X und X1 sind initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn X leer und X1 nicht leer ist 
+         oder wenn beide nicht leer sind und 
+         der Wert von X kleiner als der von X1 ist. *)
+
+PROCEDURE definieren (X: Objekte; N: CARDINAL);
+(* Vor.: X ist initialisiert. 
+   Eff.: Wenn N < 10^(Stelligkeit von X), hat X den Wert N, 
+         sonst ist X leer. *)
+
+PROCEDURE Wert (X: Objekte): CARDINAL;
+(* Vor.: X ist initialisiert. 
+   Eff.: Liefert 10^9, wenn X leer ist, sonst den Wert von X. *)
+
+PROCEDURE inkrementieren (X: Objekte; N: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Wenn der Wert von X um N erhöht kleiner als 10^Stelligkeit ist, 
+         hat X diesen neuen Wert, sonst ist X leer. *)
+
+PROCEDURE dekrementieren (X: Objekte; N: CARDINAL);
+(* Vor.: X ist initialisiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Wenn der Wert von X um N vermindert größer oder gleich 0 ist,
+         hat X diesen neuen Wert, sonst ist X leer. *)
+
+PROCEDURE faerben (X: Objekte; S, H: Farben.Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X hat die Farben S und H für Schrift und Hintergrund. *)
+
+PROCEDURE definiert (X: Objekte; T: ARRAY OF CHAR): BOOLEAN;
+(* Vor.: X ist initialisiert.
+   Eff.: Liefert genau dann TRUE, wenn T eine Zahl im Rahmen der 
+         Stelligkeit von X definiert. 
+         In diesem Fall hat X diesen Wert, sonst ist X leer. *)
+
+PROCEDURE vertexten (X: Objekte; VAR T: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert. T umfaßt eine der Stelligkeit von X 
+         entsprechende Anzahl von Zeichen.
+   Eff.: Ist X leer, besteht T nur aus Leerzeichen; 
+         andernfalls ist T die Ziffernfolge des Wertes von Z. *)
+
+PROCEDURE ausgeben (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z < Bildschirm.Zeilenzahl,
+         S + Stelligkeit von X < Bildschirm.Spaltenzahl. 
+   Eff.: X ist ab Position (Z, S) in der Farbe von X auf dem Bildschirm 
+         ausgegeben. Ist X leer, sind nur Leerzeichen ausgegeben. *)
+
+PROCEDURE editieren (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z < Bildschirm.Zeilenzahl,
+         S + Stelligkeit von X < Bildschirm.Spaltenzahl. 
+   Eff.: X hat den per Tastatur ab Position (Z, S) auf dem Bildschirm
+         eingegebenen Wert. Sind nur Leerzeichen eingegeben, ist X leer. *)
+
+PROCEDURE setzen (X: Objekte; F: CARDINAL);
+(* Vor: X ist initialisiert. F ist ein definierter Font.
+   Eff: X hat den Font F. *)
+
+PROCEDURE drucken (X: Objekte; Z, S: CARDINAL);
+(* Vor.: X ist initialisiert. Z und S sind klein genug.
+   Eff.: X ab der Seitenposition (Z, S) im Druckerpuffer. *)
+
+PROCEDURE Codelaenge (): CARDINAL;
+(* Vor.: Keine.
+   Eff.: Liefert die Anzahl der Zeichen, die zur eindeutig umkehrbaren
+         Codierung einer Zahl als als Strom notwendig ist.
+         Diese Anzahl ist für alle Zahlen gleich groß. *)
+
+PROCEDURE codieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist ab A eindeutig umkehrbar als Strom codiert. *)
+
+PROCEDURE decodieren (X: Objekte; A: ADDRESS);
+(* Vor.: X ist initialisiert. Ab A steht eine Zahl als Strom codiert.
+   Eff.: X ist diese Zahl. *)
+
+PROCEDURE addieren (X, X1, S: Objekte);
+(* Vor.: X, X1 und S sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist S leer. Andernfalls gilt: 
+         Wenn der Wert von X + X1 im Rahmen der Stelligkeit von S liegt,
+         hat S diesen Wert, sonst ist S leer. *)
+
+PROCEDURE subtrahieren (X, X1, D: Objekte);
+(* Vor.: X, X1 und D sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist D leer. Andernfalls gilt: 
+         Wenn der Wert von X größer oder gleich dem von X1 ist und 
+         der Wert von X - X1 im Rahmen der Stelligkeit von D liegt,
+         hat D diesen Wert, sonst ist D leer. *)
+
+PROCEDURE modularisieren (X, X1, M: Objekte);
+(* Vor.: X, X1 und M sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist M leer. 
+         Andernfalls hat M den Wert von X MOD X1. *)
+
+PROCEDURE ggTBestimmen (X, X1, G: Objekte);
+(* Vor.: X, X1 und G sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist G leer. Andernfalls gilt: 
+         Hat X oder X1 den Wert 0, ist G leer, sonst hat G 
+         den Wert des größten gemeinsamen Teilers von X und X1. *)
+
+PROCEDURE multiplizieren (X, X1, P: Objekte);
+(* Vor.: X, X1 und P sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist P leer. Andernfalls gilt: 
+         Wenn der Wert von X * X1 im Rahmen der Stelligkeit von P liegt,
+         hat P diesen Wert, sonst ist Q leer. *)
+
+PROCEDURE dividieren (X, X1, Q: Objekte);
+(* Vor.: X, X1 und Q sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist oder X1 den Wert 0 hat, ist Q leer. 
+         Andernfalls gilt: 
+         Wenn der Wert von X DIV X1 im Rahmen der Stelligkeit von Q liegt,
+         hat Q diesen Wert, sonst ist Q leer. *)
+
+PROCEDURE potenzieren (X: Objekte; n: CARDINAL; P: Objekte);
+(* Vor.: X und P sind initialisiert.
+   Eff.: Wenn X oder P leer sind, ist P leer. Andernfalls gilt:
+         Wenn der Wert von X hoch n im Rahmen der Stelligkeit von P liegt,
+         hat P diesen WErt, sonst ist P leer. *)
+
+PROCEDURE kgVBestimmen (X, X1, K: Objekte);
+(* Vor.: X, X1 und K sind initialisiert. 
+   Eff.: Wenn X oder X1 leer ist, ist K leer. 
+         Wenn X oder X1 den Wert 0 hat, ist K leer. Andernfalls 
+         gilt: Wenn das kleinste gemeinsame Vielfache der Werte 
+         von X und X1 im Rahmen der Stelligkeit von K liegt, 
+         hat K diesen Wert, sonst ist K leer. *)
+
+END BNatZahlen.

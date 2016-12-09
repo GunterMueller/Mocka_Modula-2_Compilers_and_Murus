@@ -1,0 +1,193 @@
+DEFINITION MODULE PIMengen;
+
+(* (c) Christian Maurer   v. 26. Mai 2006 *)
+
+FROM SYSTEM IMPORT ADDRESS;
+FROM Prozedurtypen IMPORT Relationen, Abbildungen, Praedikate,
+                          Bearbeitungen, bedingteBearbeitungen;
+
+TYPE Objekte; 
+(* Persistente geordnete Mengen von Strömen beliebiger, aber fester Länge > 0
+   (zur Definition von Strömen s. Folgen).
+   Die strikten Ordnungen der Mengen, von denen jeweils genau eine aktuell ist,
+   sind auf gewissen Teilen der Ströme in ihnen definiert, über die als Index
+   auf die Ströme zugegriffen wird. Die Begriffe "erster", "nach", "folgender",
+   "Reihenfolge" usw. beziehen sich auf die jeweils aktuelle Ordnung.
+
+   In jeder nichtleeren Menge ist genau ein Strom der aktuelle Strom. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; N, I: CARDINAL; L: ADDRESS;
+                                          C: Abbildungen; K: Relationen);
+(* Vor.: X ist nicht initialisiert. 0 < I <= N.
+         Der Strom ab L der Länge N charakterisiert die leeren Ströme in X,
+         d.h. ein Strom in X wird genau dann als leer interpretiert,
+         wenn er mit dem Strom ab L der Länge n übereinstimmt.
+         K ist eine strikte ("<", nicht "<=" !) Ordnungsrelation auf gewissen
+         Teilströmen der Ströme von X; K ist auf genau denjenigen Strömen der
+         Länge I definiert, auf die C die Ströme der Länge N aus X abbildet.
+         Zwei Ströme aus X ab A bzw. A1 sind genau dann nicht unterscheidbar
+         (d.h. nur einer von ihnen kann in X enthalten sein), wenn die
+         Ströme B und B1 der Länge I, auf die die Ströme ab A bzw. A1
+         durch C abgebildet werden, durch K nicht unterscheidbar sind.
+   Eff.: X ist initialisiert und leer und hat keine Nummer.
+         X hat die Stromlänge N und die Indexlänge I.
+         Der Strom ab L der Länge N ist der Leerstrom von X.
+         X ist bzgl. K geordnet. *)
+
+PROCEDURE numerifizieren (X: Objekte);
+(* Vor.: X ist initialisiert, aber nicht definiert.
+         Die Ströme in X enthalten am Anfang eine Nummer vom Typ SHORTCARD.
+   Eff.: X ist numerifiziert. *)
+
+PROCEDURE definieren (X: Objekte; N: ARRAY OF CHAR);
+(* Vor.: X ist initialisiert. 
+         N ist ein im Betriebssystem gültiger Dateiname.
+   Eff.: X ist mit dem Namen N definiert, d.h. X stimmt mit derjenigen
+         Menge überein, die als letzte mit dem Namen N definiert war,
+         falls es eine solche gibt; andernfalls ist X leer.
+         Wenn X numerifiziert ist, hat X die Nummer 1 + Maximum aller
+         Nummern der Objekte von X (wenn X leer ist, die Nummer 1). *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist nicht initialisiert. *)
+
+PROCEDURE leer (X: Objekte): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn X keinen Strom enthält. *)
+
+PROCEDURE leeren (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist leer. Es gibt keinen aktuellen Strom in X. *)
+
+PROCEDURE Anzahl (X: Objekte): CARDINAL;
+(* Vor.: X ist definiert und enthält <= MAX (CARDINAL) Ströme.
+   Eff.: Liefert die Anzahl der Ströme in X. *) 
+
+PROCEDURE enthalten (X: Objekte; A: ADDRESS): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn in X ein Strom enthalten ist, 
+         dessen ausgezeichneter Teilstrom mit dem entsprechenden 
+         Teil des Stromes ab A der Stromlänge von X übereinstimmt.
+         In diesem Fall ist der erste solche Strom der aktuelle Strom von X, 
+         sonst ist aktueller Strom von X der, der vorher aktuell war. *)
+
+PROCEDURE einordnen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist definiert. 
+   Eff.: Wenn der Strom ab A der Stromlänge von X schon in X enthalten 
+         ist oder wenn er mit dem Leerstrom von X übereinstimmt,
+         ist nichts verändert. Andernfalls ist er in X eingeordnet,
+         d.h. er ist jetzt in X enthalten und X ist geordnet.
+         Aktueller Strom von X ist der eingeordnete.
+         Wenn X numerifiziert ist, enthält der Strom ab A am Anfang die
+         Nummer von X und die Nummer von X ist jetzt um eins erhöht. *)
+
+PROCEDURE positionieren1 (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt: 
+         War der aktuelle Strom von X vorher der letzte (für w = TRUE) 
+         bzw. der erste (für w = FALSE) Strom aus X, ist nichts verändert,
+         andernfalls ist aktueller Strom von X jetzt der nach nach (für
+         w = TRUE) bzw. vor (für w = FALSE) dem aktuellen Strom vorher. *)
+
+PROCEDURE positionieren (X: Objekte; w: BOOLEAN);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer war, ist nichts verändert.
+         Sonst ist für w = TRUE (bzw. w = FALSE) der letzte
+         (bzw. der erste) Strom aus X aktueller Strom. *)
+
+PROCEDURE positioniert1 (X: Objekte; w: BOOLEAN): BOOLEAN;
+(* Vor.: X ist definiert.
+   Eff.: Liefert genau dann TRUE, wenn X nicht leer und
+         der aktuelle Strom von X für w = TRUE der letzte,
+         für w = FALSE der erste Strom in X ist. *)
+
+PROCEDURE lesen (X: Objekte; A: ADDRESS);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer war, ist nichts verändert.
+         Sonst steht ab A der aktuelle Strom von X der Stromlänge von X. *)
+
+PROCEDURE schreiben (X: Objekte; A: ADDRESS);
+(* Vor.: X ist definiert. 
+   Eff.: Wenn X leer ist, ist nichts verändert. 
+         Wenn X bzgl. der aktuellen Ordnung nicht veränderbar ist 
+         und der Strom ab A bzgl. dieser Ordnung nicht gleich 
+         dem aktuellen Strom ist, ist nichts verändert. 
+         (* Wenn X bzgl. der aktuellen Ordnung einfach ist und einen 
+         Strom enthält, der bzgl. dieser Ordnung gleich dem Strom 
+         ab A ist, ist nichts verändert. *)
+         Sonst ist der aktuelle Strom aus X entfernt und der Strom ab A der
+         Stromlänge von X ist in X eingeordnet und ist jetzt aktueller Strom. *)
+
+PROCEDURE entfernen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: Wenn X leer ist, ist nichts verändert. Sonst gilt:
+         Der vorher aktuelle Strom von X ist aus X entfernt. War dies der
+         einzige Strom in X, ist kein Strom aktuell; andernfalls ist aktueller
+         Strom von X jetzt der nach dem vorherigen aktuellen Strom, falls es
+         einen solchen gibt, sonst der letzte Strom von X. *)
+
+PROCEDURE existiert (X: Objekte; A: ADDRESS): BOOLEAN;
+(* Vor.: X ist definiert. 
+   Eff.: Liefert genau dann TRUE, wenn es einen Strom in X gibt, der bzgl.
+         der aktuellen Ordnung von X größer oder gleich dem Strom ab A ist.
+         In diesem Fall ist der erste solche Strom in X aktueller Strom,
+         sonst ist der aktuelle Strom von X der, der vorher aktuell war. *)
+
+PROCEDURE ordnen (X: Objekte);
+(* Vor.: X ist definiert.
+   Eff.: X ist bezüglich der aktuellen Ordnung umgeordnet. *)
+
+PROCEDURE ordnen1 (X: Objekte; R: Relationen);
+(* Vor.: X ist definiert. R ist eine strikte Ordnungsrelation.
+   Eff.: X ist bezüglich R umgeordnet. *)
+
+PROCEDURE numerischOrdnen (X: Objekte);
+(* Vor.: X ist definiert und numerifiziert.
+   Eff.: X ist bezüglich der Nummern am Anfang der Ströme von X umgeordnet. *)
+
+PROCEDURE traversieren (X: Objekte; B: Bearbeitungen);
+(* Vor.: X ist definiert.
+   Eff.: Auf alle Ströme in X ist B angewandt. Aktueller Strom von X
+         ist jetzt der erste Strom aus X, sofern X nicht leer ist. *)
+
+PROCEDURE bedingtTraversieren (X: Objekte; P: Praedikate;
+                                           B: bedingteBearbeitungen);
+(* Vor.: X ist definiert.
+   Eff.: Auf alle Ströme in X ist B(-, TRUE) angewandt, wenn P auf sie
+         zutrifft, sonst B(-, FALSE) (d.h. auf jeden Strom ab A in X
+         ist B(A, P(A)) angewandt. Aktueller Strom von X ist jetzt
+         der erste Strom aus X, sofern X nicht leer ist. *)
+
+PROCEDURE filtrieren (X, X1: Objekte; P: Praedikate);
+(* Vor.: X und X1 sind definiert.
+   Eff.: Wenn X und X1 mit gleichem Namen definiert sind oder nicht
+         die gleiche Stromlänge oder verschiedene Leerströme haben,
+         ist nichts verändert. Sonst gilt:
+         X1 besteht aus den Strömen aus X vorher, auf die P zutrifft,
+         in ihrer vorherigen Reihenfolge. X1 hat die gleiche Ordnung
+         wie X und ist geordnet. Aktueller Strom von X1 ist der erste,
+         sofern X1 nicht leer ist. X ist unverändert. *)
+
+PROCEDURE separieren (X, X1: Objekte; P: Praedikate);
+(* Vor.: X und X1 sind definiert.
+   Eff.: Wenn X und X1 mit gleichem Namen definiert sind oder nicht
+         die gleiche Stromlänge oder verschiedene Leerströme haben,
+         ist nichts verändert. Sonst gilt:
+         X1 besteht aus den Strömen aus X vorher, auf die P zutrifft,
+         in ihrer vorherigen Reihenfolge und genau diese Ströme
+         sind jetzt aus X entfernt. X1 hat die gleiche Ordnung wie X
+         und ist geordnet. Aktueller Strom von X bzw. X1 ist jeweils
+         der erste, sofern X bzw. X1 nicht leer ist. *)
+
+PROCEDURE vereinigen (X, X1: Objekte);
+(* Vor.: X und X1 sind definiert.
+         X und X1 enthalten keine gemeinsamen Ströme, die verschieden
+         sind, aber identische ausgezeichnete Teilströme haben.
+   Eff.: Wenn X und X1 mit gleichem Namen definiert sind oder nicht
+         die gleiche Stromlänge oder verschiedene Leerströme haben
+         oder wenn X1 leer ist, ist nichts verändert. Sonst gilt:
+         Alle Ströme aus X1 sind in X eingeordnet. Aktueller Strom
+         von X ist der erste, sofern X nicht leer ist. X1 ist leer. *)
+
+END PIMengen.

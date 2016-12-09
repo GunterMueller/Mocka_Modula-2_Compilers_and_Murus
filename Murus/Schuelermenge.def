@@ -1,0 +1,19 @@
+DEFINITION MODULE Schuelermenge;
+
+(* (c) Christian Maurer   v. 12. März 2008 *)
+
+FROM Schuelerinnen IMPORT Objekte, Nummern;
+
+PROCEDURE initialisieren (N: ARRAY OF CHAR);
+
+PROCEDURE ausgewaehlt (Sch: Objekte; Z, S: CARDINAL): BOOLEAN;
+
+PROCEDURE finden (Sch: Objekte; N: Nummern);
+
+PROCEDURE einordnen (Sch: Objekte; Z, S: CARDINAL);
+
+PROCEDURE aendern (Sch: Objekte; Z, S: CARDINAL);
+
+PROCEDURE entfernen (Sch: Objekte; Z, S: CARDINAL);
+
+END Schuelermenge.

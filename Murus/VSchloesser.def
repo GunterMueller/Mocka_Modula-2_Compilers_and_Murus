@@ -1,0 +1,41 @@
+DEFINITION MODULE VSchloesser;
+
+(* (c) Christian Maurer   v. 9. Juni 2008
+       Nutzungsbedingungen siehe Murus.mod *)
+
+FROM IP IMPORT Namen;
+
+CONST M = 16; (* größtmögliche Anzahl der beteiligten Prozesse *)
+TYPE Nummern = [0 .. M - 1];
+     Objekte;
+(* Boolesche Schlösser (gesperrt oder nicht) als Zugangsprotokolle
+   zu kritischen Abschnitten zum nebenläufigen Zugriff mehrerer
+   - auf paarweise verschiedenen - Rechnern verteilter Prozesse
+   auf gemeinsame Daten gemäß Definition der Sperrsynchronisation
+   (s. Grundzüge der Nichtsequentiellen Programmierung, S. 14).
+
+   Die Prozeduren sperren und entsperren sind unteilbar, d.h.
+   sie können von anderen Prozessen nicht unterbrochen werden. *)
+
+PROCEDURE initialisieren (VAR X: Objekte; n: CARDINAL; R: ARRAY OF Namen);
+(* Vor.: X ist nicht initialisiert.
+         1 < n < M.
+         Alle R [k] (0 <= k < n) sind Namen von im Netz erreichbaren
+         paarweise verschiedenen Rechnern.
+   Eff.: X ist initialisiert und nicht gesperrt.
+         Kein Prozeß ist auf X blockiert. *)
+
+PROCEDURE terminieren (VAR X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: X ist nicht initialisiert und nicht definiert. *)
+
+PROCEDURE sperren (X: Objekte);
+(* Vor.: X ist initialisiert.
+   Eff.: Der aufrufende Prozeß war ggf. solange auf X blockiert,
+         bis X nicht gesperrt war. Jetzt hat X gesperrt. *)
+
+PROCEDURE entsperren (X: Objekte);
+(* Vor.: X ist initialisiert und gesperrt.
+   Eff.: X ist nicht gesperrt. *)
+  
+END VSchloesser.
