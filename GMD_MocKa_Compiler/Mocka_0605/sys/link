@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 14. August 2006
+
+case $1 in
+'-elf' ) shift ;;
+*      ) ;;
+esac
+
+case $1 in
+'-g' ) shift ;;
+*    ) ;;
+esac
+
+Programm=${1##*/}; Verzeichnis=${1%/*}; shift
+
+gcc -D_REENTRANT -o $Programm $MOCKA/sys/M2RTS.o $* $MOCKALINK
+
+strip $Programm
+
+ln -sf ../$Programm $Verzeichnis/$Programm

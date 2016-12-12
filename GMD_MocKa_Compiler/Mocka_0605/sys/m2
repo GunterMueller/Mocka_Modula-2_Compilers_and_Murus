@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 14. August 2006
+
+mkdir -p m2bin
+
+$MOCKA/sys/Mc \
+  -link $MOCKA/sys/link \
+  -edit $MOCKA/sys/edit \
+  -list $MOCKA/sys/list \
+  -asm  $MOCKA/sys/asm \
+  -syslib $MOCKA/lib/m2bin \
+  -index -range -S \
+  -d ./m2bin -D ./m2bin $MOCKAM2 \
+  -g -elf $*

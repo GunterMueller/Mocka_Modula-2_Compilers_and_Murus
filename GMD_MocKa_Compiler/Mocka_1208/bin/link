@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 5. August 2012
+
+case $1 in
+'-elf' ) shift ;;
+*      ) ;;
+esac
+
+case $1 in
+'-g' ) shift ;;
+*    ) ;;
+esac
+
+PRG=${1##*/}; shift
+
+gcc -D_REENTRANT -m32 -o $PRG /usr/local/m2/out/mocka/M2RTS.o $* $MOCKALINK
+strip $PRG
+mv $PRG $M2BIN
