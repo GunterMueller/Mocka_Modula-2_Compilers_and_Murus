@@ -1,0 +1,90 @@
+Fetch the Murus package
+
+You can get the current copy of the Murus sourcefiles here: http://lwb.mi.fu-berlin.de/murus/Murus.tgz or else try here: http://www.murus.org.
+
+Install the Murus package
+
+This is a translation from the PDF file which can be downloaded from http://lwb.mi.fu-berlin.de/murus/doc/Installation.pdf which was made by Dr Maurer. The original PDF file is in German.
+Prerequisites
+Murus needs the Modula-2 compiler Mocka 0608m. If you don't have it, get it here: http://lwb.mi.fu-berlin.de/mocka/
+Installing Murus for Mocka in Linux.
+The following work must be done as root!
+It is advised by Dr Maurer to install Murus in /usr/local/Murus. Make sure root has set the following environment variables:
+
+    MURUS
+        MOCKAM2
+	    MOCKALINK
+	        HOST
+
+If these do not exist, set them now as follows:
+
+   export MURUS=/usr/local/Murus
+   	  export MOCKAM2="-d  $MURUS/m2bin -CcallsMocka"
+	  	 export MOCKALINK="-lpthread -L/usr/X11R6/lib -lX11"
+
+
+If HOST does not exist, define it as follows:
+
+   export HOST=$HOSTNAME
+
+
+Check which one exists on your system. Use:
+
+      echo $HOST
+      	   echo $HOSTNAME
+
+
+If the HOST line produces the name of your system, stop. If it produces a blank line, use 'export HOST=$HOSTNAME' to set things straight.
+
+Store the 'export' lines in /etc/profile (if you use SuSE, use /etc/profile.local).
+
+Check if 'libX11.so' is available in your system and where it is. Do so as follows:
+
+      jan@beryllium:~/develop/Murus$ locate libX11.so
+      				     /usr/X11R6/lib/libX11.so
+					/usr/X11R6/lib/libX11.so.6
+						/usr/X11R6/lib/libX11.so.6.2
+							jan@beryllium:~/develop/Murus$
+
+
+In my system, I need '/usr/X11R6/lib/libX11.so.6.2' to be available in /usr/X11R6/lib Activate it as follows:
+
+   ln -s /usr/X11R6/lib/libX11.so.6.2 /usr/X11R6/lib/libX11.so
+
+
+If your 'libX11.so.6.2' is located elsewhere change the line accordingly. But you're a programmer, so it should be obvious.
+Systemwide installation by 'root'.
+Root makes sure he is in /usr/local/ and makes sure the latest version of Murus.tgz is in this directory. Then execute:
+
+     tar zxf Murus.tgz
+
+
+Now go into the newly created diretory (with cd Murus) and initialize Murus:
+
+    ./machen
+
+
+If you get LOADS of errormessages, the environment variables were not set accordingly. If all goes right, Murus is started and you can get out again by either of these:
+
+    ESC key
+        ENTER key
+	    LeftMouseButton in Murus window
+
+That's it.
+Personal installation in a users own space.
+A developer might be better off to store Murus in his own diskspace. In my case I stored Murus in '/home/jan/develop/Murus'. This has the advantage that I, a normal user, can change and compile the programs without being root. A major advantage.
+
+You only need to change one environment variable:
+
+    export MURUS=/usr/local/Murus
+
+
+must be set to
+
+     export MURUS=/home/jan/develop/Murus
+
+
+in my case of course, but you're programmer in the first place, so I am sure this information is all superfluous.
+
+If you want to automate setting of the environment variables I would set ALL in /etc/profile (/etc/profile.local for Suse Kunden) but the MURUS variable in your local file '.bashrc'
+Your mileage may vary!

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+case $1 in
+'-elf' ) AS=/usr/bin/as ; shift ;;
+*      ) AS=/usr/i486-linuxaout/bin/as ;;
+esac;
+
+case $1 in
+'-g' ) OPTIONS=  ; shift ;;
+*    ) OPTIONS= ;;
+esac;
+
+$AS $OPTIONS -o $1.o $1.s

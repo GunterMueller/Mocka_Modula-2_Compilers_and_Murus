@@ -1,0 +1,45 @@
+tmpdir=/tmp/beg$$
+flags=
+cgd=
+usage="usage: $0 [flags...] cgdfile"
+
+while [ $# -gt 0 ]
+do
+  case "$1" in
+  -*) flags="$flags $1" ;;
+  *)  if [ "$cgd" ] ; then echo $usage 2>&1; exit 1 ; else cgd=$1 ; fi ;;
+  esac
+  shift
+done
+
+if [ -z "$cgd" ] ; then echo $usage 2>&1; exit 1; fi
+
+trap 'exitcode=$? ; rm -rf $tmpdir ; exit $exitcode' 0
+trap 'exit 2' 2 3               # INT QUIT
+
+mkdir $tmpdir 
+#echo $beg $flags $cgd $tmpdir
+if $beg $flags $cgd $tmpdir
+then
+  echo beg sucessful 
+  mv $tmpdir/Stat.*[hd] $tmpdir/Stat
+  if test -r $tmpdir/Emit.c
+  then 
+      mv $tmpdir/Emit.c $tmpdir/Emit.dot
+      $dottool < $tmpdir/Emit.dot > $tmpdir/Emit.c
+  else
+      mv $tmpdir/Emit.mi $tmpdir/Emit.dot
+      $dottool < $tmpdir/Emit.dot > $tmpdir/Emit.mi
+  fi
+  rm $tmpdir/Emit.dot
+  for i in $tmpdir/*
+  do
+    f=`basename $i`
+    if test -r $f; cmp -s $i $f
+    then :
+    else echo $f has changed; mv $i $f
+    fi
+  done
+else
+  exit 1
+fi

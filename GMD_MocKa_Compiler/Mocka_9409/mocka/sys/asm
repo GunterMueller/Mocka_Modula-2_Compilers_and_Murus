@@ -1,0 +1,5 @@
+case $1 in
+'-g' ) OPTIONS=  ; shift ;;
+*    ) OPTIONS= ;;
+esac;
+as $OPTIONS -o $1.o $1.s

@@ -1,0 +1,40 @@
+Version	Date		Changes
+------------------------------------------------------------------------
+9409	94/10/04	several optimizations in code generation
+
+9406	94/06/14	new implementation of type transfers
+			update the new lib library
+
+9405	94/04/28	fixed bug in REAL/LONGREAL function call
+
+9404	94/04/13	fixed a coercion bug
+			fixed stabs (-g option):
+			  ARRAY Type OF ... where Type is no Subrange
+
+9403	94/03/23	fixed bug in REAL/LONGREAL range check
+			fixed bug in TRUNC operation
+			fixed bugs in REAL/LONGREAL expressions
+			more REAL/LONGREAL constant folding
+			removed superfluous parts of codegenerator
+			  (additional code to avoid calling old
+			   gas-assembler bugs)
+
+9402	94/03/05	fixed bug  recursive pointers in -g option
+			made sourcecode mtc-convertable
+
+9401	94/02/25	fixed bug  conversion of bitsets
+			fixed bug  byte multiplication (enum Types)
+			fixed bug  array subscript of byte types
+			delete c style comments in assembler output
+			  (gas 2.2 does not run cpp before assembling)
+			first 386BSD Version
+
+9304	93/11/12	Sorry, wrong Makefile in 9303
+
+9303	93/11/11	Coroutines are now supported
+			fixed bug  float subtraction
+			changed oAPPEND constant in SysLib.md
+
+9302	93/11/08	fixed bug in  Ln ( .. function( ... ) )
+
+9301	93/11/04	initial version

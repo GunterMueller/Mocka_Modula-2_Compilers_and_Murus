@@ -1,0 +1,524 @@
+(******************************************************************************)
+(* Copyright (c) 1990 by GMD Karlruhe, Germany				      *)
+(* Gesellschaft fuer Mathematik und Datenverarbeitung			      *)
+(* (German National Research Center for Computer Science)		      *)
+(* Forschungsstelle fuer Programmstrukturen an Universitaet Karlsruhe	      *)
+(* All rights reserved.							      *)
+(******************************************************************************)
+
+IMPLEMENTATION MODULE RealConv;
+
+  (* (w) 1990 CvR *)
+  (* 03/93 HH : Endlosschleife bei Infinity beseitigt	       *)
+  (* 03/93 HH : korrekte Ueberprufung HIGH(s) bei LongReal2Str *)
+  (* 03/93 HH : Unterscheidung von Infinity und Nan	       *)
+  (* 04/93 HH : Sonderbehandlung bei MIPS		       *)
+  
+  FROM LREAL	IMPORT LFLOAT, LTRUNC;
+
+  (* ++ HH 10.03.93 ++ *)
+  TYPE LRTRANSLATE = RECORD 
+		       CASE : BOOLEAN OF
+		       | TRUE : r : LONGREAL;
+		       | FALSE : c2, c1 : LONGCARD;
+		       END;
+		     END;
+
+       RTRANSLATE  = RECORD 
+		       CASE : BOOLEAN OF
+		       | TRUE : r : REAL;
+		       | FALSE : c : LONGCARD;
+		       END;
+		     END;
+
+
+  PROCEDURE IsLongRealInfinityOrNaN (x: LONGREAL) : BOOLEAN;
+    VAR tr : LRTRANSLATE;
+  BEGIN
+    tr.r := x;
+    RETURN ((tr.c1 DIV 00100000H) MOD 0800H) = 07FFH
+  END IsLongRealInfinityOrNaN;
+
+  PROCEDURE IsRealInfinityOrNaN (x: REAL) : BOOLEAN;
+    VAR tr : RTRANSLATE;
+  BEGIN
+    tr.r := x;
+    RETURN ((tr.c DIV 00800000H) MOD 0100H) = 0FFH
+  END IsRealInfinityOrNaN;
+
+  PROCEDURE IsLongRealInfinity (x: LONGREAL) : BOOLEAN;
+    VAR tr : LRTRANSLATE;
+  BEGIN
+    tr.r := x;
+    RETURN (((tr.c1 DIV 00100000H) MOD 0800H) = 07FFH) AND 
+	    ((tr.c1 MOD 00100000H) = 0)
+  END IsLongRealInfinity;
+
+  PROCEDURE IsRealInfinity (x: REAL) : BOOLEAN;
+    VAR tr : RTRANSLATE;
+  BEGIN
+    tr.r := x;
+    RETURN (((tr.c DIV 00800000H) MOD 0100H) = 0FFH) AND
+	    ((tr.c MOD 00800000H) = 0)
+  END IsRealInfinity;
+  (* ++ HH 10.03.93 ++ *)
+
+
+  PROCEDURE Pow10(e: INTEGER): REAL;
+  (* Returns 10 to the 'e's.	*)	
+    VAR
+      expNeg: BOOLEAN;
+      b, x: REAL;
+  BEGIN
+    expNeg := e<0;
+    e := ABS(e);
+    b := 10.0;
+    x := 1.0;
+    WHILE e#0 DO
+      IF ODD(e) THEN
+        x := x*b;
+      END;
+      b := b*b; e := e DIV 2;
+     END;
+    IF expNeg THEN
+      RETURN 1.0/x;
+    ELSE
+      RETURN x;
+    END;
+  END Pow10;
+     
+  PROCEDURE LPow10(e: INTEGER): LONGREAL;
+  (* Returns 10 to the 'e's.	*)	
+    VAR
+      expNeg: BOOLEAN;
+      b, x: LONGREAL;
+  BEGIN
+    expNeg := e<0;
+    e := ABS(e);
+    b := 10.0;
+    x := 1.0;
+    WHILE e#0 DO
+      IF ODD(e) THEN
+        x := x*b;
+      END;
+      b := b*b; e := e DIV 2;
+    END;
+    IF expNeg THEN
+      RETURN 1.0/x;
+    ELSE
+      RETURN x;
+    END;
+  END LPow10;
+     
+  PROCEDURE Str2Real(s: ARRAY OF CHAR; VAR done: BOOLEAN): REAL;
+  (* Converts the string 's' to real 'x'.			*)
+  (* s has to be of the form:					*)
+  (* real   = num ['.' {digit}] ['E' num].			*)
+  (* num    = ['+'|'-'] digit {digit}.				*)
+
+    CONST
+      HighM = 0;
+      (* HighM+1 Cardinals will be used to store the Mantissa. *)
+
+    VAR
+      i: CARDINAL;
+      e, fractionDigits, truncatedDigits: INTEGER;
+      phase: (Integral,Fractional);
+      
+      M: ARRAY[0..HighM] OF CARDINAL;
+      (* Will hold the DezimalMantissa.	*)
+      
+      N: ARRAY[0..HighM] OF INTEGER;
+      (* N[i]= Number of decimal digits stored in M[i].	*)
+      
+      m: CARDINAL;
+      (* The actual Index for M and N.	*) 
+      
+      x: REAL;
+      mantNeg, expNeg: BOOLEAN;
+  BEGIN
+    done:=FALSE; mantNeg:=FALSE;
+    i:=0; 
+    fractionDigits:=0; truncatedDigits:=0;
+    FOR m:=0 TO HighM DO M[m]:=0; N[m]:=0; END;
+    m:=0;
+
+    phase := Integral;
+
+    IF s[i]='-' THEN
+      INC(i);
+      mantNeg := TRUE;
+    ELSIF s[i]='+' THEN
+      INC(i);
+    END;
+
+    IF (i<=HIGH(s)) & (s[i]#0C) THEN
+      REPEAT
+        IF ('0'<=s[i]) & (s[i]<='9') THEN
+          IF phase=Fractional THEN
+            INC(fractionDigits);
+          END;
+
+          IF (m<HighM) & (M[m]>=MAX(INTEGER) DIV 10) THEN
+            (* MUST be MAX(INTEGER) since we're   *)
+	    (* calling LFLOAT(x:INTEGER) with it. *)
+            INC(m);
+          END;
+              
+          IF M[m]<MAX(INTEGER) DIV 10 THEN
+            M[m] := M[m]*10 + (ORD(s[i]) - ORD('0')); INC(N[m]);
+          ELSE
+            INC(truncatedDigits);
+          END;
+        ELSIF (phase=Integral) & (s[i]='.') THEN
+          phase := Fractional;
+        ELSE
+          RETURN 0.0;
+        END;
+        INC(i);
+      UNTIL (i>HIGH(s)) OR (s[i]=0C) OR (s[i]='E');
+    END;
+    
+    e:=0; expNeg:=FALSE;
+    IF (i<=HIGH(s)) & (s[i]#0C) & (s[i]='E') THEN
+      INC(i);
+      IF (i>HIGH(s)) OR (s[i]=0C) THEN RETURN 0.0; END;
+      IF s[i]='-' THEN
+        INC(i);
+        expNeg := TRUE;
+      ELSIF s[i]='+' THEN
+        INC(i);
+      END;
+      IF (i>HIGH(s)) OR (s[i]=0C) THEN RETURN 0.0; END;
+      REPEAT
+        IF ('0'<=s[i]) & (s[i]<='9') THEN
+          e:=e*10+INTEGER(ORD(s[i])-ORD('0'));
+	  (* ToDo: Overflowchecks !!! *)   
+        ELSE
+          RETURN 0.0;
+        END;
+        INC(i);
+      UNTIL (i>HIGH(s)) OR (s[i]=0C);
+      IF expNeg THEN e:=-e END;
+    END;
+    e:=e-fractionDigits+truncatedDigits;
+    (* ToDo: Overflowchecks !!! *)
+    x:=0.0;
+    LOOP
+      x:=x+FLOAT(M[m])*Pow10(e); 
+      IF m=0 THEN EXIT; END;
+      e:=e+N[m];
+      DEC(m);
+    END;
+    done := TRUE;
+    IF mantNeg THEN
+      RETURN -x;
+    ELSE
+      RETURN x;
+    END;
+  END Str2Real;
+
+
+
+  PROCEDURE Str2LongReal(s: ARRAY OF CHAR; VAR done: BOOLEAN): LONGREAL;
+  (* Converts the string 's' to real 'x'.			*)
+  (* s has to be of the form:					*)
+  (* real   = num ['.' {digit}] ['E' num].			*)
+  (* num    = ['+'|'-'] digit {digit}.				*)
+
+    CONST
+      HighM = 1;
+      (* HighM+1 Cardinals will be used to store the Mantissa. *)
+
+    VAR
+      i: CARDINAL;
+      e, fractionDigits, truncatedDigits: INTEGER;
+      phase: (Integral,Fractional);
+      
+      M: ARRAY[0..HighM] OF CARDINAL;
+      (* Will hold the DezimalMantissa.	*)
+      
+      N: ARRAY[0..HighM] OF INTEGER;
+      (* N[i]= Number of decimal digits stored in M[i].	*)
+      
+      m: CARDINAL;
+      (* The actual Index for M and N.	*) 
+      
+      x: LONGREAL;
+      mantNeg, expNeg: BOOLEAN;
+  BEGIN
+    done:=FALSE; mantNeg:=FALSE;
+    i:=0; 
+    fractionDigits:=0; truncatedDigits:=0;
+    FOR m:=0 TO HighM DO M[m]:=0; N[m]:=0; END;
+    m:=0;
+
+    phase := Integral;
+
+    IF s[i]='-' THEN
+      INC(i);
+      mantNeg := TRUE;
+    ELSIF s[i]='+' THEN
+      INC(i);
+    END;
+
+    IF (i<=HIGH(s)) & (s[i]#0C) THEN
+      REPEAT
+        IF ('0'<=s[i]) & (s[i]<='9') THEN
+          IF phase=Fractional THEN
+            INC(fractionDigits);
+          END;
+
+          IF (m<HighM) & (M[m]>=MAX(INTEGER) DIV 10) THEN
+            INC(m);
+          END;
+              
+          IF M[m]<MAX(INTEGER) DIV 10 THEN
+            M[m] := M[m]*10 + (ORD(s[i]) - ORD('0')); INC(N[m]);
+          ELSE
+            INC(truncatedDigits);
+          END;
+        ELSIF (phase=Integral) & (s[i]='.') THEN
+          phase := Fractional;
+        ELSE
+          RETURN 0.0;
+        END;
+        INC(i);
+      UNTIL (i>HIGH(s)) OR (s[i]=0C) OR (s[i]='E');
+    END;
+    
+    e:=0; expNeg:=FALSE;
+    IF (i<=HIGH(s)) & (s[i]='E') THEN
+      INC(i);
+      IF (i>HIGH(s)) OR (s[i]=0C) THEN RETURN 0.0; END;
+      IF s[i]='-' THEN
+        INC(i);
+        expNeg := TRUE;
+      ELSIF s[i]='+' THEN
+        INC(i);
+      END;
+      IF (i>HIGH(s)) OR (s[i]=0C) THEN RETURN 0.0; END;
+      REPEAT
+        IF ('0'<=s[i]) & (s[i]<='9') THEN
+          e:=e*10+INTEGER(ORD(s[i])-ORD('0'));
+	  (* ToDo: Overflowchecks !!! *)   
+        ELSE
+          RETURN 0.0;
+        END;
+        INC(i);
+      UNTIL (i>HIGH(s)) OR (s[i]=0C);
+      IF expNeg THEN e:=-e END;
+    END;
+    e:=e-fractionDigits+truncatedDigits;
+    (* ToDo: Overflowchecks !!! *)
+    x:=0.0;
+    LOOP
+      x:=x+LFLOAT(M[m])*LPow10(e); 
+      IF m=0 THEN EXIT; END;
+      e:=e+N[m];
+      DEC(m);
+    END;
+    done := TRUE;
+    IF mantNeg THEN
+      RETURN -x;
+    ELSE
+      RETURN x;
+    END;
+  END Str2LongReal;
+
+  PROCEDURE Real2Str (x : REAL; n : CARDINAL; k : INTEGER;
+                      VAR S: ARRAY OF CHAR; VAR done: BOOLEAN);
+  (* Convert real 'x' into external representation.	*)
+  (* If k > 0 use k decimal places.			*)
+  (* If k = 0 write x as integer.			*)
+  (* If k < 0 use scientific notation.			*)
+  BEGIN
+    LongReal2Str(x,n,k,S,done);
+  END Real2Str;
+
+  PROCEDURE LongReal2Str (x : LONGREAL; n : CARDINAL; k : INTEGER;
+			  VAR S: ARRAY OF CHAR; VAR done: BOOLEAN);
+  (* Convert long real 'x' into external representation.*)
+  (* If k > 0 use k decimal places.			*)
+  (* If k = 0 write x as integer.			*)
+  (* If k < 0 use scientific notation.			*)
+
+    VAR
+      xl : LONGREAL;
+      c  : CARDINAL;
+      neg : BOOLEAN;
+      exp, i, p, rexp : INTEGER;
+      blanks, ExpLength,
+      n0, i0, k0, exp0 : INTEGER;
+
+  BEGIN
+    done:=FALSE; S[0]:=0C;
+    IF HIGH(S)+1<n THEN RETURN END; (* Result won't fit into given String *)
+
+    (* ++ HH 10.03.93 ++ *)
+    IF IsLongRealInfinityOrNaN (x)
+      THEN
+        IF HIGH(S) >= 8
+	  THEN
+	    IF IsLongRealInfinity (x)
+	      THEN
+		IF n > 9 THEN p := n-1 ELSE p := 8 END;
+		FOR i := 0 TO p-9 DO S[i] := ' ' END;
+		IF x > 0.0 THEN S[p-8] := ' ' ELSE S[p-8] := '-' END;
+		S[p-7] := 'I';
+		S[p-6] := 'n';
+		S[p-5] := 'f';
+		S[p-4] := 'i';
+		S[p-3] := 'n';
+		S[p-2] := 'i';
+		S[p-1] := 't';
+		S[p  ] := 'y';
+	      ELSE
+	        IF n > 3 THEN p := n-1 ELSE p := 3 END;
+		FOR i := 0 TO p-3 DO S[i] := ' ' END;
+		S[p-2] := 'N';
+		S[p-1] := 'a';
+		S[p  ] := 'N';
+	    END;
+	    IF p+1 <= VAL (INTEGER,HIGH(S)) THEN S[p+1] := 0C END;
+	    done := TRUE;
+	  ELSE
+	    S[0] := 0C;
+	    done := FALSE;
+        END;
+	RETURN		  
+    END;
+    (* ++ HH 10.03.93 ++ *)
+
+    p:=0;
+    
+    n0  := n;
+    k0  := k;
+    neg := x < 0.0;
+    IF neg THEN x := -x; END;
+
+    IF k>=0 THEN 
+      x:=x+0.5*LPow10(-k);
+    END;
+
+    (* get exponent *)
+    exp := 0;
+    IF x >= 10.0 THEN
+      REPEAT
+        INC (exp); x := x / 10.0;
+      UNTIL x < 10.0;
+    ELSIF (x < 1.0) & (x # 0.0) THEN
+      REPEAT
+        DEC (exp); x := x * 10.0;
+      UNTIL x >= 1.0;
+    END;
+
+    IF k<0 THEN
+      x:=x+0.5*LPow10(k);
+    END;
+
+    IF x>=10.0 THEN
+      INC(exp); x:=x/10.0;
+    END;
+
+    (* calculate leading blanks *)
+    exp0 := exp;
+    ExpLength := 0;
+    REPEAT
+      INC (ExpLength); exp0 := exp0 DIV 10;
+    UNTIL exp0 = 0;
+    IF k < 0 THEN
+      blanks := n0 - (-k0 + 3 + ExpLength);
+      IF exp < 0 THEN DEC (blanks); END;
+    ELSE
+      IF k > 0 THEN
+        IF exp < 0 THEN
+          blanks := n0 - (k0 + 2);
+        ELSE
+          blanks := n0 - (exp + 2 + k0); (* HH 16.03.93 war: exp0 *)
+        END;
+      ELSE
+        IF exp < 0 THEN
+          (* will be zero *)
+          neg    := FALSE;
+          blanks :=  n0 - 1;
+        ELSE
+          blanks :=  n0 - (exp + 1);  (* HH 16.03.93 war: exp0 *)
+        END;
+      END;
+    END;
+    IF neg THEN DEC (blanks); END;
+
+    IF (blanks<0) & (VAL(INTEGER,n)-VAL(INTEGER,HIGH(S))>blanks) THEN
+      RETURN	(* Result won't fit into given string.	*)
+    END;
+    done:=TRUE;
+
+    (* fill in leading blanks *)
+    WHILE blanks > 0 DO
+      S[p]:=' '; INC(p);
+      DEC(blanks);
+    END;
+
+    (* sign *)
+    IF neg THEN
+      S[p]:='-'; INC(p);
+    END;
+
+    (* absolute value *)
+    IF k >= 0 THEN
+      IF exp < 0 THEN
+        S[p]:='0'; INC(p);
+      ELSE
+        FOR i := 0 TO exp DO
+          c := LTRUNC (x);
+          S[p]:=VAL (CHAR, ORD ('0') + c); INC(p);
+          xl := LFLOAT (c);
+          x := (x - xl) * 10.0;
+        END;
+      END;
+    ELSE (* k < 0 *)
+      c := LTRUNC (x);
+      S[p]:=VAL (CHAR, ORD ('0') + c); INC(p);
+      xl := LFLOAT (c);
+      x := (x - xl) * 10.0;
+    END;
+    IF k # 0 THEN
+      S[p]:='.'; INC(p);
+      IF (k > 0) & (exp < 0) THEN
+        IF k < ABS (exp) THEN
+          FOR i := 1 TO k DO
+            S[p]:='0'; INC(p);
+          END;
+          IF p<=VAL(INTEGER,HIGH(S)) THEN S[p]:=0C; END;
+          RETURN
+        ELSE
+          FOR i := 1 TO ABS (exp) - 1 DO
+            S[p]:='0'; INC(p);
+          END;
+          k := k + exp + 1;
+        END;
+      END;
+      FOR i := 1 TO ABS (k) DO
+        c := LTRUNC (x);
+        S[p]:=VAL (CHAR, ORD ('0') + c); INC(p);
+        xl := LFLOAT (c);
+        x := (x - xl) * 10.0;
+      END;
+      IF k < 0 THEN
+        S[p]:='E'; INC(p);
+        IF exp<0 THEN exp:=-exp;
+          S[p]:='-'; INC(p);
+        END;
+        i:=ExpLength-1;
+        WHILE i>=0 DO
+          S[p+i]:=VAL(CHAR, ORD('0')+exp MOD 10); exp:=exp DIV 10;
+          DEC(i);
+        END;
+        INC(p,ExpLength);
+      END;
+    END;
+    IF p<=VAL(INTEGER,HIGH(S)) THEN S[p]:=0C; END;
+  END LongReal2Str;
+
+END RealConv.

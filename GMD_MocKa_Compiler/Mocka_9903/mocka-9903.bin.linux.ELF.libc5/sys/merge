@@ -1,0 +1,12 @@
+#!/bin/sh
+
+SYSDIR=`dirname $0`
+LIST=/tmp/$1.$$
+SRC=$1
+ERROR=$2
+
+trap "rm -f $LIST; exit 5" 3
+$SYSDIR/Lister $SRC $ERROR $LIST
+/usr/bin/vi +'map v j/^@[ ]*^/\^k|1' $LIST < /dev/tty; 
+$SYSDIR/Unlister $SRC $LIST
+rm -f $LIST $ERROR

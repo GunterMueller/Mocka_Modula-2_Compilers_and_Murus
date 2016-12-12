@@ -1,0 +1,54 @@
+\" .so ditroff.head
+.TH BEG 1 "GMD-Karlsruhe"
+.SH NAME
+beg \-  Back End Generator 
+.SH SYNOPSIS
+\fBBeg \fR
+[\fI-onthefly\fR] [\fI-test\fR] [\fI-RegNameTable\fR] [\fI-IRConsCheck\fR]
+\fIinput\fR  \fIoutput-directory
+.SH DESCRIPTION
+.I Beg
+takes a Code Generator Description 
+and translates it into several Modula-2 modules.
+They are
+put into the \fIoutput-directory\fR.
+.SH OPTIONS
+Options may be proceeded by 'no' to be switched off.
+.IP "\fB-onthefly\fR
+BEG generates a register allocator using the 'on the fly'
+register allocation method instead of using the general method.
+Default is noonthefly.
+.IP "\fB-test\fR 
+BEG produces code to print test output. However
+test output will be produced only if certain options
+at run time are set. Default is notest.
+.IP "\fB-RegNameTable\fR 
+Generates RegTable into GcgBase.md. RegTable can be used
+to print out register names in readable form. Default is RegNameTable.
+.IP "\fB-IRConsCheck\fR 
+Produce code to enforce type correctness of the intermediate
+representation. Default is IRConsCheck.
+
+.SH AUTHOR
+BEG was developed by Helmut Emmelmann,
+emmel@karlsruhe.gmd.dbp.de,
+at GMD Forschungsstelle fuer Programmstrukturen
+an der Universitaet Karlsruhe, Haid-und-Neu-Str. 7, 7500
+Karlsruhe, Germany-West, 49-721-6622-0 
+.SH SEE ALSO
+H.Emmelmann, F-W.Schroeer, R.Landwehr:
+BEG - a Generator for Efficient Back Ends,
+Proceedings of the Sigplan'89 Conference on Programming 
+Language Design and Implementation, Portland, Oregon, 1989,
+Sigplan Notices, Vol. 24, Number 7, July 1989
+.br
+ 
+H.Emmelmann: BEG User Manual 
+(available from GMD, comes with BEG)
+.br
+ 
+H.Emmelmann: Automatische Erzeugung effizienter Codegeneratoren
+Diplomarbeit, GMD Studie 158, Gesellschaft fuer Mathematik
+und Datenverarbeitung mbH - Sankt Augustin, ISBN 3-88457-158-3
+(in German)
+

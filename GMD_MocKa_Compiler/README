@@ -1,0 +1,114 @@
+The Mocka 0608m compiler
+
+The Mocka compiler is a product of Karlsruhe university's Mathematics department. It is (or used to be) available for just about any UNIX system. Also for Linux and FreeBSD. All Mocka compilers are somewhat commercial, but the versions for Linux and FreeBSD are GPL style FREE.
+I used to run version 9903, but it had a drawback: it used the same name as the Midnight Commander: mc. So a lot of work-arounds were required to get both executables working reliably on the same system.
+
+As I told: I used to run 9903. In June 2006 I switched to 9905m. And in August I switched once more: to 0608m. This is a full mocka compiler, partly rewritten by Dr Maurer of the FU Berlin. It differs from standard Mocka as follows:.
+
+    the md and mi file extensions from Mocka are back to def and mod
+        all files produced by mocka are placed in a subdirectory called './m2bin'.
+	    executables are stripped by default
+	        executables are stored in the base directory and are symlinks in ./m2bin
+		    it has been compiled with a recent version of the libraries
+		        it comes with full instructions and a set of scripts for installing
+			    it is ready to produce GUI programs with X-windows!
+
+A lot of changes. A lot of advantages.
+
+Setting up the Mocka 0608m compiler.
+
+This is a lot simpler than getting 9903 or 0605 to run. Dr Maurer did a good job here. Just download some packages from my site (download section), run some scripts and that's it. Below I will explain what I did to get my system installed. I am running Mocka 0608m on my systems (Most of them running Slackware 12.2 or later).
+
+Step 1: get the compiler
+
+All files can be downloaded from this website. On the site of the FU Berlin a new version is out (1208m) but it uses a strange way of operation. If you want 1208m, get it at the Mocka section on FU Berlin: http://lwb.mi.fu-berlin.de/inf/mocka/installation.shtml This page is in German, so if you don't speak the language keep an eye on my webpages. You mat run it through Google Translate but beware. When the translated text asks you to fry an egg (or worse) don't do it!
+
+I recommend you download the mocka tarball (as in A) here: http://fruttenboel.verhoeven272.nl/mocka/arch/mocka.tgz . The file is a standard gzipped tar file. Download it into your home directory for the time being. In the remainder of this text is a translation of the installation webpage (as in B).
+
+Step 2: install mocka 0608m
+
+All these actions require you to be root user!
+
+    Change into the directory where the compiler must be installed. We recommend to install it in /usr/local/mocka:
+
+    cd /usr/local
+
+    Make sure the file 'mocka.tgz' is in the required directory (this one, to be precise). If it is not here yet, copy it NOW.
+        Unpack the tgz file into the required directory:
+
+    tar xfz mocka.tgz
+
+    Append the line
+
+    export MOCKA=/usr/local/mocka
+
+    to the end of your '/etc/profile' script or to ~/.profile
+        Install the man page in the appropriate place:
+
+    cd /usr/local/mocka/man1
+        gzip mc.1
+	    cp mc.1.gz /usr/local/mocka/man1/mocka.1.gz
+
+    Now make sure the most important sections are built for your system:
+
+    cd /usr/local/mocka/lib
+        ./machen
+	    ./makemockabin
+
+That's it! You just installed the Mocka compiler to your system!
+
+Mocka 0608m is started with the command $MOCKA/sys/m2. The standard Mocka libraries are now in the directory $MOCKA/lib. You can shorten this command-name with a set of symlinks from /usr/local/bin:
+
+ln -s /usr/local/mocka/sys/m2 /usr/local/bin/mocka
+ln -s /usr/local/mocka/sys/m2 /usr/local/bin/m2
+
+Notes:
+
+    If another editor as 'vi' is used, you need to adapt the files $MOCKA/sys/edit and $MOCKA/sys/list.
+        To keep the working directories tidy, the result files are all stored in the subdirectory ./m2bin. This is a feature compiled in by Dr Maurer.
+
+Step 3: change the editor
+
+Mocka invokes the editor not by a direct call. Instead, it issues the command '$MOCKA/sys/edit %1' which enables the user to choose the editor of his choice. I prefer the jed editor which is fast and friendly. The contents of my $MOCKA/sys/edit file are as follows:
+
+jed $1
+
+But that's not all. The editor is also invoked from within the error correction routine, controlled by '$MOCKA/sys/list' so we need to change this as well:
+
+#!/bin/sh
+#
+# (c) GMD Karlsruhe
+
+LIST=/tmp/$1.$$
+SRC=$1
+ERROR=$2
+
+trap "rm -f $LIST; exit 5" 3
+$MOCKA/sys/Lister $SRC $ERROR $LIST
+jed $LIST
+$MOCKA/sys/Unlister $SRC $LIST
+rm -f $LIST $ERROR
+
+Step 4: make a link for m2
+
+After the mockainit script has finished, the actual mocka IDE is called 'm2' and it is located in '$MOCKA/sys/m2'. This is not a very convenient way to start a compiler session. So I added a symlink called 'mocka' in '/usr/local/bin' as follows:
+
+ln -s /usr/local/mocka/sys/m2 /usr/local/bin/mocka
+
+as can be seen here:
+
+jan@beryllium:~/internet/fruttenboel/mocka$ ls -lh /usr/local/bin/
+lrwxrwxrwx  1 root staff   23 2006-08-20 22:18 m2 -> /usr/local/mocka/sys/m2
+lrwxrwxrwx  1 root staff   23 2006-08-20 22:02 mocka -> /usr/local/mocka/sys/m2
+
+Step 5: make a purge file
+
+In order to remove jed backup files and errorfiles generated by Mocka, it can be convenient to have a script that reoves those files only. Together with my friend Jan Wagemakers I developed the following file, called 'purge':
+
+#! /bin/sh
+
+if (! rm *~ 2> /dev/null 1> /dev/null)  then
+   echo No 'jed' backup files found.
+   fi
+
+It is a lot safer than running 'rm *~' each and every time. Forget the tilde one time, and you loose a lot of work. 
