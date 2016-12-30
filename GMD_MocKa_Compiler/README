@@ -1,3 +1,11 @@
+
+PLEASE USE 0608m version of the Mocka Modula-2 Compiler.
+It's in the Mocka_m2_0608m directory.
+
+
+CHANGES:
+Adjusted to compile on a 64bit Ubuntu based Linux system, i.e. Mint Linux 17.3 and 18.1.
+
 The Mocka 0608m compiler
 
 The Mocka compiler is a product of Karlsruhe university's Mathematics department. It is (or used to be) available for just about any UNIX system. Also for Linux and FreeBSD. All Mocka compilers are somewhat commercial, but the versions for Linux and FreeBSD are GPL style FREE.
