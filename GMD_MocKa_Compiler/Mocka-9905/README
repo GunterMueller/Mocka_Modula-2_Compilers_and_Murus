@@ -1,0 +1,66 @@
+
+
+
+
+
+
+
+                           MMOOCCKKAA
+                MMoodduullaa--22 CCoommppiilleerr KKaarrllssrruuhhee
+                     IInnssttaallllaattiioonn NNootteess
+                            ffoorr
+                         LLiinnuuxx//xx8866
+
+
+
+                   Universitaet Karlsruhe
+        Institut fuer Programm- und Datenstrukturen
+                          Zirkel 2
+                     D-76131 Karlsruhe
+11.. TThhee ddiissttrriibbuuttiioonn ffoorrmmaatt
+
+MOCKA  is  distributed  on tape.  The tape is written in TAR
+format.  To read the tape issue
+The distribution tape contains several directories
+   bin     -  the mc commands.
+   sys     -  scripts and programs used by mc.
+   lib     -  the system library.
+   reuse   -  if present, another library
+              (incompatible with lib)
+   src     -  if present, the compiler source.
+   man1    -  the manual page "mc.1".
+The tape does not contain absolute path names.
+
+22.. IInnssttaalllliinngg MMOOCCKKAA
+
+The files on the distribution tape are prepared for  instal-
+lation in the directory
+
+   _/_u_s_r_/_l_o_c_a_l_/_l_i_b_/_m_o_c_k_a
+
+If  you want to install MOCKA there cd to that directory and
+read the tape.  Then you are ready to  invoke  the  compiler
+using
+
+   _/_u_s_r_/_l_o_c_a_l_/_l_i_b_/_m_o_c_k_a_/_b_i_n_/_m_c
+
+If  you  want  to  install MOCKA somewhere else create a new
+directory, cd to that directory and read the tape.  Then you
+have  to  assign  the shell variable _M_O_C_K_A_D_I_R in the command
+file _b_i_n_/_m_c the absolute pathname of the installation direc-
+tory.
+
+33.. NNoottee
+
+The current version of Mocka is 9905.
+
+
+
+
+
+
+
+
+
+
+

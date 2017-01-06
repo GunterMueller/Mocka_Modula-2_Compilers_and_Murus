@@ -1,0 +1,164 @@
+#! /usr/bin/make -f
+
+MOCKADRV :=	$(shell command -v mocka 2>/dev/null || true)
+ifeq ($(strip $(MOCKADRV)),)
+MOCKA	:=	MOCKADIR=$(shell pwd) LD_ASSUME_KERNEL=2.4.1 $(shell pwd)/bin/mc
+else
+MOCKA	:=	$(MOCKADRV)
+endif
+
+# Installation directories
+PKGDIR  :=	$(shell pwd)/debian/tmp
+BINDIR	:=	$(PKGDIR)/usr/bin
+LIBDIR	:=	$(PKGDIR)/usr/lib/mocka
+SCRIPTDIR :=	$(PKGDIR)/usr/share/mocka
+MANDIR	:=	$(PKGDIR)/usr/share/man
+DOCDIR  :=	$(PKGDIR)/usr/share/doc/mocka
+
+# Things to build
+
+LIB_MODULES = 	$(wildcard lib/*.mi)
+LIB_DEFS =	$(wildcard lib/*.md)
+C_MODULES = 	$(wildcard lib/*.c)
+ASM_MODULES = 	$(wildcard lib/*.s)
+RTS_MODULES =	sys/M2RTS-elf.s
+LIB_OBJS = 	$(LIB_MODULES:.mi=.o) $(LIB_DEFS:.md=.d) $(LIB_MODULES:.mi=.r) \
+		$(RTS_MODULES:.s=.o)  \
+		$(C_MODULES:.c=.r) $(C_MODULES:.c=.o)		\
+		$(ASM_MODULES:.s=.r) $(ASM_MODULES:.s=.o)
+
+SCRIPTS =	$(addprefix debian/, asm link list)
+BINARIES = 	$(addprefix sys/, Lister Unlister)
+
+# Build the mocka compiler "Mc" in src
+# This target triggers compilation of the compiler and utilities 
+# by having dependencies on them. The actual compilation code is at 
+# the end of this file.
+
+stamp/build:	stamp/patched $(LIB_OBJS) src/Mc $(BINARIES) 
+	touch $@
+
+# Install the compiler
+
+stamp/install:	stamp/build
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+
+# Install compiler and utilities
+	install -s src/Mc $(LIBDIR)/mc
+	install -s $(BINARIES) $(LIBDIR)
+
+# Install library object files
+	install -m 644 $(LIB_OBJS) $(LIBDIR)
+	strip --strip-debug $(LIBDIR)/*.o
+
+# Install definition modules for reference
+	install -m 644 $(LIB_DEFS) $(DOCDIR)/lib
+
+# Install compiler driver
+	install $(SCRIPTS) $(SCRIPTDIR)
+	install debian/mocka $(BINDIR)
+
+# Install manpage
+	install -m 644 man1/mc.1 $(MANDIR)/man1/mocka.1
+
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	-test -f stamp/patched && 				\
+		patch -d src -R <patches/setup && rm stamp/patched
+	-test -f stamp/fixed-missing && rm src/Emit.mi
+	rm -f src/Mc $(LIB_OBJS) $(BINARIES) src/*.[ord] lib/tst.r	\
+	      $(addsuffix .[ro], $(BINARIES))
+	dh_clean
+	rm -Rf patches stamp
+
+binary-arch:	stamp/install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Somehow upstream managed to lose the Emit.mi file from the current 
+# distribution. It was included in 9903 though so I included that file
+# in the package. As it is generated and the source did not change 
+# (I can't regenerate it since I don't have access to BEG :(()
+# I assume that the old file still works.
+
+stamp/fixed-missing:	stamp/exists
+	test -f src/Emit.mi || cp debian/Emit.mi src/
+	touch $@
+
+# The current source files have some kind of conditional compilation. I 
+# don't know how to trigger that by using the mocka command line so I 
+# am using awk to setup the files accordingly. A log of what was done 
+# is in patches/setup after this target. Note that this target is not 
+# omnipotent...
+
+stamp/patched:	stamp/fixed-missing patches/exists
+	rm -f patches/setup
+	cd src;						\
+	for i in *.m[di]; do				\
+	  echo -n Patching $$i...;			\
+	  awk <$$i >$$i.new '				\
+	  	/^%\( CGMOBIL/	{ opened=1; next }	\
+	  	/^%\( Debug/	{ opened=1; next }	\
+		/^%\( I386/	{ opened=1; next }	\
+		/^%\)/	{ if(opened) {opened=0; next} }	\
+				{ print }'; 		\
+	  diff -u $$i $$i.new >>../patches/setup;	\
+	  mv -f $$i.new $$i; 				\
+	  echo done;					\
+	done
+	touch $@
+
+# Building of Modula 2 binaries
+
+.SUFFIXES:	.mi
+%	:	%.mi
+	@cd $(@D) && rm -f $(@F).o $(@F).r; echo p $(*F) | $(MOCKA)
+
+# Building symbol files
+
+.SUFFIXES:	.d .md
+%.d	:	%.md
+	@cd $(@D) && echo s $(*F) | $(MOCKA)
+
+# Building object files
+
+.SUFFIXES:	.o .r
+%.o %.r	:	%.mi
+	@cd $(@D) && echo c $(*F) | $(MOCKA)
+
+# Assembling .s files
+.SUFFIXES:	.s
+%.o	:	%.s
+	as -o $@ $<
+
+# Auxilary targets for creating directories
+
+stamp/exists:
+	test -d stamp || mkdir stamp
+	touch $@
+
+patches/exists:
+	test -d patches || mkdir patches
+	touch $@
+
+install:	stamp/install
+build:		stamp/build
+binary:		binary-arch
+binary-indep:
+
+.PHONY:	build clean binary-indep binary-arch binary install

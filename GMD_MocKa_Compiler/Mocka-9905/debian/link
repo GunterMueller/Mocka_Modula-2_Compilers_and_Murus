@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "$1" = "-elf" ]; then shift; fi
+if [ "$1" = "-static" ]; then shift; fi
+if [ "$1" = "-g" ]; then shift; fi
+
+program=$1 ; shift ; modules="$*"
+
+gcc -o $program /usr/lib/mocka/M2RTS-elf.o $modules -lc

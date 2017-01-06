@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if test -z "$MOCKADIR"; then
+  COMPILER=${MCOMP-/usr/lib/mocka/mc}
+  LINK=${MCLINK-/usr/share/mocka/link}
+  EDIT=${MCEDIT-/usr/bin/sensible-editor}
+  LIST=${MCLIST-/usr/share/mocka/list}
+  ASM=${MCASM-/usr/share/mocka/asm}
+  SYSLIB=${MCSYSLIB-/usr/lib/mocka}
+else
+  export MOCKADIR
+
+  COMPILER=${MCOMP-$MOCKADIR/sys/Mc}
+  LINK=${MCLINK-$MOCKADIR/sys/link}
+  EDIT=${MCEDIT-$MOCKADIR/sys/edit}
+  LIST=${MCLIST-$MOCKADIR/sys/list}
+  ASM=${MCASM-$MOCKADIR/sys/asm}
+  SYSLIB=${MCSYSLIB-$MOCKADIR/lib}
+fi
+
+$COMPILER               \
+  -link $LINK           \
+  -edit $EDIT           \
+  -list $LIST           \
+  -asm  $ASM            \
+  -syslib $SYSLIB       \
+  -index -range -noS -g -elf $*

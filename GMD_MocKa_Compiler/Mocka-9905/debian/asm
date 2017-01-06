@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ "$1" = "-elf" ]; then shift; fi
+if [ "$1" = "-g" ]; then shift; fi
+
+as -o $1.o $1.s

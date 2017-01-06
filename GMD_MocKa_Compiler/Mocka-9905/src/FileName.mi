@@ -1,0 +1,62 @@
+(******************************************************************************)
+(* Copyright (c) 1988 by GMD Karlruhe, Germany                                *)
+(* Gesellschaft fuer Mathematik und Datenverarbeitung                         *)
+(* (German National Research Center for Computer Science)                     *)
+(* Forschungsstelle fuer Programmstrukturen an Universitaet Karlsruhe         *)
+(* All rights reserved.                                                       *)
+(******************************************************************************)
+
+IMPLEMENTATION MODULE FileName;
+
+%( IDS
+  FROM SuBase IMPORT FileName;
+  FROM Strings IMPORT Length;
+
+PROCEDURE LowerFileName(VAR name:ARRAY OF CHAR);
+
+VAR i : INTEGER;
+
+BEGIN
+  FOR i := 0 TO INTEGER(Length(name)) - 1 DO
+    IF (name[i] >= 'A') AND (name[i] <= 'Z') THEN
+      name[i] := CHR(ORD(name[i]) + ORD('a') - ORD('A'));
+    END;
+  END;
+END LowerFileName;
+
+
+PROCEDURE LimitFileName(VAR name:ARRAY OF CHAR);
+
+VAR i : INTEGER;
+
+BEGIN
+  IF Length(name) > MaxFileNameLength THEN
+    name[MaxFileNameLength] := 0C;
+  END;
+END LimitFileName;
+
+
+PROCEDURE DeleteFileNameExtension(VAR name:ARRAY OF CHAR);
+
+VAR i : INTEGER;
+    done : BOOLEAN;
+
+BEGIN
+  i := Length(name);
+  done := FALSE;
+  WHILE (i >= 0) AND (name[i] <> '/') AND (name[i] <> '\') AND (done = FALSE) DO
+    IF name[i] = '.' THEN
+      name[i] := 0C;
+      done := TRUE;
+    END;
+    i := i - 1;
+  END;
+
+END DeleteFileNameExtension;
+%)
+
+%( ~ IDS
+  (* empty *)
+%)
+
+END FileName.

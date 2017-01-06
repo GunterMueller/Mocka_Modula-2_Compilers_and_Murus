@@ -1,0 +1,11 @@
+#!/bin/sh
+
+LIST=/tmp/$1.$$
+SRC=$1
+ERROR=$2
+
+trap "rm -f $LIST; exit 5" 3
+/usr/lib/mocka/Lister $SRC $ERROR $LIST
+vi +'map v j/^@[ ]*^/\^k|1' $LIST < /dev/tty; 
+/usr/lib/mocka/Unlister $SRC $LIST
+rm -f $LIST $ERROR

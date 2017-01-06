@@ -1,0 +1,15 @@
+Source: mocka
+Section: non-free/devel
+Priority: extra
+Maintainer: Torsten Landschoff <torsten@debian.org>
+Standards-Version: 3.0.1
+Build-Depends: debhelper (>= 2.0.0)
+
+Package: mocka
+Architecture: i386
+Depends:  ${shlibs:Depends}
+Description: modula-2 compiler
+ Mocka is a modula-2 compiler.  The compiler
+ is written in modula-2 and can be compiled under
+ mocka.
+ Web Page: http://i44s11.info.uni-karlsruhe.de:80/~modula/
