@@ -1,7 +1,0 @@
-FOREIGN MODULE miscc;
-FROM SYSTEM IMPORT ADDRESS;
-FROM SysLib IMPORT timeT;
-
-PROCEDURE getmtime(path: ADDRESS): timeT;
-
-END miscc.
