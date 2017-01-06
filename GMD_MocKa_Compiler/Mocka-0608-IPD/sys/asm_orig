@@ -1,0 +1,14 @@
+#!/bin/sh
+
+case $1 in
+'-elf' ) shift ;;
+*      ) ;;
+esac;
+
+case $1 in
+'-g' ) shift ;;
+*    ) ;;
+esac;
+
+/usr/bin/as -W -o $1.o $1.s
+# /usr/bin/as -o $1.o $1.s

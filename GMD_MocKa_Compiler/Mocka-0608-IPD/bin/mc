@@ -1,0 +1,19 @@
+#!/bin/sh
+
+MOCKADIR=${MOCKADIR-/ben/modula/mocka9905/i386-linux}
+export MOCKADIR
+
+COMPILER=${MCOMP-$MOCKADIR/sys/Mc}
+LINK=${MCLINK-$MOCKADIR/sys/link}
+EDIT=${MCEDIT-$MOCKADIR/sys/edit}
+LIST=${MCLIST-$MOCKADIR/sys/list}
+ASM=${MCASM-$MOCKADIR/sys/asm}
+SYSLIB=${MCSYSLIB-$MOCKADIR/lib}
+
+$COMPILER               \
+  -link $LINK           \
+  -edit $EDIT           \
+  -list $LIST           \
+  -asm  $ASM            \
+  -syslib $SYSLIB       \
+  -index -range -noS -g -elf $*
