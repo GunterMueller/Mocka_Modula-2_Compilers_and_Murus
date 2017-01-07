@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Christian Maurer   v. 5. August 2012
+
+case $1 in
+'-elf' ) shift ;;
+*      ) ;;
+esac;
+
+case $1 in
+'-g' ) shift ;;
+*    ) ;;
+esac;
+
+/usr/bin/as -W --32 -o $1.o $1.s
