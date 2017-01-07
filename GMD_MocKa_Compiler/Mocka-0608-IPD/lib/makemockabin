@@ -2,7 +2,6 @@
 #
 # Christian Maurer   v. 14. August 2006
 
-export MOCKA=/home/gunter/SANDBOX/Mocka_m2_0608m
 
 mkdir -p m2bin
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-MOCKADIR=${MOCKADIR-/ben/modula/mocka9905/i386-linux}
+MOCKADIR=${MOCKADIR-$MOCKA}
 export MOCKADIR
 
 COMPILER=${MCOMP-$MOCKADIR/sys/Mc}

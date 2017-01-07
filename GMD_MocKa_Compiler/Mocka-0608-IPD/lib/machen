@@ -6,7 +6,6 @@
 
 mkdir -p mockabin
 
-export MOCKA=/home/gunter/SANDBOX/Mocka_m2_0608m
 
 export MOCKAM2=
 export MOCKALINK=
