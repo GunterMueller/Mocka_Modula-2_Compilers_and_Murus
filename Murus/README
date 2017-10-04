@@ -1,3 +1,8 @@
+
+
+Note: This part is copied from material written by Jan Verhoeven ( http://fruttenboel.verhoeven272.nl/ )
+
+
 Fetch the Murus package
 
 You can get the current copy of the Murus sourcefiles here: http://lwb.mi.fu-berlin.de/murus/Murus.tgz or else try here: http://www.murus.org.
@@ -12,15 +17,15 @@ The following work must be done as root!
 It is advised by Dr Maurer to install Murus in /usr/local/Murus. Make sure root has set the following environment variables:
 
     MURUS
-        MOCKAM2
-	    MOCKALINK
-	        HOST
+    MOCKAM2
+    MOCKALINK
+    HOST
 
 If these do not exist, set them now as follows:
 
    export MURUS=/usr/local/Murus
-   	  export MOCKAM2="-d  $MURUS/m2bin -CcallsMocka"
-	  	 export MOCKALINK="-lpthread -L/usr/X11R6/lib -lX11"
+   export MOCKAM2="-d  $MURUS/m2bin -CcallsMocka"
+   export MOCKALINK="-lpthread -L/usr/X11R6/lib -lX11"
 
 
 If HOST does not exist, define it as follows:
@@ -31,7 +36,7 @@ If HOST does not exist, define it as follows:
 Check which one exists on your system. Use:
 
       echo $HOST
-      	   echo $HOSTNAME
+      echo $HOSTNAME
 
 
 If the HOST line produces the name of your system, stop. If it produces a blank line, use 'export HOST=$HOSTNAME' to set things straight.
@@ -67,8 +72,8 @@ Now go into the newly created diretory (with cd Murus) and initialize Murus:
 If you get LOADS of errormessages, the environment variables were not set accordingly. If all goes right, Murus is started and you can get out again by either of these:
 
     ESC key
-        ENTER key
-	    LeftMouseButton in Murus window
+    ENTER key
+    LeftMouseButton in Murus window
 
 That's it.
 Personal installation in a users own space.

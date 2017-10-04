@@ -5,6 +5,7 @@
 #!/bin/sh
 
 mkdir -p mockabin
+ln -s mockabin m2bin
 
 export MOCKAM2=
 export MOCKALINK=

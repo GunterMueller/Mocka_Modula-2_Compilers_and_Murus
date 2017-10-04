@@ -21,4 +21,4 @@ done
 
 echo p tst | $MOCKA/sys/m2
 
-tst
+m2bin/tst

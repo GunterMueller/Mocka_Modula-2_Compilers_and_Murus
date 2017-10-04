@@ -6,20 +6,22 @@ It's in the Mocka_m2_0608m directory.
 CHANGES:
 Adjusted to compile on a 64bit Ubuntu based Linux system, i.e. Mint Linux 17.3 and 18.1.
 
+Note: This part is copied from material written by Jan Verhoeven ( http://fruttenboel.verhoeven272.nl/ )
+
 The Mocka 0608m compiler
 
-The Mocka compiler is a product of Karlsruhe university's Mathematics department. It is (or used to be) available for just about any UNIX system. Also for Linux and FreeBSD. All Mocka compilers are somewhat commercial, but the versions for Linux and FreeBSD are GPL style FREE.
+The Mocka compiler is a product of Karlsruhe university's Computer Science department. It is (or used to be) available for just about any UNIX system. Also for Linux and FreeBSD. All Mocka compilers are somewhat commercial, but the versions for Linux and FreeBSD are GPL style FREE.
 I used to run version 9903, but it had a drawback: it used the same name as the Midnight Commander: mc. So a lot of work-arounds were required to get both executables working reliably on the same system.
 
 As I told: I used to run 9903. In June 2006 I switched to 9905m. And in August I switched once more: to 0608m. This is a full mocka compiler, partly rewritten by Dr Maurer of the FU Berlin. It differs from standard Mocka as follows:.
 
     the md and mi file extensions from Mocka are back to def and mod
-        all files produced by mocka are placed in a subdirectory called './m2bin'.
-	    executables are stripped by default
-	        executables are stored in the base directory and are symlinks in ./m2bin
-		    it has been compiled with a recent version of the libraries
-		        it comes with full instructions and a set of scripts for installing
-			    it is ready to produce GUI programs with X-windows!
+    all files produced by mocka are placed in a subdirectory called './m2bin'.
+    executables are stripped by default
+    executables are stored in the base directory and are symlinks in ./m2bin
+    it has been compiled with a recent version of the libraries
+    it comes with full instructions and a set of scripts for installing
+    it is ready to produce GUI programs with X-windows!
 
 A lot of changes. A lot of advantages.
 
