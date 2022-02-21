@@ -16,6 +16,6 @@ Programm=${1##*/}; Verzeichnis=${1%/*}; shift
 
 gcc -m32 -D_REENTRANT -o $Programm $MOCKA/sys/M2RTS.o $* $MOCKALINK
 
-strip $Programm
+## strip $Programm
 
 ln -sf ../$Programm $Verzeichnis/$Programm
